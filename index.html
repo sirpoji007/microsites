@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crossword Puzzle Game</title>
+  <style>
+    body { font-family: 'Poppins', sans-serif; text-align: center; background: #F4F4F4; padding: 20px; }
+    h1 { color: #0047AB; }
+    #crossword-container { display: grid; grid-template-columns: repeat(6, 50px); gap: 10px; margin: 20px auto; justify-content: center; }
+    input { width: 50px; height: 50px; text-align: center; text-transform: uppercase; font-size: 1.2rem; border: 2px solid #0047AB; border-radius: 5px; outline: none; }
+    input.correct { background: #2ECC71; color: white; }
+    #clues { margin: 20px 0; text-align: left; }
+    #timer, #score { font-size: 1.3rem; margin-bottom: 10px; color: #0047AB; }
+    button { padding: 10px 15px; background: #0047AB; color: white; border: none; cursor: pointer; border-radius: 10px; margin: 20px; }
+    button:hover { background: #2ECC71; }
+  </style>
+</head>
+<body>
+<h1>Financing Crossword Puzzle</h1>
+<div id="timer">⏰ Time Left: 60s</div>
+<div id="score">Score: 0</div>
+<div id="crossword-container"></div>
+<div id="clues">
+  <h3>Clues:</h3>
+  <ul>
+    <li>1. Borrowing funds with interest (5 Letters)</li>
+    <li>2. Raising capital from many people (13 Letters)</li>
+    <li>3. Small loans to rural businesses (12 Letters)</li>
+    <li>4. Shariah-compliant financing (7 Letters)</li>
+    <li>5. Non-repayable government funds (6 Letters)</li>
+  </ul>
+</div>
+<button onclick="checkAnswers()">Submit Answers</button>
+<div id="message"></div>
+<script>
+  const answers = ["DEBT", "CROWDFUNDING", "MICROFINANCE", "ISLAMIC", "GRANTS"];
+  let timer = 60, score = 0, interval;
+  const container = document.getElementById("crossword-container");
+
+  function generateGrid() {
+    const grid = ["DEBT", "", "MICROFINANCE", "ISLAMIC", "GRANTS"];
+    grid.forEach(word => {
+      word.split('').forEach(letter => {
+        let cell = document.createElement("input");
+        cell.dataset.answer = letter;
+        container.appendChild(cell);
+      });
+    });
+    startTimer();
+  }
+
+  function checkAnswers() {
+    const cells = document.querySelectorAll("input");
+    let correct = true, score = 0;
+    cells.forEach(cell => {
+      if (cell.dataset.answer) {
+        if (cell.value.toUpperCase() === cell.dataset.answer) {
+          cell.classList.add("correct");
+          score += 20;
+        } else {
+          correct = false;
+        }
+      }
+    });
+    document.getElementById("score").textContent = `Score: ${score}`;
+    document.getElementById("message").textContent = correct ? "🎉 Correct!" : "❌ Try Again!";
+    clearInterval(interval);
+  }
+
+  function startTimer() {
+    interval = setInterval(() => {
+      timer--;
+      document.getElementById("timer").textContent = `⏰ Time Left: ${timer}s`;
+      if (timer === 0) {
+        clearInterval(interval);
+        checkAnswers();
+      }
+    }, 1000);
+  }
+
+  generateGrid();
+</script>
+</body>
+</html>
