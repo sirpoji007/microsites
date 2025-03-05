@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Financing Crossword Search Game</title>
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        text-align: center;
+        background: linear-gradient(135deg, #0072ff, #00c6ff);
+        color: #fff;
+        margin: 0;
+        padding: 10px;
+        animation: gradientBG 10s infinite alternate;
+        overflow-x: hidden;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    @keyframes gradientBG {
+        from { background-position: 0% 50%; }
+        to { background-position: 100% 50%; }
+    }
+
+    body {
+        background-size: 100% 100%;
+    }
+    
+    * {
+        box-sizing: border-box;
+    }
+
+    h1 { 
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+        margin-bottom: 10px;
+        font-size: 1.8rem;
+    }
+    
+    @media (max-width: 500px) {
+        h1 {
+            font-size: 1.5rem;
+        }
+    }
+    
+    #grid {
+        display: grid;
+        grid-template-columns: repeat(14, minmax(20px, 1fr));
+        gap: 3px;
+        margin: 20px auto;
+        padding: 10px;
+        max-width: 700px;
+        width: 95%;
+        overflow-x: hidden;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .cell {
+        width: 100%;
+        aspect-ratio: 1/1;
+        min-width: 0;
+        font-size: 0.9rem;
+        display: flex; 
+        align-items: center; 
+        justify-content: center;
+        border: 1px solid #fff; 
+        cursor: pointer;
+        user-select: none; 
+        font-weight: bold; 
+        transition: 0.3s;
+        border-radius: 5px;
+    }
+    
+    @media (max-width: 500px) {
+        .cell {
+            font-size: 0.8rem;
+        }
+    }
+    
+    .cell:hover { 
+        background: #ff9800; 
+        transform: scale(1.1); 
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+    
+    .cell.selected { 
+        background: #00ff99; 
+        color: #000; 
+    }
+    
+    .cell.found { 
+        background: #ff5722; 
+        pointer-events: none; 
+    }
+
+    #words ul {
+        padding: 0; 
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin: 0 auto;
+        max-width: 600px;
+        width: 95%;
+    }
+    
+    #words li {
+        display: inline-block; 
+        padding: 6px 10px; 
+        margin: 5px;
+        background: rgba(0, 0, 0, 0.4); 
+        border-radius: 20px; 
+        transition: 0.3s;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+    
+    @media (max-width: 500px) {
+        #words li {
+            padding: 5px 8px;
+            margin: 4px;
+            font-size: 0.8rem;
+        }
+    }
+    
+    #words li.found { 
+        text-decoration: line-through; 
+        background: #00ff99; 
+        color: #000;
+    }
+
+    button {
+        padding: 10px 20px; 
+        margin: 8px;
+        background: #ff5722; 
+        border: none; 
+        cursor: pointer; 
+        border-radius: 25px;
+        font-weight: bold;
+        color: white;
+        transition: all 0.3s;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        font-size: 0.9rem;
+    }
+    
+    @media (max-width: 500px) {
+        button {
+            padding: 8px 16px;
+            margin: 5px;
+            font-size: 0.8rem;
+        }
+    }
+    
+    button:hover { 
+        background: #ff9800; 
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    button:active {
+        transform: translateY(1px);
+    }
+    
+    #game-stats {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 10px auto;
+        width: 95%;
+    }
+    
+    #score, #hintCounter { 
+        font-size: 1.1rem; 
+        background: rgba(0, 0, 0, 0.3);
+        display: inline-block;
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-weight: bold;
+        min-width: 100px;
+    }
+    
+    @media (max-width: 500px) {
+        #score, #hintCounter {
+            font-size: 0.9rem;
+            padding: 6px 10px;
+            min-width: 80px;
+        }
+    }
+    
+    #score {
+        background: rgba(255, 215, 0, 0.3);
+        color: #fff;
+    }
+    
+    #message {
+        min-height: 40px;
+        font-weight: bold;
+        color: #ffeb3b;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        padding: 5px;
+    }
+    
+    .game-controls {
+        margin: 15px 0;
+    }
+    
+    .success-animation {
+        animation: pulse 0.5s ease-in-out;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+</style>
+</head>
+<body>
+<h1>Financing Crossword Search Game</h1>
+<div id="game-stats">
+    <div id="score">🏆 Score: 0</div>
+    <div id="hintCounter">💡 Hints: 3</div>
+</div>
+<div id="grid"></div>
+
+<div id="words">
+    <h3>Find These Words:</h3>
+    <ul id="word-list">
+        <!-- Words will be added by JavaScript -->
+    </ul>
+</div>
+
+<div class="game-controls">
+    <button onclick="resetGame()">🔄 Reset Game</button>
+    <button onclick="getHint()">💡 Get Hint</button>
+</div>
+<p id="message"></p>
+
+<script>
+const words = ['EQUITY', 'DEBT', 'MICROFINANCE', 'CROWDFUNDING', 'ISLAMIC', 'PEERTOPEER', 'GRANTS', 'FINTECH', 'STARTUP', 'BLOCKCHAIN'];
+let selectedCells = [];
+let foundWords = [];
+let hintsLeft = 3;
+let score = 0;
+
+const gridData = [
+    "E Q U I T Y F I N T E C H Z",
+    "I S L A M I C W O R D N P L",
+    "C R O W D F U N D I N G Q X",
+    "M I C R O F I N A N C E S Y",
+    "G R A N T S F I N T O P A V",
+    "P E E R T O P E E R L M Q W",
+    "B L O C K C H A I N V N Y R",
+    "S T A R T U P F I N M K J H",
+    "D E B T F I N A N C E U I G"
+];
+
+function createGrid() {
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
+    
+    gridData.forEach(row => {
+        row.split(" ").forEach(letter => {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.textContent = letter;
+            cell.addEventListener('click', () => selectCell(cell));
+            grid.appendChild(cell);
+        });
+    });
+    
+    // Create word list
+    const wordList = document.getElementById('word-list');
+    wordList.innerHTML = '';
+    words.forEach(word => {
+        const li = document.createElement('li');
+        li.textContent = word;
+        li.dataset.word = word;
+        wordList.appendChild(li);
+    });
+}
+
+function selectCell(cell) {
+    if (cell.classList.contains('found')) return;
+    
+    if (cell.classList.contains('selected')) {
+        // Deselect all cells after this one
+        const index = selectedCells.indexOf(cell);
+        for (let i = selectedCells.length - 1; i >= index; i--) {
+            selectedCells[i].classList.remove('selected');
+            selectedCells.pop();
+        }
+    } else {
+        cell.classList.add('selected');
+        selectedCells.push(cell);
+        checkWord();
+    }
+}
+
+function checkWord() {
+    const selectedText = selectedCells.map(c => c.textContent).join('');
+    
+    for (let word of words) {
+        if (selectedText === word && !foundWords.includes(word)) {
+            foundWords.push(word);
+            
+            // Calculate points based on word length
+            const wordPoints = calculatePoints(word);
+            score += wordPoints;
+            updateScore();
+            
+            // Mark cells as found
+            selectedCells.forEach(c => {
+                c.classList.remove('selected');
+                c.classList.add('found');
+            });
+            
+            // Mark word as found in the list
+            const wordElement = document.querySelector(`#word-list li[data-word="${word}"]`);
+            if (wordElement) {
+                wordElement.classList.add('found');
+                wordElement.classList.add('success-animation');
+            }
+            
+            // Play success sound (simulated with animation)
+            document.getElementById('message').textContent = `🎯 Found: ${word}! +${wordPoints} points!`;
+            document.getElementById('message').classList.add('success-animation');
+            setTimeout(() => {
+                document.getElementById('message').classList.remove('success-animation');
+            }, 800);
+            
+            // Clear selected cells
+            selectedCells = [];
+            
+            // Check if all words are found
+            if (foundWords.length === words.length) {
+                // Bonus for completing all words
+                const completionBonus = 100;
+                score += completionBonus;
+                updateScore();
+                document.getElementById('message').innerHTML = `🏆 You found all the words! Amazing job!<br>Completion Bonus: +${completionBonus} points!`;
+                document.getElementById('message').classList.add('success-animation');
+            }
+            
+            return;
+        }
+    }
+    
+    // If selection is getting too long without a match, clear it
+    if (selectedCells.length > 15) {
+        clearSelection();
+    }
+}
+
+function clearSelection() {
+    selectedCells.forEach(cell => cell.classList.remove('selected'));
+    selectedCells = [];
+}
+
+function getHint() {
+    if (hintsLeft > 0) {
+        let remainingWords = words.filter(w => !foundWords.includes(w));
+        if (remainingWords.length === 0) return;
+        
+        let hint = remainingWords[Math.floor(Math.random() * remainingWords.length)];
+        
+        // Highlight the first letter of the word in the grid
+        const cells = document.querySelectorAll('.cell');
+        let firstLetter = hint[0];
+        let highlightedCell = null;
+        
+        // Find a cell that contains the first letter and isn't already found
+        for (let cell of cells) {
+            if (cell.textContent === firstLetter && !cell.classList.contains('found')) {
+                cell.classList.add('selected');
+                setTimeout(() => {
+                    if (!cell.classList.contains('found')) {
+                        cell.classList.remove('selected');
+                    }
+                }, 2000);
+                highlightedCell = cell;
+                break;
+            }
+        }
+        
+        document.getElementById('message').innerText = `Hint 🔍: Look for "${hint}"`;
+        hintsLeft--;
+        document.getElementById('hintCounter').innerText = `💡 Hints: ${hintsLeft}`;
+        
+        // Add a small penalty for using hints
+        score = Math.max(0, score - 10);
+        updateScore();
+    } else {
+        document.getElementById('message').innerText = "No more hints available!";
+        setTimeout(() => {
+            document.getElementById('message').innerText = "";
+        }, 2000);
+    }
+}
+
+// Calculate points based on word length
+function calculatePoints(word) {
+    // Base points: longer words are worth more
+    return word.length * 10;
+}
+
+// Update the score display
+function updateScore() {
+    document.getElementById('score').textContent = `🏆 Score: ${score}`;
+}
+
+function resetGame() {
+    foundWords = [];
+    selectedCells = [];
+    hintsLeft = 3;
+    score = 0;
+    document.getElementById('hintCounter').innerText = `💡 Hints: ${hintsLeft}`;
+    document.getElementById('score').innerText = `🏆 Score: ${score}`;
+    document.getElementById('message').innerText = '';
+    createGrid();
+}
+
+window.onload = () => {
+    createGrid();
+};
+
+</script>
+</body>
+</html>
