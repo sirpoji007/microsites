@@ -5,14 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Financing Crossword Search Game</title>
 <style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
     body {
         font-family: 'Poppins', sans-serif;
         text-align: center;
         background: linear-gradient(135deg, #0072ff, #00c6ff);
         color: #fff;
         margin: 0;
-        padding: 20px;
+        padding: 10px;
         animation: gradientBG 10s infinite alternate;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
     @keyframes gradientBG {
@@ -24,17 +34,26 @@
         background-size: 200% 200%;
     }
 
+    .container {
+        width: 100%;
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 5px;
+    }
+
     h1 { 
         text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
         margin-bottom: 10px;
+        font-size: clamp(1.2rem, 5vw, 2rem);
     }
     
     #grid {
         display: grid;
         grid-template-columns: repeat(14, 1fr);
-        gap: 5px;
-        margin: 20px auto;
-        padding: 10px;
+        gap: 2px;
+        margin: 10px auto;
+        padding: 8px;
+        width: 100%;
         max-width: 700px;
         background: rgba(0, 0, 0, 0.3);
         border-radius: 10px;
@@ -42,8 +61,8 @@
     }
     
     .cell {
-        width: 35px; 
-        height: 35px;
+        aspect-ratio: 1/1;
+        width: 100%;
         display: flex; 
         align-items: center; 
         justify-content: center;
@@ -52,12 +71,13 @@
         user-select: none; 
         font-weight: bold; 
         transition: 0.3s;
-        border-radius: 5px;
+        border-radius: 3px;
+        font-size: clamp(0.6rem, 3vw, 0.9rem);
     }
     
     .cell:hover { 
         background: #ff9800; 
-        transform: scale(1.1); 
+        transform: scale(1.05); 
         box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
     }
     
@@ -71,24 +91,41 @@
         pointer-events: none; 
     }
 
+    #game-stats {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin: 5px 0;
+    }
+
+    #words {
+        margin: 10px 0;
+    }
+
+    #words h3 {
+        margin-bottom: 5px;
+        font-size: clamp(1rem, 4vw, 1.2rem);
+    }
+
     #words ul {
         padding: 0; 
         list-style: none;
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
+        gap: 8px;
         margin: 0 auto;
-        max-width: 600px;
+        max-width: 700px;
     }
     
     #words li {
-        display: inline-block; 
-        padding: 8px 15px; 
-        margin: 8px;
+        padding: 5px 10px; 
         background: rgba(0, 0, 0, 0.4); 
-        border-radius: 20px; 
+        border-radius: 15px; 
         transition: 0.3s;
         font-weight: bold;
+        font-size: clamp(0.7rem, 3vw, 0.9rem);
     }
     
     #words li.found { 
@@ -97,17 +134,25 @@
         color: #000;
     }
 
+    .game-controls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin: 10px 0;
+    }
+
     button {
-        padding: 12px 24px; 
-        margin: 10px;
+        padding: 8px 16px; 
         background: #ff5722; 
         border: none; 
         cursor: pointer; 
-        border-radius: 25px;
+        border-radius: 20px;
         font-weight: bold;
         color: white;
         transition: all 0.3s;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        font-size: clamp(0.8rem, 3vw, 1rem);
     }
     
     button:hover { 
@@ -120,33 +165,21 @@
         transform: translateY(1px);
     }
     
-    #timer { 
-        font-size: 1.5rem; 
-        margin: 15px;
+    #timer, #score, #hintCounter { 
+        font-size: clamp(0.8rem, 3vw, 1.1rem);
         background: rgba(0, 0, 0, 0.3);
-        display: inline-block;
-        padding: 8px 20px;
-        border-radius: 20px;
+        padding: 5px 10px;
+        border-radius: 15px;
         font-weight: bold;
     }
     
     #message {
-        height: 30px;
+        min-height: 30px;
         font-weight: bold;
         color: #ffeb3b;
         text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-    }
-    
-    #hintCounter {
-        background: rgba(0, 0, 0, 0.3);
-        display: inline-block;
-        padding: 8px 15px;
-        border-radius: 15px;
-        margin-bottom: 10px;
-    }
-    
-    .game-controls {
-        margin: 15px 0;
+        margin: 5px 0;
+        font-size: clamp(0.8rem, 3vw, 1rem);
     }
     
     .success-animation {
@@ -158,29 +191,43 @@
         50% { transform: scale(1.2); }
         100% { transform: scale(1); }
     }
+
+    /* Media Queries */
+    @media (max-width: 500px) {
+        #grid {
+            gap: 1px;
+            padding: 5px;
+        }
+        
+        .cell {
+            border-width: 1px;
+        }
+    }
 </style>
 </head>
 <body>
-<h1>Financing Crossword Search Game</h1>
-<div id="game-stats">
-    <div id="timer">⏰ Time Left: 60s</div>
-    <div id="score">🏆 Score: 0</div>
-    <div id="hintCounter">💡 Hints: 3</div>
-</div>
-<div id="grid"></div>
+<div class="container">
+    <h1>Financing Crossword Search Game</h1>
+    <div id="game-stats">
+        <div id="timer">⏰ Time Left: 60s</div>
+        <div id="score">🏆 Score: 0</div>
+        <div id="hintCounter">💡 Hints: 3</div>
+    </div>
+    <div id="grid"></div>
 
-<div id="words">
-    <h3>Find These Words:</h3>
-    <ul id="word-list">
-        <!-- Words will be added by JavaScript -->
-    </ul>
-</div>
+    <div id="words">
+        <h3>Find These Words:</h3>
+        <ul id="word-list">
+            <!-- Words will be added by JavaScript -->
+        </ul>
+    </div>
 
-<div class="game-controls">
-    <button onclick="resetGame()">🔄 Reset Game</button>
-    <button onclick="getHint()">💡 Get Hint</button>
+    <div class="game-controls">
+        <button onclick="resetGame()">🔄 Reset Game</button>
+        <button onclick="getHint()">💡 Get Hint</button>
+    </div>
+    <p id="message"></p>
 </div>
-<p id="message"></p>
 
 <script>
 const words = ['EQUITY', 'DEBT', 'MICROFINANCE', 'CROWDFUNDING', 'ISLAMIC', 'PEERTOPEER', 'GRANTS', 'FINTECH', 'STARTUP', 'BLOCKCHAIN'];
@@ -189,6 +236,7 @@ let foundWords = [];
 let hintsLeft = 3;
 let timeLeft = 60;
 let timerInterval;
+let score = 0;
 
 const gridData = [
     "E Q U I T Y F I N T E C H Z",
@@ -250,6 +298,10 @@ function checkWord() {
     for (let word of words) {
         if (selectedText === word && !foundWords.includes(word)) {
             foundWords.push(word);
+            
+            // Increase score based on word length
+            score += word.length * 10;
+            document.getElementById('score').innerText = `🏆 Score: ${score}`;
             
             // Mark cells as found
             selectedCells.forEach(c => {
@@ -371,6 +423,8 @@ function resetGame() {
     foundWords = [];
     selectedCells = [];
     hintsLeft = 3;
+    score = 0;
+    document.getElementById('score').innerText = `🏆 Score: ${score}`;
     document.getElementById('hintCounter').innerText = `💡 Hints: ${hintsLeft}`;
     document.getElementById('message').innerText = '';
     createGrid();
@@ -381,7 +435,6 @@ window.onload = () => {
     createGrid();
     startTimer();
 };
-
 </script>
 </body>
 </html>
