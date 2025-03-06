@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Financing Crossword Search Game</title>
 <style>
     body {
@@ -11,11 +11,8 @@
         background: linear-gradient(135deg, #0072ff, #00c6ff);
         color: #fff;
         margin: 0;
-        padding: 10px;
+        padding: 20px;
         animation: gradientBG 10s infinite alternate;
-        overflow-x: hidden;
-        width: 100%;
-        box-sizing: border-box;
     }
 
     @keyframes gradientBG {
@@ -24,44 +21,29 @@
     }
 
     body {
-        background-size: 100% 100%;
-    }
-    
-    * {
-        box-sizing: border-box;
+        background-size: 200% 200%;
     }
 
     h1 { 
         text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
         margin-bottom: 10px;
-        font-size: 1.8rem;
-    }
-    
-    @media (max-width: 500px) {
-        h1 {
-            font-size: 1.5rem;
-        }
     }
     
     #grid {
         display: grid;
-        grid-template-columns: repeat(14, minmax(20px, 1fr));
-        gap: 3px;
+        grid-template-columns: repeat(14, 1fr);
+        gap: 5px;
         margin: 20px auto;
         padding: 10px;
         max-width: 700px;
-        width: 95%;
-        overflow-x: hidden;
         background: rgba(0, 0, 0, 0.3);
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
     
     .cell {
-        width: 100%;
-        aspect-ratio: 1/1;
-        min-width: 0;
-        font-size: 0.9rem;
+        width: 35px; 
+        height: 35px;
         display: flex; 
         align-items: center; 
         justify-content: center;
@@ -71,12 +53,6 @@
         font-weight: bold; 
         transition: 0.3s;
         border-radius: 5px;
-    }
-    
-    @media (max-width: 500px) {
-        .cell {
-            font-size: 0.8rem;
-        }
     }
     
     .cell:hover { 
@@ -103,26 +79,16 @@
         justify-content: center;
         margin: 0 auto;
         max-width: 600px;
-        width: 95%;
     }
     
     #words li {
         display: inline-block; 
-        padding: 6px 10px; 
-        margin: 5px;
+        padding: 8px 15px; 
+        margin: 8px;
         background: rgba(0, 0, 0, 0.4); 
         border-radius: 20px; 
         transition: 0.3s;
         font-weight: bold;
-        font-size: 0.9rem;
-    }
-    
-    @media (max-width: 500px) {
-        #words li {
-            padding: 5px 8px;
-            margin: 4px;
-            font-size: 0.8rem;
-        }
     }
     
     #words li.found { 
@@ -132,8 +98,8 @@
     }
 
     button {
-        padding: 10px 20px; 
-        margin: 8px;
+        padding: 12px 24px; 
+        margin: 10px;
         background: #ff5722; 
         border: none; 
         cursor: pointer; 
@@ -142,15 +108,6 @@
         color: white;
         transition: all 0.3s;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-        font-size: 0.9rem;
-    }
-    
-    @media (max-width: 500px) {
-        button {
-            padding: 8px 16px;
-            margin: 5px;
-            font-size: 0.8rem;
-        }
     }
     
     button:hover { 
@@ -163,44 +120,29 @@
         transform: translateY(1px);
     }
     
-    #game-stats {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin: 10px auto;
-        width: 95%;
-    }
-    
-    #score, #hintCounter { 
-        font-size: 1.1rem; 
+    #timer { 
+        font-size: 1.5rem; 
+        margin: 15px;
         background: rgba(0, 0, 0, 0.3);
         display: inline-block;
-        padding: 8px 12px;
+        padding: 8px 20px;
         border-radius: 20px;
         font-weight: bold;
-        min-width: 100px;
-    }
-    
-    @media (max-width: 500px) {
-        #score, #hintCounter {
-            font-size: 0.9rem;
-            padding: 6px 10px;
-            min-width: 80px;
-        }
-    }
-    
-    #score {
-        background: rgba(255, 215, 0, 0.3);
-        color: #fff;
     }
     
     #message {
-        min-height: 40px;
+        height: 30px;
         font-weight: bold;
         color: #ffeb3b;
         text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-        padding: 5px;
+    }
+    
+    #hintCounter {
+        background: rgba(0, 0, 0, 0.3);
+        display: inline-block;
+        padding: 8px 15px;
+        border-radius: 15px;
+        margin-bottom: 10px;
     }
     
     .game-controls {
@@ -221,6 +163,7 @@
 <body>
 <h1>Financing Crossword Search Game</h1>
 <div id="game-stats">
+    <div id="timer">⏰ Time Left: 60s</div>
     <div id="score">🏆 Score: 0</div>
     <div id="hintCounter">💡 Hints: 3</div>
 </div>
@@ -244,7 +187,8 @@ const words = ['EQUITY', 'DEBT', 'MICROFINANCE', 'CROWDFUNDING', 'ISLAMIC', 'PEE
 let selectedCells = [];
 let foundWords = [];
 let hintsLeft = 3;
-let score = 0;
+let timeLeft = 60;
+let timerInterval;
 
 const gridData = [
     "E Q U I T Y F I N T E C H Z",
@@ -307,11 +251,6 @@ function checkWord() {
         if (selectedText === word && !foundWords.includes(word)) {
             foundWords.push(word);
             
-            // Calculate points based on word length
-            const wordPoints = calculatePoints(word);
-            score += wordPoints;
-            updateScore();
-            
             // Mark cells as found
             selectedCells.forEach(c => {
                 c.classList.remove('selected');
@@ -326,22 +265,19 @@ function checkWord() {
             }
             
             // Play success sound (simulated with animation)
-            document.getElementById('message').textContent = `🎯 Found: ${word}! +${wordPoints} points!`;
+            document.getElementById('message').textContent = `🎯 Found: ${word}!`;
             document.getElementById('message').classList.add('success-animation');
             setTimeout(() => {
                 document.getElementById('message').classList.remove('success-animation');
-            }, 800);
+            }, 500);
             
             // Clear selected cells
             selectedCells = [];
             
             // Check if all words are found
             if (foundWords.length === words.length) {
-                // Bonus for completing all words
-                const completionBonus = 100;
-                score += completionBonus;
-                updateScore();
-                document.getElementById('message').innerHTML = `🏆 You found all the words! Amazing job!<br>Completion Bonus: +${completionBonus} points!`;
+                clearInterval(timerInterval);
+                document.getElementById('message').innerHTML = "🏆 You found all the words! Amazing job!";
                 document.getElementById('message').classList.add('success-animation');
             }
             
@@ -358,6 +294,39 @@ function checkWord() {
 function clearSelection() {
     selectedCells.forEach(cell => cell.classList.remove('selected'));
     selectedCells = [];
+}
+
+function startTimer() {
+    clearInterval(timerInterval);
+    timeLeft = 60;
+    document.getElementById('timer').innerText = `⏰ Time Left: ${timeLeft}s`;
+    
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').innerText = `⏰ Time Left: ${timeLeft}s`;
+        
+        if (timeLeft <= 10) {
+            document.getElementById('timer').style.color = '#ff5252';
+        } else {
+            document.getElementById('timer').style.color = '#fff';
+        }
+        
+        if (timeLeft === 0) {
+            clearInterval(timerInterval);
+            document.getElementById('message').innerText = "⏳ Time's Up! Try Again!";
+            disableGrid();
+        }
+    }, 1000);
+}
+
+function disableGrid() {
+    const cells = document.querySelectorAll('.cell');
+    cells.forEach(cell => {
+        if (!cell.classList.contains('found')) {
+            cell.style.opacity = '0.5';
+            cell.style.pointerEvents = 'none';
+        }
+    });
 }
 
 function getHint() {
@@ -389,10 +358,6 @@ function getHint() {
         document.getElementById('message').innerText = `Hint 🔍: Look for "${hint}"`;
         hintsLeft--;
         document.getElementById('hintCounter').innerText = `💡 Hints: ${hintsLeft}`;
-        
-        // Add a small penalty for using hints
-        score = Math.max(0, score - 10);
-        updateScore();
     } else {
         document.getElementById('message').innerText = "No more hints available!";
         setTimeout(() => {
@@ -401,30 +366,20 @@ function getHint() {
     }
 }
 
-// Calculate points based on word length
-function calculatePoints(word) {
-    // Base points: longer words are worth more
-    return word.length * 10;
-}
-
-// Update the score display
-function updateScore() {
-    document.getElementById('score').textContent = `🏆 Score: ${score}`;
-}
-
 function resetGame() {
+    clearInterval(timerInterval);
     foundWords = [];
     selectedCells = [];
     hintsLeft = 3;
-    score = 0;
     document.getElementById('hintCounter').innerText = `💡 Hints: ${hintsLeft}`;
-    document.getElementById('score').innerText = `🏆 Score: ${score}`;
     document.getElementById('message').innerText = '';
     createGrid();
+    startTimer();
 }
 
 window.onload = () => {
     createGrid();
+    startTimer();
 };
 
 </script>
