@@ -1,0 +1,1673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Islamic Finance | Chapter 1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f0fe',
+                            100: '#e2e1fd',
+                            200: '#c9c7fb',
+                            300: '#aca9f8',
+                            400: '#8e8cf4',
+                            500: '#7674ee',
+                            600: '#5D5CDE',
+                            700: '#4744c8',
+                            800: '#3c39a3',
+                            900: '#35338a',
+                        },
+                        dark: {
+                            800: '#222222',
+                            900: '#181818',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        .slide-enter {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .slide-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 300ms, transform 300ms;
+        }
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.35s;
+            transform-origin: 50% 50%;
+            transform: rotate(-90deg);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Arabic text style */
+        .arabic {
+            font-family: 'Traditional Arabic', 'Scheherazade New', serif;
+            direction: rtl;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-dark-900 text-gray-800 dark:text-gray-200 min-h-screen font-sans">
+    <!-- Dark mode detection -->
+    <script>
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+    </script>
+
+    <!-- Main container -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8 border-b dark:border-gray-700 pb-4">
+            <div>
+                <h1 class="text-3xl font-bold text-primary-600 dark:text-primary-500">Islamic Finance</h1>
+                <p class="text-gray-600 dark:text-gray-400">Chapter 1: Introduction to Islamic Finance</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="theme-toggle" class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                    <svg id="dark-icon" class="hidden dark:block w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path>
+                    </svg>
+                    <svg id="light-icon" class="block dark:hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                    </svg>
+                </button>
+                <div class="relative" id="progress-container">
+                    <svg class="w-12 h-12">
+                        <circle class="progress-ring__circle" stroke="#e2e1fd" stroke-width="4" fill="transparent" r="18" cx="24" cy="24"/>
+                        <circle class="progress-ring__circle" stroke="#5D5CDE" stroke-width="4" fill="transparent" r="18" cx="24" cy="24" id="progress-circle"/>
+                    </svg>
+                    <span class="absolute inset-0 flex items-center justify-center text-xs font-medium" id="progress-text">0%</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation & Content Container -->
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Side Navigation -->
+            <nav class="lg:w-1/4 space-y-2">
+                <div class="sticky top-4">
+                    <h2 class="text-lg font-semibold mb-3">Contents</h2>
+                    <ul class="space-y-2" id="nav-menu">
+                        <li>
+                            <button data-section="philosophy" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors section-btn">
+                                1. Philosophy of Islamic Finance
+                            </button>
+                        </li>
+                        <li>
+                            <button data-section="economics" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors section-btn">
+                                2. Principles of Islamic Economics
+                            </button>
+                        </li>
+                        <li>
+                            <button data-section="principles" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors section-btn">
+                                3. Principles of Islamic Finance
+                            </button>
+                        </li>
+                        <li>
+                            <button data-section="shariah" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors section-btn">
+                                4. Shariah Framework
+                            </button>
+                        </li>
+                        <li>
+                            <button data-section="prohibited" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors section-btn">
+                                5. Prohibited Elements
+                            </button>
+                        </li>
+                        <li>
+                            <button data-section="differences" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors section-btn">
+                                6. Differences from Conventional Finance
+                            </button>
+                        </li>
+                        <li>
+                            <button data-section="development" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors section-btn">
+                                7. Development in Malaysia
+                            </button>
+                        </li>
+                        <li>
+                            <button data-section="today" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors section-btn">
+                                8. Islamic Finance Today
+                            </button>
+                        </li>
+                        <li>
+                            <button data-section="quiz" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors section-btn">
+                                9. Chapter Quiz
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="lg:w-3/4">
+                <div id="content-sections" class="space-y-8">
+                    <!-- Philosophy of Islamic Finance -->
+                    <section id="philosophy" class="content-section bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                        <h2 class="text-2xl font-bold mb-4 text-primary-600 dark:text-primary-400">Philosophy of Islamic Finance</h2>
+                        
+                        <div class="space-y-4">
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                <h3 class="font-semibold mb-2">What is Finance?</h3>
+                                <p>Finance concerns resource allocation, management, acquisition, and investment. It is the flow of funds through the financial system, which can be both direct and indirect.</p>
+                            </div>
+
+                            <div class="mb-4">
+                                <h3 class="font-semibold mb-2">The Islamic Worldview</h3>
+                                <p class="mb-4">The Islamic financial system is based on a specific worldview that differs from conventional finance:</p>
+                                
+                                <div class="bg-primary-50 dark:bg-gray-700 p-4 rounded-lg mb-4">
+                                    <div class="flex flex-col items-center">
+                                        <div class="text-center font-bold text-primary-600 dark:text-primary-400 mb-2">Allah</div>
+                                        <div class="flex flex-col md:flex-row justify-between w-full">
+                                            <div class="text-center p-2 border border-primary-200 dark:border-primary-700 rounded-lg">
+                                                <span class="block">Individual</span>
+                                                <span class="text-xs italic">Concept of Istikhlaf</span>
+                                            </div>
+                                            <div class="text-center p-2 border border-primary-200 dark:border-primary-700 rounded-lg mt-2 md:mt-0">
+                                                <span class="block">Ummah</span>
+                                                <span class="text-xs italic">Community</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-center mt-4 p-2 border border-primary-200 dark:border-primary-700 rounded-lg w-full">
+                                            <span class="block">Shariah Islamiah</span>
+                                            <span class="text-xs italic">Islamic Law</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <h4 class="font-medium">Istikhlaf (Vicegerency)</h4>
+                                    <p>This principle implies that man is not the absolute owner of resources, but rather he is entrusted with them and may utilize them only for the betterment of mankind. Therefore, man is accountable to Allah for his conduct on earth.</p>
+                                    <p class="mt-2 italic text-sm">The concept of trust, in Islam, is linked with responsibility, implying that wealth that is entrusted upon a human being is indeed a responsibility that he will be accounted for in the Hereafter.</p>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <h3 class="font-semibold mb-2">What is Islamic Finance?</h3>
+                                <p>Islamic Finance comprises financial markets and institutions that deal with resource allocation, management, acquisition, and investment in accordance with Shariah principles. It is the provision of financial services on a basis that is compliant with the principles and rules of Islamic commercial jurisprudence (Fiqh al-Mua'malat).</p>
+                                
+                                <div class="p-4 bg-yellow-50 dark:bg-gray-700 rounded-lg mt-4">
+                                    <blockquote class="arabic text-center text-lg mb-2">وَمَا أَرْسَلْنَاكَ إِلَّا رَحْمَةً لِلْعَالَمِينَ</blockquote>
+                                    <p class="text-center text-sm italic">"And We have sent you (O Muhammad) not but a mercy to the whole universe" (Al-Ambiya:107)</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="font-semibold mb-2">Maqasid al-Shariah (Objectives of Shariah)</h3>
+                                <p class="mb-3">The objectives of Shariah aim to preserve and promote:</p>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-5 gap-2 text-center">
+                                    <div class="p-3 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <span class="font-medium block">Religion</span>
+                                        <span class="text-sm">(Deen)</span>
+                                    </div>
+                                    <div class="p-3 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <span class="font-medium block">Life</span>
+                                        <span class="text-sm">(Nafs)</span>
+                                    </div>
+                                    <div class="p-3 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <span class="font-medium block">Intellect</span>
+                                        <span class="text-sm">(Aql)</span>
+                                    </div>
+                                    <div class="p-3 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <span class="font-medium block">Posterity</span>
+                                        <span class="text-sm">(Nasl)</span>
+                                    </div>
+                                    <div class="p-3 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <span class="font-medium block">Wealth</span>
+                                        <span class="text-sm">(Mal)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <button class="check-understanding-btn bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition">Check Understanding</button>
+                                <div class="check-understanding-container hidden mt-4 space-y-4">
+                                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                        <p class="font-medium">What is Istikhlaf in Islamic finance?</p>
+                                        <div class="mt-2 space-y-2">
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q1" value="a" class="mt-1">
+                                                <span class="ml-2">The concept that mankind is the absolute owner of all resources</span>
+                                            </label>
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q1" value="b" class="mt-1">
+                                                <span class="ml-2">The principle that man is a trustee of resources, not their absolute owner</span>
+                                            </label>
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q1" value="c" class="mt-1">
+                                                <span class="ml-2">The principle that financial resources should be maximized for individual profit</span>
+                                            </label>
+                                        </div>
+                                        <div class="feedback hidden mt-3 p-2 rounded-lg"></div>
+                                    </div>
+                                    
+                                    <button class="submit-answer-btn bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition">Submit Answer</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Principles of Islamic Economics -->
+                    <section id="economics" class="content-section bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hidden">
+                        <h2 class="text-2xl font-bold mb-4 text-primary-600 dark:text-primary-400">Principles of Islamic Economics</h2>
+                        
+                        <div class="space-y-4">
+                            <blockquote class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border-l-4 border-primary-500 italic">
+                                "Islamic economics is based on a paradigm which is not secularist and value-neutral. It treats all human beings as vicegerents of God and brothers unto each other. All resources at the disposal of human beings are trust and must be used for the well-being of all in conformity with the values provided by the Shari'ah."
+                                <footer class="text-sm mt-2 not-italic">- Muhammad Umar Chapra (1998)</footer>
+                            </blockquote>
+
+                            <div class="mb-6">
+                                <h3 class="font-semibold mb-3">Foundation of Islamic Economic System</h3>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400">Tawhid</h4>
+                                        <p class="text-sm mt-1">The indivisible oneness concept of monotheism in Islam. It's the religion's central concept upon which a Muslim's entire religious adherence rests.</p>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400">Rububiyyah</h4>
+                                        <p class="text-sm mt-1">From "rabb" (ّرب) meaning Owner and the one who is to be obeyed. It refers to Allah's divine arrangement for nourishment, sustenance and guiding things toward their perfection.</p>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400">Risalah</h4>
+                                        <p class="text-sm mt-1">The concept of messengership. It represents the various ways Allah communicates with humanity through prophets.</p>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400">Akhirah</h4>
+                                        <p class="text-sm mt-1">The Islamic term referring to the afterlife. It emphasizes that life on earth is temporary, and actions here have consequences in the hereafter.</p>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400">Tazkiyah</h4>
+                                        <p class="text-sm mt-1">The purification of the heart and soul. It cultivates people's consciousness, character, spirituality, and morality.</p>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400">Kafalah</h4>
+                                        <p class="text-sm mt-1">Means guarantee. A contractual guarantee where the guarantor assumes responsibilities and obligations of the party being guaranteed.</p>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400">Adalah</h4>
+                                        <p class="text-sm mt-1">Means justice. It denotes the Justice of God and emphasizes that there is intrinsic good or evil in things.</p>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400">Falah</h4>
+                                        <p class="text-sm mt-1">The Arabic word for success, happiness, and well-being. In the Qur'an, actions like conforming to Allah's commands will lead to falah.</p>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400">Istikhlaf</h4>
+                                        <p class="text-sm mt-1">The concept that humans are vicegerents of Allah on earth, entrusted with resources to be used for the betterment of mankind.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="font-semibold mb-3">Ethical and Moral Framework of the Shari'ah</h3>
+                                <p class="mb-4">The principles of halal (permissible) and haram (prohibited) provide a sort of moral filter for actions taken by every individual in the society and form a legal framework for Islamic finance.</p>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                                    <div class="p-3 bg-green-50 dark:bg-gray-700 rounded-lg">
+                                        <span class="font-medium block text-green-600 dark:text-green-400">Justice</span>
+                                    </div>
+                                    <div class="p-3 bg-green-50 dark:bg-gray-700 rounded-lg">
+                                        <span class="font-medium block text-green-600 dark:text-green-400">Fairness</span>
+                                    </div>
+                                    <div class="p-3 bg-green-50 dark:bg-gray-700 rounded-lg">
+                                        <span class="font-medium block text-green-600 dark:text-green-400">Trust</span>
+                                    </div>
+                                    <div class="p-3 bg-green-50 dark:bg-gray-700 rounded-lg">
+                                        <span class="font-medium block text-green-600 dark:text-green-400">Honesty</span>
+                                    </div>
+                                    <div class="p-3 bg-green-50 dark:bg-gray-700 rounded-lg">
+                                        <span class="font-medium block text-green-600 dark:text-green-400">Integrity</span>
+                                    </div>
+                                    <div class="p-3 bg-green-50 dark:bg-gray-700 rounded-lg">
+                                        <span class="font-medium block text-green-600 dark:text-green-400">A Balanced Society</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <button class="check-understanding-btn bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition">Check Understanding</button>
+                                <div class="check-understanding-container hidden mt-4 space-y-4">
+                                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                        <p class="font-medium">Which of the following principles refers to the concept of justice in Islamic economics?</p>
+                                        <div class="mt-2 space-y-2">
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q2" value="a" class="mt-1">
+                                                <span class="ml-2">Tawhid</span>
+                                            </label>
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q2" value="b" class="mt-1">
+                                                <span class="ml-2">Adalah</span>
+                                            </label>
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q2" value="c" class="mt-1">
+                                                <span class="ml-2">Kafalah</span>
+                                            </label>
+                                        </div>
+                                        <div class="feedback hidden mt-3 p-2 rounded-lg"></div>
+                                    </div>
+                                    
+                                    <button class="submit-answer-btn bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition">Submit Answer</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Principles of Islamic Finance -->
+                    <section id="principles" class="content-section bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hidden">
+                        <h2 class="text-2xl font-bold mb-4 text-primary-600 dark:text-primary-400">Principles of Islamic Finance</h2>
+                        
+                        <div class="space-y-4">
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                <p>Islam promotes economically productive activities and genuine trade and business transactions on one side; while it calls for avoidance of interest-based transactions, no involvement in illegal and unethical activities and avoidance of speculative transactions, on the other.</p>
+                            </div>
+
+                            <div class="mb-6">
+                                <h3 class="font-semibold mb-3">Validity versus Permissibility</h3>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400">Validity (Sah)</h4>
+                                        <ul class="list-disc list-inside text-sm mt-2 space-y-1">
+                                            <li>Based on the FORM of the contract</li>
+                                            <li>A valid contract is not necessarily permissible</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400">Permissibility (Halal)</h4>
+                                        <ul class="list-disc list-inside text-sm mt-2 space-y-1">
+                                            <li>Based on the SUBSTANCE of the contract</li>
+                                            <li>And the INTENTION of the contractors</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center mt-3 p-2 bg-green-50 dark:bg-gray-700 rounded-lg">
+                                    <p class="font-medium text-green-600 dark:text-green-400">A financial contract must be both halal (permissible) and sah (valid)</p>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <h3 class="font-semibold mb-3">How to Make Money in Islam</h3>
+                                
+                                <div class="mb-4">
+                                    <div class="p-4 bg-yellow-50 dark:bg-gray-700 rounded-lg">
+                                        <blockquote class="arabic text-center text-lg mb-2">وَأَحَلَّ اللَّهُ الْبَيْعَ وَحَرَّمَ الرِّبَا</blockquote>
+                                        <p class="text-center text-sm italic">"Allah permits trading but prohibits Riba" (2:275)</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+                                    <div class="p-4 bg-green-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-green-600 dark:text-green-400 text-center mb-2">Trading (Profits)</h4>
+                                        <p class="text-sm text-center">With Counter-Value ('Iwad)</p>
+                                        <div class="grid grid-cols-3 gap-2 mt-3 text-center">
+                                            <div class="p-2 bg-white dark:bg-gray-600 rounded-lg">
+                                                <span class="text-sm">Risk (Al-Ghurm)</span>
+                                            </div>
+                                            <div class="p-2 bg-white dark:bg-gray-600 rounded-lg">
+                                                <span class="text-sm">Effort (Al-Kasb)</span>
+                                            </div>
+                                            <div class="p-2 bg-white dark:bg-gray-600 rounded-lg">
+                                                <span class="text-sm">Liability (Al-Dhaman)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-red-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-red-600 dark:text-red-400 text-center mb-2">Riba (Interest)</h4>
+                                        <p class="text-sm text-center">No Counter-Value</p>
+                                        <div class="p-2 bg-white dark:bg-gray-600 rounded-lg mt-3 text-center">
+                                            <blockquote class="arabic text-center mb-1">قَالُوا إِنَّمَا الْبَيْعُ مِثْلُ الرِّبَا</blockquote>
+                                            <p class="text-xs italic">"They said that indeed trading is just like riba" (2:275)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="font-semibold mb-3">The concept of 'iwad (Equal Countervalue)</h3>
+                                <p>Islam prohibits riba but permits sale (bay'). The element of 'iwad promotes a sense of equity and justice in economic transactions, differentiating it from riba.</p>
+                                <p class="mt-2 italic">"Every increase, which is without 'iwad or equal countervalue, is riba" – Ibn al-'Arabi</p>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400 text-center">Risk (ghurm)</h4>
+                                        <p class="text-sm mt-2">Market risk: price risk, holding costs, obsolescence.</p>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400 text-center">Work and effort (kasb)</h4>
+                                        <p class="text-sm mt-2">Services or activities that add value to the products or transactions.</p>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400 text-center">Liability (daman)</h4>
+                                        <p class="text-sm mt-2">Product liability borne by seller, in the event of defects.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <button class="check-understanding-btn bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition">Check Understanding</button>
+                                <div class="check-understanding-container hidden mt-4 space-y-4">
+                                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                        <p class="font-medium">What is the key difference between trading (profits) and riba (interest) in Islamic finance?</p>
+                                        <div class="mt-2 space-y-2">
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q3" value="a" class="mt-1">
+                                                <span class="ml-2">Trading generates more money than riba</span>
+                                            </label>
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q3" value="b" class="mt-1">
+                                                <span class="ml-2">Trading involves risk while riba is risk-free</span>
+                                            </label>
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q3" value="c" class="mt-1">
+                                                <span class="ml-2">Trading involves countervalue ('iwad) while riba does not</span>
+                                            </label>
+                                        </div>
+                                        <div class="feedback hidden mt-3 p-2 rounded-lg"></div>
+                                    </div>
+                                    
+                                    <button class="submit-answer-btn bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition">Submit Answer</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Shariah Framework -->
+                    <section id="shariah" class="content-section bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hidden">
+                        <h2 class="text-2xl font-bold mb-4 text-primary-600 dark:text-primary-400">Shariah Framework for Islamic Finance</h2>
+                        
+                        <div class="space-y-4">
+                            <div class="mb-4">
+                                <h3 class="font-semibold mb-2">What is Shariah?</h3>
+                                <p>Shariah literally means 'path to watering place'. In technical terms, it refers to the path to tread for guidance in this world.</p>
+                                <p class="mt-2">It encompasses the commands, prohibitions, and values prescribed by Allah for His slaves either through Al-Quran or As-Sunnah (a divinely guided lifestyle and whatever was reported about what the Prophet Muhammad (pbuh) said, did, or gave his tacit approval).</p>
+                                <p class="mt-2 italic">According to one observer, the Sharī'ah is the "epitome of Islamic thought, the most typical manifestation of the Islamic way of life, the core and kernel of Islam itself".</p>
+                            </div>
+
+                            <div class="mb-6">
+                                <h3 class="font-semibold mb-3">Components of Shariah</h3>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400 text-center">Aqidah</h4>
+                                        <p class="text-sm mt-2 text-center">Belief/Creed</p>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400 text-center">Fiqh</h4>
+                                        <p class="text-sm mt-2 text-center">Jurisprudence</p>
+                                        <div class="grid grid-cols-1 gap-2 mt-3">
+                                            <div class="p-2 bg-white dark:bg-gray-600 rounded-lg text-center">
+                                                <span class="text-xs">Ibadah (rituals)</span>
+                                            </div>
+                                            <div class="p-2 bg-white dark:bg-gray-600 rounded-lg text-center">
+                                                <span class="text-xs">Munakahat (family laws)</span>
+                                            </div>
+                                            <div class="p-2 bg-white dark:bg-gray-600 rounded-lg text-center">
+                                                <span class="text-xs">Muamalat (commercial transactions)</span>
+                                            </div>
+                                            <div class="p-2 bg-white dark:bg-gray-600 rounded-lg text-center">
+                                                <span class="text-xs">Jinayat (crimes and punishments)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400 text-center">Akhlak</h4>
+                                        <p class="text-sm mt-2 text-center">Ethics/Morals</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <h3 class="font-semibold mb-3">Sources of Shariah</h3>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400">Primary Sources</h4>
+                                        <ul class="list-disc list-inside text-sm mt-2 space-y-1">
+                                            <li>The Holy Qur'an</li>
+                                            <li>Sunnah (Prophetic tradition)</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400">Secondary Sources</h4>
+                                        <ul class="list-disc list-inside text-sm mt-2 space-y-1">
+                                            <li>Ijma' (consensus of opinion)</li>
+                                            <li>Qiyas (Analogical deductions)</li>
+                                            <li>Istihsan (equity in Islamic law)</li>
+                                            <li>Masalih Mursalah (public interest)</li>
+                                            <li>Istishaab (presumption of continuity)</li>
+                                            <li>Sadd al-dzara'i (blocking the means)</li>
+                                            <li>'Urf (custom)</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="font-semibold mb-3">Maqasid al-Shariah in Financial Transactions</h3>
+                                <p class="mb-3 italic text-center">"The origin of Muamalat matters is by understanding its underlying wisdom"</p>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="space-y-2">
+                                        <div class="p-3 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                            <span class="font-medium">To facilitate the needs of human being</span>
+                                            <span class="text-xs block">(Al-Jumuah: 10)</span>
+                                        </div>
+                                        <div class="p-3 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                            <span class="font-medium">Ar-Rawaj: to ensure wealth is circulated fairly</span>
+                                            <span class="text-xs block">(Al-Hasyr: 7)</span>
+                                        </div>
+                                        <div class="p-3 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                            <span class="font-medium">To avoid dispute and ensure stability</span>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <div class="p-3 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                            <span class="font-medium">To promote maslahah and avoid harm</span>
+                                        </div>
+                                        <div class="p-3 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                            <span class="font-medium">To uphold and promote justice in acquiring wealth</span>
+                                        </div>
+                                        <div class="p-3 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                            <span class="font-medium">To promote transparency and accountability</span>
+                                            <span class="text-xs block">(Al-Baqarah: 282)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <button class="check-understanding-btn bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition">Check Understanding</button>
+                                <div class="check-understanding-container hidden mt-4 space-y-4">
+                                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                        <p class="font-medium">What are the primary sources of Shariah?</p>
+                                        <div class="mt-2 space-y-2">
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q4" value="a" class="mt-1">
+                                                <span class="ml-2">Ijma' and Qiyas</span>
+                                            </label>
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q4" value="b" class="mt-1">
+                                                <span class="ml-2">The Holy Qur'an and Sunnah</span>
+                                            </label>
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q4" value="c" class="mt-1">
+                                                <span class="ml-2">Istihsan and Masalih Mursalah</span>
+                                            </label>
+                                        </div>
+                                        <div class="feedback hidden mt-3 p-2 rounded-lg"></div>
+                                    </div>
+                                    
+                                    <button class="submit-answer-btn bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition">Submit Answer</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Prohibited Elements -->
+                    <section id="prohibited" class="content-section bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hidden">
+                        <h2 class="text-2xl font-bold mb-4 text-primary-600 dark:text-primary-400">Fundamental Prohibited Elements in Islamic Finance</h2>
+                        
+                        <div class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                                <div class="p-4 bg-red-50 dark:bg-gray-700 rounded-lg">
+                                    <h3 class="text-xl font-medium text-red-600 dark:text-red-400">Riba</h3>
+                                    <p class="text-sm mt-1">Interest/Usury</p>
+                                </div>
+                                
+                                <div class="p-4 bg-red-50 dark:bg-gray-700 rounded-lg">
+                                    <h3 class="text-xl font-medium text-red-600 dark:text-red-400">Gharar</h3>
+                                    <p class="text-sm mt-1">Excessive Uncertainty</p>
+                                </div>
+                                
+                                <div class="p-4 bg-red-50 dark:bg-gray-700 rounded-lg">
+                                    <h3 class="text-xl font-medium text-red-600 dark:text-red-400">Maysir</h3>
+                                    <p class="text-sm mt-1">Gambling/Speculation</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                <p class="text-center font-medium">Islam promotes maslahah by protecting the interests and benefits of all parties involved in the market.</p>
+                            </div>
+
+                            <!-- Riba Section -->
+                            <div>
+                                <h3 class="text-xl font-semibold mb-3 text-primary-600 dark:text-primary-400">Riba (Interest/Usury)</h3>
+                                
+                                <div class="mb-4">
+                                    <h4 class="font-medium mb-2">What is Riba?</h4>
+                                    <p>Riba literally means excess, increase, expansion, or growth. In Shariah, it refers to:</p>
+                                    <ul class="list-disc list-inside mt-2 space-y-1">
+                                        <li>A surplus of commodity or an excess in return without counter value (Hanafi school)</li>
+                                        <li>A predetermined excess or surplus over and above the loan received by the creditor conditionally in relation to a specified time period</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <h4 class="font-medium mb-2">The Prohibition of Riba in the Qur'an</h4>
+                                    <div class="p-4 bg-yellow-50 dark:bg-gray-700 rounded-lg">
+                                        <p class="italic text-sm">O you who believe, fear Allah and give up what remains [due to you] of interest, if you should be believers. And if you do not, then be informed of a war [against you] from Allah and His Messenger. But if you repent, you may have your principal [without interest] – [thus] you do no wrong, nor are you wronged.</p>
+                                        <p class="text-right text-xs mt-2">(Al-Baqarah: 278-279)</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <h4 class="font-medium mb-2">Categories of Riba</h4>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                            <h5 class="font-medium text-primary-600 dark:text-primary-400">Loan Riba or Riba Qard/Duyun</h5>
+                                            <ul class="list-disc list-inside text-sm mt-2 space-y-1">
+                                                <li>Also known as Riba al-Quran because it is prohibited by the Quran</li>
+                                                <li>Applies to loans or any debt regardless of cause</li>
+                                                <li>Two types:
+                                                    <ul class="list-disc list-inside ml-4 text-xs">
+                                                        <li>Riba' al-qard (imposed from the beginning)</li>
+                                                        <li>Riba' jahiliyyah (only imposed after default)</li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                            <h5 class="font-medium text-primary-600 dark:text-primary-400">Sales Riba or Riba al-Buyun</h5>
+                                            <ul class="list-disc list-inside text-sm mt-2 space-y-1">
+                                                <li>Also known as Riba as-Sunnah because it is prohibited by the Sunnah</li>
+                                                <li>Applies to sale transactions in certain commodities</li>
+                                                <li>Two types:
+                                                    <ul class="list-disc list-inside ml-4 text-xs">
+                                                        <li>Riba al nasi'ah (delay in paying or delivery)</li>
+                                                        <li>Riba al fadl (exchanging one ribawi commodity for the same commodity but unequal in amount)</li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <h4 class="font-medium mb-2">Hadith on Ribawi Items</h4>
+                                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                        <p class="italic text-sm">"Gold for gold, silver for silver, wheat for wheat, barley for barley, dates for dates, salt for salt – like for like, equal for equal, and hand-to-hand (spot); if the commodities differ, then you may sell as you wish, provided that the exchange is hand-to-hand or a spot transaction."</p>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="font-medium mb-2">Why is Interest Prohibited?</h4>
+                                    <ul class="list-disc list-inside space-y-1">
+                                        <li>It is an injustice to borrowers who must repay regardless of their financial situation</li>
+                                        <li>It is unfair to lenders when returns on investments are much higher than interest charged</li>
+                                        <li>Riba corrupts society (Surah ar-Rum: 37-41)</li>
+                                        <li>Riba implies improper appropriation of others' property (Surah an-Nisa': 160-161)</li>
+                                        <li>Riba's ultimate effect is negative growth (Surah al-Baqarah: 276)</li>
+                                        <li>Riba demeans and diminishes human personality (Surah al-Baqarah: 275)</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Gharar Section -->
+                            <div>
+                                <h3 class="text-xl font-semibold mb-3 text-primary-600 dark:text-primary-400">Gharar (Excessive Uncertainty)</h3>
+                                
+                                <div class="mb-4">
+                                    <h4 class="font-medium mb-2">What is Gharar?</h4>
+                                    <p><strong>Literal meaning:</strong> Deceit, fraud, uncertainty, danger, peril, or hazard that might lead to destruction or loss.</p>
+                                    <p class="mt-2"><strong>Technical meaning:</strong> Uncertainty and/or ignorance of one or both parties in a contract over the substance or attributes of the object of sale, or doubt over its existence and availability at the time of contract.</p>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <h4 class="font-medium mb-2">Types of Gharar</h4>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                            <h5 class="font-medium text-primary-600 dark:text-primary-400">Gharar Yasir (Minor Gharar)</h5>
+                                            <p class="text-sm mt-2">Contracts involving minor gharar are permissible and valid.</p>
+                                        </div>
+                                        
+                                        <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                            <h5 class="font-medium text-primary-600 dark:text-primary-400">Gharar Fahish (Major Gharar)</h5>
+                                            <p class="text-sm mt-2">Uncertainty is so great that it becomes unacceptable. Related to factors such as buyer and seller, asset, price, and contract.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="font-medium mb-2">Classical Examples of Gharar Sale</h4>
+                                    <ul class="list-disc list-inside space-y-1">
+                                        <li>Sale of fish still in the sea</li>
+                                        <li>Sale of birds in the air</li>
+                                        <li>Sale of unborn animals</li>
+                                    </ul>
+                                    
+                                    <div class="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                        <p class="font-medium">Gharar in Modern Financial Transactions</p>
+                                        <ul class="list-disc list-inside text-sm mt-2 space-y-1">
+                                            <li>Financing documentation must feature sufficient details to avoid gharar</li>
+                                            <li>Conventional insurance is deemed not Shariah-compliant because it entails gharar</li>
+                                            <li>The Islamic alternative to conventional insurance is takaful, based on mutual assistance</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Maysir Section -->
+                            <div>
+                                <h3 class="text-xl font-semibold mb-3 text-primary-600 dark:text-primary-400">Maysir (Gambling)</h3>
+                                
+                                <div class="mb-4">
+                                    <h4 class="font-medium mb-2">What is Maysir?</h4>
+                                    <p>Gambling or maysir, also known as qimar, is defined as any activity which involves betting whereby the winner will take the entire bet and the loser will lose his bet. It means games of pure chance where any party might gain at the expense of the loss of the other party.</p>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <h4 class="font-medium mb-2">Prohibition of Gambling in the Qur'an</h4>
+                                    <div class="p-4 bg-yellow-50 dark:bg-gray-700 rounded-lg">
+                                        <p class="italic text-sm">"O believers, wine and gambling (maysir), idols and divination by arrows are but abominations devised by the Satan, avoid them so that you may prosper. Indeed Satan seeks to stir up enmity and hatred among you by means of wine and gambling and to keep you away from remembrance of Allah swt and from your prayers."</p>
+                                        <p class="text-right text-xs mt-2">(Surah al-Maidah, verses 90-91)</p>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="font-medium mb-2">Why is Gambling Prohibited?</h4>
+                                    <ul class="list-disc list-inside space-y-1">
+                                        <li>Gambling does not create wealth; it only redistributes what already exists</li>
+                                        <li>The betting is done on the basis of other people's wealth</li>
+                                        <li>Because speculation resembles gambling, it increases volatility in financial markets</li>
+                                        <li>It invokes enmity in society and distracts believers from worshipping Allah</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <button class="check-understanding-btn bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition">Check Understanding</button>
+                                <div class="check-understanding-container hidden mt-4 space-y-4">
+                                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                        <p class="font-medium">Which of the following is NOT a category of Riba?</p>
+                                        <div class="mt-2 space-y-2">
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q5" value="a" class="mt-1">
+                                                <span class="ml-2">Riba al-Qard</span>
+                                            </label>
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q5" value="b" class="mt-1">
+                                                <span class="ml-2">Riba al-Buyun</span>
+                                            </label>
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q5" value="c" class="mt-1">
+                                                <span class="ml-2">Riba al-Takaful</span>
+                                            </label>
+                                        </div>
+                                        <div class="feedback hidden mt-3 p-2 rounded-lg"></div>
+                                    </div>
+                                    
+                                    <button class="submit-answer-btn bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition">Submit Answer</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Differences from Conventional Finance -->
+                    <section id="differences" class="content-section bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hidden">
+                        <h2 class="text-2xl font-bold mb-4 text-primary-600 dark:text-primary-400">Differences Between Islamic Finance and Conventional Finance</h2>
+                        
+                        <div class="space-y-6">
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                <p>In the Islamic financial system, money is not a commodity as is the case with the conventional financial system. Islamic finance is community-oriented and entrepreneur-friendly, emphasizing productivity and physical expansion of economic production and services.</p>
+                            </div>
+
+                            <div class="mb-6">
+                                <h3 class="font-semibold mb-3">Key Differences</h3>
+                                
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                        <thead>
+                                            <tr>
+                                                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Conventional Finance</th>
+                                                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Islamic Finance</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                            <tr>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">Man-made principles</td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">Principles prescribed by Islamic law</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">Does not need an asset to be purchased for transaction to happen</td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">Promotes purchase of an asset to generate an income or a return</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">Charging of interest permitted</td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">Prohibits charging of interest</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">Structures do not need to be approved for compliance</td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">Structures approved by Shari'ah Advisory Committee or Shari'ah Supervisory Board</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">Prohibited activities depends on each bank's frameworks</td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">Financing of certain activities such as gambling is not permitted</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="font-semibold mb-3">Differences Between Islamic Financing and Conventional Loan</h3>
+                                
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                        <thead>
+                                            <tr>
+                                                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Items</th>
+                                                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Conventional Banking</th>
+                                                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Islamic Banking</th>
+                                                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Commentary</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                            <tr>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">Banking Relationship</td>
+                                                <td class="px-6 py-4 text-sm">Loan arrangement and services</td>
+                                                <td class="px-6 py-4 text-sm">Financing arrangement based on Partnership, Profit-sharing, Trading, Buying-and-selling, Agency relationship, Commodity sale and services</td>
+                                                <td class="px-6 py-4 text-sm">IB relationship is based on actual economic transaction which must be effected. And where applicable must involve a real asset and ownership.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">Contractual terms</td>
+                                                <td class="px-6 py-4 text-sm">Borrower and lender</td>
+                                                <td class="px-6 py-4 text-sm">Partners, Fund Provider and Entrepreneur, Buyer and Seller, Principal and Agent, Supplier and Buyer, Service Provider</td>
+                                                <td class="px-6 py-4 text-sm">Under IB, each relationship is tied to specific contractual obligations where the roles and responsibilities of each party to the transaction is clearly defined and agreed up-front.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">Governing Authority</td>
+                                                <td class="px-6 py-4 text-sm">Bank Negara Malaysia</td>
+                                                <td class="px-6 py-4 text-sm">Bank Negara Malaysia and Shariah Committee</td>
+                                                <td class="px-6 py-4 text-sm">A Bank's Shariah Committee may override a BNM instruction if it deems non-compliant or for differing views/ interpretation.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">Determinant of Returns</td>
+                                                <td class="px-6 py-4 text-sm">Contractual obligation on the loan amount</td>
+                                                <td class="px-6 py-4 text-sm">Reliant on the activities done to justify earning the returns on the transaction</td>
+                                                <td class="px-6 py-4 text-sm">In IB, an economic action is crucial to formalize the agreement to pay the Bank a return on their capital, efforts, or assets. Otherwise, this will be considered "back-door riba".</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">Bank Rate Calculation</td>
+                                                <td class="px-6 py-4 text-sm">Monthly/daily rest interest calculations based on floating/ fixed rate loan</td>
+                                                <td class="px-6 py-4 text-sm">Monthly or daily rest profit calculations based on floating or fixed rate financing</td>
+                                                <td class="px-6 py-4 text-sm">IB are on par with conventional loan at the same bank rate strategy, but must not be deemed excessive.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <button class="check-understanding-btn bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition">Check Understanding</button>
+                                <div class="check-understanding-container hidden mt-4 space-y-4">
+                                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                        <p class="font-medium">Which of the following is NOT a characteristic of Islamic finance?</p>
+                                        <div class="mt-2 space-y-2">
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q6" value="a" class="mt-1">
+                                                <span class="ml-2">It is based on Shariah principles</span>
+                                            </label>
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q6" value="b" class="mt-1">
+                                                <span class="ml-2">It treats money as a commodity</span>
+                                            </label>
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q6" value="c" class="mt-1">
+                                                <span class="ml-2">It prohibits interest-based transactions</span>
+                                            </label>
+                                        </div>
+                                        <div class="feedback hidden mt-3 p-2 rounded-lg"></div>
+                                    </div>
+                                    
+                                    <button class="submit-answer-btn bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition">Submit Answer</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Development in Malaysia -->
+                    <section id="development" class="content-section bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hidden">
+                        <h2 class="text-2xl font-bold mb-4 text-primary-600 dark:text-primary-400">Development of Islamic Finance in Malaysia</h2>
+                        
+                        <div class="space-y-6">
+                            <div class="mb-6">
+                                <h3 class="font-semibold mb-3">Journey of Islamic Finance</h3>
+                                
+                                <div class="relative">
+                                    <div class="absolute left-4 inset-y-0 w-0.5 bg-primary-200 dark:bg-primary-700"></div>
+                                    
+                                    <div class="relative ml-8 mb-8">
+                                        <div class="flex items-center mb-2">
+                                            <div class="absolute -left-8 flex items-center justify-center w-6 h-6 rounded-full bg-primary-500 dark:bg-primary-600 text-white">
+                                                <span class="text-xs">1</span>
+                                            </div>
+                                            <h4 class="text-lg font-medium">1960s - 1970s: Early Foundations</h4>
+                                        </div>
+                                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                            <ul class="list-disc list-inside text-sm space-y-1">
+                                                <li>1963: Mit Ghamr Local Savings Bank (Egypt) and Lembaga Tabung Haji (Malaysia)</li>
+                                                <li>1971: Nasser Social Bank (Egypt)</li>
+                                                <li>1975: Islamic Development Bank (Jeddah) and Dubai Islamic Bank</li>
+                                                <li>1977: Faisal Islamic Bank (Sudan)</li>
+                                                <li>1979: Bahrain Islamic Bank</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="relative ml-8 mb-8">
+                                        <div class="flex items-center mb-2">
+                                            <div class="absolute -left-8 flex items-center justify-center w-6 h-6 rounded-full bg-primary-500 dark:bg-primary-600 text-white">
+                                                <span class="text-xs">2</span>
+                                            </div>
+                                            <h4 class="text-lg font-medium">1980s: Expansion Phase</h4>
+                                        </div>
+                                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                            <ul class="list-disc list-inside text-sm space-y-1">
+                                                <li>1982: Al-Baraka</li>
+                                                <li>1983: Bank Islam Malaysia Berhad</li>
+                                                <li>1983: Islamic Bank, Bangladesh</li>
+                                                <li>1984: Dar al-Maal Islamic Trust, Geneva</li>
+                                                <li>1989: ANZ Global Islamic Finance, UK</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="relative ml-8 mb-8">
+                                        <div class="flex items-center mb-2">
+                                            <div class="absolute -left-8 flex items-center justify-center w-6 h-6 rounded-full bg-primary-500 dark:bg-primary-600 text-white">
+                                                <span class="text-xs">3</span>
+                                            </div>
+                                            <h4 class="text-lg font-medium">1990s: Institutional Development</h4>
+                                        </div>
+                                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                            <ul class="list-disc list-inside text-sm space-y-1">
+                                                <li>1991: Accounting & Auditing Organization for Islamic Financial Institutions (AAOIFI), Bahrain</li>
+                                                <li>1993: Islamic Bank of Brunei</li>
+                                                <li>1994: Islamic Inter-banks Money Market, Malaysia</li>
+                                                <li>1999: Bank Muamalat Malaysia Berhad</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="relative ml-8">
+                                        <div class="flex items-center mb-2">
+                                            <div class="absolute -left-8 flex items-center justify-center w-6 h-6 rounded-full bg-primary-500 dark:bg-primary-600 text-white">
+                                                <span class="text-xs">4</span>
+                                            </div>
+                                            <h4 class="text-lg font-medium">2000s and Beyond: Global Integration</h4>
+                                        </div>
+                                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                            <ul class="list-disc list-inside text-sm space-y-1">
+                                                <li>2002: International Islamic Financial Market, Bahrain and Islamic Financial Services Board, Kuala Lumpur</li>
+                                                <li>2006: International Centre for Education in Islamic Finance (INCEIF)</li>
+                                                <li>2010: International Islamic Liquidity Management Corporation (IILM)</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <h3 class="font-semibold mb-3">Malaysia's Development Approach</h3>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400 text-center">Inception Stage (1983-1993)</h4>
+                                        <p class="text-sm mt-2">Instituting foundations of Islamic finance and financial inclusion. Building the foundation of legal, regulatory and Shari'ah framework.</p>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400 text-center">Intermediate Stage (1993-2001)</h4>
+                                        <p class="text-sm mt-2">Institutional building, stimulate competition, activity generation and market vibrancy. Increase the number of players, develop financial markets and enhance Shari'ah governance.</p>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400 text-center">Advanced Stage (2001-Present)</h4>
+                                        <p class="text-sm mt-2">Vision creation, comprehensive and international integration. Market liberalization, upgrade of infrastructures, and strengthening the overall Islamic financial landscape.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="font-semibold mb-3">Implementation of Islamic Finance in Malaysia</h3>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400 text-center">Phase 1 (1970s - 1980s)</h4>
+                                        <p class="text-sm mt-2 mb-2">Establishment of Islamic financial institutions:</p>
+                                        <ul class="list-disc list-inside text-xs space-y-1">
+                                            <li>Tabung Haji</li>
+                                            <li>Bank Islam Malaysia Berhad</li>
+                                            <li>Syarikat Takaful Malaysia Berhad</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400 text-center">Phase 2 (1980s - 1990s)</h4>
+                                        <p class="text-sm mt-2 mb-2">Conventional banks were allowed to offer Islamic financial products and services under Islamic Banking Scheme:</p>
+                                        <ul class="list-disc list-inside text-xs space-y-1">
+                                            <li>Interest-free Banking Scheme</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400 text-center">Phase 3 & 4 (1990s - 2000s)</h4>
+                                        <p class="text-sm mt-2 mb-2">Conventional banks were allowed to set up Islamic subsidiaries, and international integration of the domestic Islamic banking system:</p>
+                                        <ul class="list-disc list-inside text-xs space-y-1">
+                                            <li>Kuwait Finance House (KFH)</li>
+                                            <li>Al-Rajhi Bank</li>
+                                            <li>Asian Finance Bank (AFB)</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <button class="check-understanding-btn bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition">Check Understanding</button>
+                                <div class="check-understanding-container hidden mt-4 space-y-4">
+                                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                        <p class="font-medium">In which year was Bank Islam Malaysia Berhad established?</p>
+                                        <div class="mt-2 space-y-2">
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q7" value="a" class="mt-1">
+                                                <span class="ml-2">1963</span>
+                                            </label>
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q7" value="b" class="mt-1">
+                                                <span class="ml-2">1983</span>
+                                            </label>
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q7" value="c" class="mt-1">
+                                                <span class="ml-2">1993</span>
+                                            </label>
+                                        </div>
+                                        <div class="feedback hidden mt-3 p-2 rounded-lg"></div>
+                                    </div>
+                                    
+                                    <button class="submit-answer-btn bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition">Submit Answer</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Islamic Finance Today -->
+                    <section id="today" class="content-section bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hidden">
+                        <h2 class="text-2xl font-bold mb-4 text-primary-600 dark:text-primary-400">Islamic Finance Today</h2>
+                        
+                        <div class="space-y-6">
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                <blockquote class="italic">
+                                    "In 2021, we will continue to develop a progressive and inclusive Islamic financial system. We will sharpen our focus across three major areas, namely, social resilience, climate resilience and business empowerment. This will entail further diversification in Shariah-compliant financial solutions to address market gaps, and innovative approaches in meeting the evolving needs of the society and economy."
+                                    <footer class="text-sm mt-2 not-italic">Source: Bank Negara Malaysia Annual Report 2020</footer>
+                                </blockquote>
+                            </div>
+
+                            <div class="mb-6">
+                                <h3 class="font-semibold mb-3">The Current Scenario</h3>
+                                
+                                <ul class="list-disc list-inside space-y-2">
+                                    <li>The global Islamic finance market is growing moderately, due to strong investments in the Halal Sectors, infrastructure, and Sukuk bonds</li>
+                                    <li>The industry's total worth was estimated to be USD 2.05 trillion in 2017, marking an 8.3% growth in assets</li>
+                                    <li>Global SUKUK outstanding surged by a record 25.6% to close at USD 399.9 billion as at end 2017</li>
+                                    <li>Islamic banking is the largest sector in the Islamic finance industry, contributing to 71%, or USD 1.72 trillion, of the industry's assets</li>
+                                </ul>
+                            </div>
+
+                            <div class="mb-6">
+                                <h3 class="font-semibold mb-3">Key Market Trends</h3>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400">Islamic Banking is the Largest Segment</h4>
+                                        <ul class="list-disc list-inside text-sm mt-2 space-y-1">
+                                            <li>There were 505 Islamic banks in 2017, including 207 Islamic Banking windows</li>
+                                            <li>A growing number of digital-only, or 'disruptor banks' with no physical branches, have emerged</li>
+                                            <li>Islamic banks are catching up with the launch of digital-only subsidiaries</li>
+                                            <li>Islamic banking is commonly seen to have advantages in terms of moral standards and ties to tangible assets</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-primary-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-primary-600 dark:text-primary-400">GCC Regional Overview</h4>
+                                        <ul class="list-disc list-inside text-sm mt-2 space-y-1">
+                                            <li>In the GCC, the market share of Islamic banking crossed the 25% threshold</li>
+                                            <li>GCC Islamic banking assets reached USD 490 billion by the end of June 2013</li>
+                                            <li>Saudi Arabia dominates the region with a 49% share</li>
+                                            <li>Islamic banking has acquired systemic proportions in Kuwait, Saudi Arabia, and the United Arab Emirates</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="font-semibold mb-3">Competitive Landscape</h3>
+                                
+                                <ul class="list-disc list-inside space-y-2">
+                                    <li>The global Islamic finance market is fragmented with many players trying to grab a significant chunk of the developing market</li>
+                                    <li>In some regions, like Asia and Africa, it is moderately growing with the presence of a large number of local players and some major players</li>
+                                    <li>GCC is a highly competitive market, with the presence of large number of international players</li>
+                                    <li>Bank Al-Rajhi, Dubai Islamic Bank, and Kuwait House Finance, are among the major players present in the region</li>
+                                </ul>
+                            </div>
+
+                            <div class="mt-6">
+                                <h3 class="font-semibold mb-3">Opportunities and Challenges</h3>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="p-4 bg-green-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-green-600 dark:text-green-400">Opportunities</h4>
+                                        <ul class="list-disc list-inside text-sm mt-2 space-y-1">
+                                            <li>Growing Muslim population and rising awareness about Islamic finance</li>
+                                            <li>Increasing government support in many countries</li>
+                                            <li>Expansion into new markets and sectors</li>
+                                            <li>Technological innovations in Islamic fintech</li>
+                                            <li>Growth in Islamic social finance (zakat, waqf, etc.)</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-red-50 dark:bg-gray-700 rounded-lg">
+                                        <h4 class="font-medium text-red-600 dark:text-red-400">Challenges</h4>
+                                        <ul class="list-disc list-inside text-sm mt-2 space-y-1">
+                                            <li>Lack of standardization across different jurisdictions</li>
+                                            <li>Limited awareness and understanding of Islamic finance</li>
+                                            <li>Competition from conventional finance institutions</li>
+                                            <li>Need for more innovation in product development</li>
+                                            <li>Regulatory challenges and differences across countries</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <button class="check-understanding-btn bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition">Check Understanding</button>
+                                <div class="check-understanding-container hidden mt-4 space-y-4">
+                                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                        <p class="font-medium">What percentage of the Islamic finance industry is contributed by Islamic banking?</p>
+                                        <div class="mt-2 space-y-2">
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q8" value="a" class="mt-1">
+                                                <span class="ml-2">25%</span>
+                                            </label>
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q8" value="b" class="mt-1">
+                                                <span class="ml-2">49%</span>
+                                            </label>
+                                            <label class="flex items-start">
+                                                <input type="radio" name="q8" value="c" class="mt-1">
+                                                <span class="ml-2">71%</span>
+                                            </label>
+                                        </div>
+                                        <div class="feedback hidden mt-3 p-2 rounded-lg"></div>
+                                    </div>
+                                    
+                                    <button class="submit-answer-btn bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition">Submit Answer</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Chapter Quiz -->
+                    <section id="quiz" class="content-section bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hidden">
+                        <h2 class="text-2xl font-bold mb-4 text-primary-600 dark:text-primary-400">Chapter Quiz</h2>
+                        
+                        <div id="quiz-container" class="space-y-6">
+                            <p class="mb-4">Test your knowledge of Islamic Finance concepts covered in this chapter.</p>
+                            
+                            <div class="mb-6">
+                                <div id="quiz-progress" class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-4">
+                                    <div class="bg-primary-600 h-2.5 rounded-full" style="width: 0%"></div>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span id="quiz-question-number">Question 0/10</span>
+                                    <span id="quiz-score">Score: 0</span>
+                                </div>
+                            </div>
+                            
+                            <div id="quiz-start-screen">
+                                <p>This quiz consists of 10 multiple-choice questions. You will receive immediate feedback on each answer.</p>
+                                <button id="start-quiz-btn" class="mt-4 bg-primary-500 hover:bg-primary-600 text-white px-6 py-2 rounded-lg transition">Start Quiz</button>
+                            </div>
+                            
+                            <div id="quiz-question-screen" class="hidden">
+                                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg mb-4">
+                                    <p id="quiz-question" class="font-medium mb-3"></p>
+                                    <div id="quiz-options" class="space-y-2">
+                                        <!-- Options will be dynamically inserted here -->
+                                    </div>
+                                </div>
+                                
+                                <div id="quiz-feedback" class="hidden p-4 rounded-lg mb-4"></div>
+                                
+                                <button id="submit-quiz-btn" class="bg-primary-500 hover:bg-primary-600 text-white px-6 py-2 rounded-lg transition">Submit Answer</button>
+                                <button id="next-question-btn" class="hidden bg-primary-500 hover:bg-primary-600 text-white px-6 py-2 rounded-lg transition">Next Question</button>
+                            </div>
+                            
+                            <div id="quiz-result-screen" class="hidden">
+                                <h3 class="text-xl font-semibold mb-3">Quiz Results</h3>
+                                <p id="final-score" class="mb-3 text-lg"></p>
+                                <p id="quiz-feedback-message" class="mb-4"></p>
+                                
+                                <div class="flex space-x-4">
+                                    <button id="retry-quiz-btn" class="bg-primary-500 hover:bg-primary-600 text-white px-6 py-2 rounded-lg transition">Retry Quiz</button>
+                                    <button id="review-chapter-btn" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition">Review Chapter</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-12 border-t dark:border-gray-700 pt-6 text-sm text-gray-600 dark:text-gray-400">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+        <div>
+<p>SirPoji © 2025 Islamic Finance Course</p>
+<p>Universiti Teknologi MARA</p>
+        </div>
+          <div class="mt-4 md:mt-0">
+               <p class="text-primary-600 dark:text-primary-400">Chapter 1: Introduction to Islamic Finance</p>
+          </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Initialize variables
+        let completedSections = 0;
+        const totalSections = document.querySelectorAll('.content-section').length - 1; // Excluding quiz section
+        
+        // Setup Progress Ring
+        const circle = document.getElementById('progress-circle');
+        const radius = 18;
+        const circumference = 2 * Math.PI * radius;
+        
+        circle.style.strokeDasharray = `${circumference} ${circumference}`;
+        circle.style.strokeDashoffset = circumference;
+        
+        function setProgress(percent) {
+            const offset = circumference - (percent / 100 * circumference);
+            circle.style.strokeDashoffset = offset;
+            document.getElementById('progress-text').textContent = `${Math.round(percent)}%`;
+        }
+        
+        // Update progress when a section is completed
+        function updateProgress() {
+            const progress = (completedSections / totalSections) * 100;
+            setProgress(progress);
+        }
+        
+        // Navigation functionality
+        document.querySelectorAll('.section-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // Hide all sections
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.add('hidden');
+                });
+                
+                // Show the selected section
+                const targetSection = button.getAttribute('data-section');
+                document.getElementById(targetSection).classList.remove('hidden');
+                
+                // Update button styles
+                document.querySelectorAll('.section-btn').forEach(btn => {
+                    btn.classList.remove('bg-primary-100', 'dark:bg-primary-900', 'text-primary-600', 'dark:text-primary-400');
+                });
+                button.classList.add('bg-primary-100', 'dark:bg-primary-900', 'text-primary-600', 'dark:text-primary-400');
+                
+                // Mark section as visited
+                if (!button.classList.contains('visited') && targetSection !== 'quiz') {
+                    button.classList.add('visited');
+                    completedSections++;
+                    updateProgress();
+                }
+            });
+        });
+        
+        // Initialize the first section
+        document.querySelector('.section-btn').click();
+        
+        // Theme toggle functionality
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+        });
+        
+        // Check Understanding functionality
+        document.querySelectorAll('.check-understanding-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const container = button.nextElementSibling;
+                container.classList.toggle('hidden');
+                
+                if (container.classList.contains('hidden')) {
+                    button.textContent = 'Check Understanding';
+                } else {
+                    button.textContent = 'Hide Questions';
+                }
+            });
+        });
+        
+        // Submit Answer functionality
+        document.querySelectorAll('.submit-answer-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const container = button.closest('.check-understanding-container');
+                const radioButtons = container.querySelectorAll('input[type="radio"]:checked');
+                const feedbackEl = container.querySelector('.feedback');
+                
+                if (radioButtons.length === 0) {
+                    feedbackEl.textContent = 'Please select an answer.';
+                    feedbackEl.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'dark:bg-green-900', 'dark:text-green-200', 'bg-red-100', 'text-red-800', 'dark:bg-red-900', 'dark:text-red-200');
+                    feedbackEl.classList.add('bg-yellow-100', 'text-yellow-800', 'dark:bg-yellow-900', 'dark:text-yellow-200');
+                    feedbackEl.classList.remove('hidden');
+                    return;
+                }
+                
+                const selectedAnswer = radioButtons[0].value;
+                let isCorrect = false;
+                
+                // Check if answer is correct based on question
+                const questionName = radioButtons[0].name;
+                
+                if (questionName === 'q1' && selectedAnswer === 'b') isCorrect = true;
+                if (questionName === 'q2' && selectedAnswer === 'b') isCorrect = true;
+                if (questionName === 'q3' && selectedAnswer === 'c') isCorrect = true;
+                if (questionName === 'q4' && selectedAnswer === 'b') isCorrect = true;
+                if (questionName === 'q5' && selectedAnswer === 'c') isCorrect = true;
+                if (questionName === 'q6' && selectedAnswer === 'b') isCorrect = true;
+                if (questionName === 'q7' && selectedAnswer === 'b') isCorrect = true;
+                if (questionName === 'q8' && selectedAnswer === 'c') isCorrect = true;
+                
+                // Display feedback
+                if (isCorrect) {
+                    feedbackEl.textContent = 'Correct! Well done.';
+                    feedbackEl.classList.remove('hidden', 'bg-yellow-100', 'text-yellow-800', 'dark:bg-yellow-900', 'dark:text-yellow-200', 'bg-red-100', 'text-red-800', 'dark:bg-red-900', 'dark:text-red-200');
+                    feedbackEl.classList.add('bg-green-100', 'text-green-800', 'dark:bg-green-900', 'dark:text-green-200');
+                } else {
+                    feedbackEl.textContent = 'Incorrect. Try again.';
+                    feedbackEl.classList.remove('hidden', 'bg-yellow-100', 'text-yellow-800', 'dark:bg-yellow-900', 'dark:text-yellow-200', 'bg-green-100', 'text-green-800', 'dark:bg-green-900', 'dark:text-green-200');
+                    feedbackEl.classList.add('bg-red-100', 'text-red-800', 'dark:bg-red-900', 'dark:text-red-200');
+                }
+                
+                feedbackEl.classList.remove('hidden');
+            });
+        });
+        
+        // Quiz functionality
+        const quizQuestions = [
+            {
+                question: "What is the concept that implies man is not the absolute owner of resources in Islamic finance?",
+                options: ["Tawhid", "Istikhlaf", "Adalah", "Tazkiyah"],
+                answer: 1
+            },
+            {
+                question: "Which of the following is a primary source of Shariah?",
+                options: ["Qiyas", "Ijma", "The Holy Qur'an", "Istihsan"],
+                answer: 2
+            },
+            {
+                question: "What are the five elements that Maqasid al-Shariah aims to preserve and promote?",
+                options: [
+                    "Wealth, Health, Education, Security, and Family",
+                    "Religion, Life, Intellect, Posterity, and Wealth",
+                    "Justice, Equality, Freedom, Peace, and Prosperity",
+                    "Belief, Prayer, Charity, Fasting, and Pilgrimage"
+                ],
+                answer: 1
+            },
+            {
+                question: "Which of the following is NOT one of the three major prohibited elements in Islamic finance?",
+                options: ["Riba (Interest/Usury)", "Gharar (Excessive Uncertainty)", "Maysir (Gambling)", "Infaq (Charitable Giving)"],
+                answer: 3
+            },
+            {
+                question: "In Islamic finance, what does the concept of 'iwad refer to?",
+                options: [
+                    "The certainty of returns in an investment",
+                    "Equal countervalue in a transaction",
+                    "Profit-sharing arrangements",
+                    "Charitable donations"
+                ],
+                answer: 1
+            },
+            {
+                question: "What type of gharar is permissible in Islamic financial contracts?",
+                options: ["Gharar Fahish (Major uncertainty)", "Gharar related to price fluctuations", "Gharar Yasir (Minor uncertainty)", "All types of gharar are prohibited"],
+                answer: 2
+            },
+            {
+                question: "Which of the following best describes the relationship between conventional banking and Islamic banking?",
+                options: [
+                    "They are identical except for terminology",
+                    "Islamic banking prohibits interest while conventional banking allows it",
+                    "Conventional banking focuses on asset-backed financing while Islamic banking doesn't",
+                    "Islamic banking only differs in how profit is calculated"
+                ],
+                answer: 1
+            },
+            {
+                question: "When was Bank Islam Malaysia Berhad established?",
+                options: ["1963", "1975", "1983", "1990"],
+                answer: 2
+            },
+            {
+                question: "What percentage of the Islamic finance industry is contributed by Islamic banking?",
+                options: ["Around 30%", "Around 50%", "Around 71%", "Around 90%"],
+                answer: 2
+            },
+            {
+                question: "Which of the following is NOT a challenge facing Islamic finance today?",
+                options: [
+                    "Lack of standardization across different jurisdictions",
+                    "Lack of Shariah-compliant financial products",
+                    "Limited awareness and understanding of Islamic finance",
+                    "Excessive market demand with insufficient supply"
+                ],
+                answer: 3
+            }
+        ];
+        
+        let currentQuestion = 0;
+        let score = 0;
+        let quizStarted = false;
+        
+        // Start Quiz
+        document.getElementById('start-quiz-btn').addEventListener('click', () => {
+            document.getElementById('quiz-start-screen').classList.add('hidden');
+            document.getElementById('quiz-question-screen').classList.remove('hidden');
+            startQuiz();
+        });
+        
+        // Retry Quiz
+        document.getElementById('retry-quiz-btn').addEventListener('click', () => {
+            document.getElementById('quiz-result-screen').classList.add('hidden');
+            document.getElementById('quiz-question-screen').classList.remove('hidden');
+            currentQuestion = 0;
+            score = 0;
+            startQuiz();
+        });
+        
+        // Review Chapter
+        document.getElementById('review-chapter-btn').addEventListener('click', () => {
+            document.querySelector('[data-section="philosophy"]').click();
+        });
+        
+        // Submit Quiz Answer
+        document.getElementById('submit-quiz-btn').addEventListener('click', () => {
+            checkAnswer();
+        });
+        
+        // Next Question
+        document.getElementById('next-question-btn').addEventListener('click', () => {
+            currentQuestion++;
+            
+            if (currentQuestion < quizQuestions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        });
+        
+        function startQuiz() {
+            quizStarted = true;
+            currentQuestion = 0;
+            score = 0;
+            loadQuestion();
+        }
+        
+        function loadQuestion() {
+            const questionData = quizQuestions[currentQuestion];
+            
+            // Update progress
+            document.querySelector('#quiz-progress div').style.width = `${(currentQuestion / quizQuestions.length) * 100}%`;
+            document.getElementById('quiz-question-number').textContent = `Question ${currentQuestion + 1}/${quizQuestions.length}`;
+            document.getElementById('quiz-score').textContent = `Score: ${score}`;
+            
+            // Set question text
+            document.getElementById('quiz-question').textContent = questionData.question;
+            
+            // Clear previous options
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            
+            // Add new options
+            questionData.options.forEach((option, index) => {
+                const optionEl = document.createElement('label');
+                optionEl.className = 'flex items-start';
+                optionEl.innerHTML = `
+                    <input type="radio" name="quiz-option" value="${index}" class="mt-1">
+                    <span class="ml-2">${option}</span>
+                `;
+                optionsContainer.appendChild(optionEl);
+            });
+            
+            // Reset UI
+            document.getElementById('quiz-feedback').classList.add('hidden');
+            document.getElementById('submit-quiz-btn').classList.remove('hidden');
+            document.getElementById('next-question-btn').classList.add('hidden');
+        }
+        
+        function checkAnswer() {
+            const selectedOption = document.querySelector('input[name="quiz-option"]:checked');
+            const feedbackEl = document.getElementById('quiz-feedback');
+            
+            if (!selectedOption) {
+                feedbackEl.textContent = 'Please select an answer.';
+                feedbackEl.className = 'p-4 rounded-lg mb-4 bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+                feedbackEl.classList.remove('hidden');
+                return;
+            }
+            
+            const answer = parseInt(selectedOption.value);
+            const correctAnswer = quizQuestions[currentQuestion].answer;
+            
+            if (answer === correctAnswer) {
+                score++;
+                feedbackEl.textContent = 'Correct! Well done.';
+                feedbackEl.className = 'p-4 rounded-lg mb-4 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+            } else {
+                feedbackEl.textContent = `Incorrect. The correct answer is: ${quizQuestions[currentQuestion].options[correctAnswer]}`;
+                feedbackEl.className = 'p-4 rounded-lg mb-4 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+            }
+            
+            feedbackEl.classList.remove('hidden');
+            document.getElementById('quiz-score').textContent = `Score: ${score}`;
+            
+            // Show next button, hide submit button
+            document.getElementById('submit-quiz-btn').classList.add('hidden');
+            document.getElementById('next-question-btn').classList.remove('hidden');
+            
+            // Disable radio buttons
+            document.querySelectorAll('input[name="quiz-option"]').forEach(radio => {
+                radio.disabled = true;
+            });
+        }
+        
+        function showResults() {
+            document.getElementById('quiz-question-screen').classList.add('hidden');
+            document.getElementById('quiz-result-screen').classList.remove('hidden');
+            
+            const finalScore = document.getElementById('final-score');
+            const feedbackMessage = document.getElementById('quiz-feedback-message');
+            
+            finalScore.textContent = `You scored ${score} out of ${quizQuestions.length}.`;
+            
+            // Provide feedback based on score
+            const percentage = (score / quizQuestions.length) * 100;
+            
+            if (percentage >= 80) {
+                feedbackMessage.textContent = 'Excellent! You have a strong understanding of Islamic Finance concepts.';
+                feedbackMessage.className = 'mb-4 text-green-600 dark:text-green-400';
+            } else if (percentage >= 60) {
+                feedbackMessage.textContent = 'Good job! You have a decent grasp of Islamic Finance concepts, but there are areas for improvement.';
+                feedbackMessage.className = 'mb-4 text-blue-600 dark:text-blue-400';
+            } else {
+                feedbackMessage.textContent = 'You may need to review the chapter again to strengthen your understanding of Islamic Finance concepts.';
+                feedbackMessage.className = 'mb-4 text-red-600 dark:text-red-400';
+            }
+        }
+    </script>
+</body>
+</html>
