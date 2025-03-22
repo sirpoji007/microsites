@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk and Insurance - Chapter 1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        secondary: '#4B5563',
+                        accent: '#8B5CF6',
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .flip-card {
+            perspective: 1000px;
+            height: 200px;
+        }
+        
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+        
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+        
+        /* Progress bar animation */
+        @keyframes progress {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+        
+        .progress-animate {
+            animation: progress 0.5s ease;
+        }
+        
+        /* Quiz styles */
+        .quiz-option {
+            transition: all 0.3s ease;
+        }
+        
+        .quiz-option:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .dark .quiz-option:hover {
+            background-color: #374151;
+        }
+        
+        .quiz-option.correct {
+            background-color: #10B981;
+            color: white;
+        }
+        
+        .quiz-option.incorrect {
+            background-color: #EF4444;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+    <!-- Navigation bar -->
+    <nav class="bg-white dark:bg-gray-800 shadow-md fixed w-full z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#" class="flex items-center space-x-2">
+                        <i class="fas fa-shield-alt text-primary text-2xl"></i>
+                        <span class="font-bold text-xl">INS200</span>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="progress-text" class="hidden md:block">Progress: 0%</span>
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <i class="fas fa-moon text-gray-600 dark:text-gray-300 dark:hidden"></i>
+                        <i class="fas fa-sun text-yellow-400 hidden dark:block"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Progress bar -->
+    <div class="fixed top-16 w-full h-1 bg-gray-200 dark:bg-gray-700 z-10">
+        <div id="progress-bar" class="h-full bg-primary" style="width: 0%"></div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="fixed left-0 top-16 h-full bg-gray-100 dark:bg-gray-800 w-64 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-10" id="sidebar">
+        <div class="p-4">
+            <h2 class="text-lg font-semibold mb-4">Chapter 1: Nature of Risk</h2>
+            <ul class="space-y-2">
+                <li><a href="#intro" class="block p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Introduction</a></li>
+                <li><a href="#definition" class="block p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Definition of Risk</a></li>
+                <li><a href="#concepts" class="block p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Loss, Peril, Hazard</a></li>
+                <li><a href="#probability" class="block p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Probability Theories</a></li>
+                <li><a href="#classification" class="block p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Classification of Risk</a></li>
+                <li><a href="#types" class="block p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Types of Pure Risk</a></li>
+                <li><a href="#quiz" class="block p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Knowledge Check</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="md:ml-64 pt-20 pb-16 min-h-screen">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Mobile menu button -->
+            <button id="mobile-menu-button" class="md:hidden fixed bottom-4 right-4 bg-primary text-white rounded-full p-3 shadow-lg z-20">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Introduction Section -->
+            <section id="intro" class="mb-12 pt-8">
+                <h1 class="text-3xl font-bold text-primary mb-6">Chapter 1: Nature of Risk</h1>
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">Chapter Outcomes</h2>
+                    <p class="mb-4">Upon completion of this chapter, you should be able to:</p>
+                    <ul class="space-y-2 ml-6 list-disc">
+                        <li>Define some common terminology</li>
+                        <li>Describe the concept of risk, perils, hazards and loss</li>
+                        <li>Explain different types of probabilities theories</li>
+                        <li>Discuss classification of risk</li>
+                        <li>Distinguish different types of pure risk</li>
+                    </ul>
+                </div>
+                <div class="flex justify-end">
+                    <a href="#definition" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md flex items-center">
+                        Next: Definition of Risk <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Definition of Risk Section -->
+            <section id="definition" class="mb-12 pt-8">
+                <h2 class="text-2xl font-bold text-primary mb-6">1.1 The Definition of Risk</h2>
+                
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <p class="mb-4"><strong>Definition:</strong> A condition in which there is a possibility of adverse deviation from a desire outcome that is expected or hoped for.</p>
+                    <ul class="space-y-2 ml-6 list-disc mb-4">
+                        <li>Risk is a variation of outcomes in a given situation</li>
+                        <li>Risk in insurance term implies some form of uncertainty about an outcome in a given situation – (loss we may suffer in the future)</li>
+                    </ul>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="flip-card" onclick="toggleFlip(this)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front bg-primary text-white rounded-xl p-6 flex flex-col justify-center items-center cursor-pointer">
+                                <h3 class="text-xl font-bold mb-2">RISK</h3>
+                                <p class="text-center">Click to see definition</p>
+                            </div>
+                            <div class="flip-card-back bg-white dark:bg-gray-800 border border-primary rounded-xl p-6 flex flex-col justify-center">
+                                <h3 class="text-xl font-bold mb-2 text-primary">RISK</h3>
+                                <p>Uncertainty about an outcome of an event</p>
+                                <p><strong>Outcome:</strong> normally NEGATIVE</p>
+                                <p><strong>Example:</strong> Rose aim to get B for INS200, but she only scored C</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flip-card" onclick="toggleFlip(this)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front bg-accent text-white rounded-xl p-6 flex flex-col justify-center items-center cursor-pointer">
+                                <h3 class="text-xl font-bold mb-2">CHANCE</h3>
+                                <p class="text-center">Click to see definition</p>
+                            </div>
+                            <div class="flip-card-back bg-white dark:bg-gray-800 border border-accent rounded-xl p-6 flex flex-col justify-center">
+                                <h3 class="text-xl font-bold mb-2 text-accent">CHANCE</h3>
+                                <p>Doubt/uncertainty about an outcome of an event</p>
+                                <p><strong>Outcome:</strong> normally POSITIVE</p>
+                                <p><strong>Example:</strong> Passing your exam with flying colours</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Concept of Risk</h3>
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-sm">
+                            <p>Risk is a situation in which some kind of loss is possible and it is a part of life</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-sm">
+                            <p>Insurance will protect risk. Those who purchase insurance are financially compensated in case of loss</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-sm">
+                            <p>Although we are uncertain on the future losses, the possibility of loss can be estimate by applying the probability theories. Provided, there is a large number of exposures</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between">
+                    <a href="#intro" class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 px-4 py-2 rounded-md flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i> Previous
+                    </a>
+                    <a href="#concepts" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md flex items-center">
+                        Next: Loss, Peril & Hazard <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Concept of Loss, Peril and Hazard Section -->
+            <section id="concepts" class="mb-12 pt-8">
+                <h2 class="text-2xl font-bold text-primary mb-6">1.2 Concept of Loss, Peril and Hazard</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 card-hover">
+                        <div class="flex justify-center mb-4">
+                            <div class="w-16 h-16 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center">
+                                <i class="fas fa-exclamation-triangle text-red-500 dark:text-red-300 text-2xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-center mb-2">Hazard</h3>
+                        <p class="text-center">A condition that increases the chance of loss</p>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 card-hover">
+                        <div class="flex justify-center mb-4">
+                            <div class="w-16 h-16 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center">
+                                <i class="fas fa-bolt text-yellow-500 dark:text-yellow-300 text-2xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-center mb-2">Peril</h3>
+                        <p class="text-center">A cause of loss</p>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 card-hover">
+                        <div class="flex justify-center mb-4">
+                            <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                                <i class="fas fa-chart-line text-blue-500 dark:text-blue-300 text-2xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-center mb-2">Loss</h3>
+                        <p class="text-center">A reduction or disappearance of economic value</p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Types of Hazard</h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="card-hover bg-white dark:bg-gray-700 rounded-xl p-5 shadow-md">
+                            <h4 class="font-bold text-lg mb-2 text-primary">Physical Hazard</h4>
+                            <p class="mb-3">Physical condition that increases the condition of loss</p>
+                            <img src="https://i.imgur.com/7RxFZMG.png" alt="Physical Hazard" class="w-full h-auto rounded-lg">
+                        </div>
+                        
+                        <div class="card-hover bg-white dark:bg-gray-700 rounded-xl p-5 shadow-md">
+                            <h4 class="font-bold text-lg mb-2 text-primary">Moral Hazard</h4>
+                            <p class="mb-3">Character defect in an individual that increases the chance of loss</p>
+                            <img src="https://i.imgur.com/fMgWdqK.png" alt="Moral Hazard" class="w-full h-auto rounded-lg">
+                        </div>
+                        
+                        <div class="card-hover bg-white dark:bg-gray-700 rounded-xl p-5 shadow-md">
+                            <h4 class="font-bold text-lg mb-2 text-primary">Morale Hazard</h4>
+                            <p class="mb-3">Indifference caused by the knowledge that insurance exists</p>
+                            <img src="https://i.imgur.com/D3hvJWy.png" alt="Morale Hazard" class="w-full h-auto rounded-lg">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Example Scenario</h3>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white dark:bg-gray-700 rounded-lg overflow-hidden">
+                            <thead class="bg-gray-100 dark:bg-gray-600">
+                                <tr>
+                                    <th class="py-3 px-4 text-left">HAZARD</th>
+                                    <th class="py-3 px-4 text-left">PERIL</th>
+                                    <th class="py-3 px-4 text-left">LOSS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-gray-200 dark:border-gray-600">
+                                    <td class="py-3 px-4">Poor brake</td>
+                                    <td class="py-3 px-4">Get into an accident</td>
+                                    <td class="py-3 px-4">
+                                        <ul class="list-disc ml-5">
+                                            <li>Property damage</li>
+                                            <li>Loss of use</li>
+                                            <li>Loss of income</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-gray-200 dark:border-gray-600">
+                                    <td class="py-3 px-4">Excessive smoking</td>
+                                    <td class="py-3 px-4">Cancer</td>
+                                    <td class="py-3 px-4">
+                                        <ul class="list-disc ml-5">
+                                            <li>Medical expenses</li>
+                                            <li>Loss due to death</li>
+                                            <li>Additional expenses</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4">Carelessness</td>
+                                    <td class="py-3 px-4">Negligence</td>
+                                    <td class="py-3 px-4">
+                                        <ul class="list-disc ml-5">
+                                            <li>Court award</li>
+                                            <li>Legal expenses</li>
+                                            <li>Additional expenses</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="flex justify-between">
+                    <a href="#definition" class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 px-4 py-2 rounded-md flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i> Previous
+                    </a>
+                    <a href="#probability" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md flex items-center">
+                        Next: Probability Theories <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Probability Theories Section -->
+            <section id="probability" class="mb-12 pt-8">
+                <h2 class="text-2xl font-bold text-primary mb-6">1.3 Probability Theories</h2>
+                
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <p class="mb-4">The term probability refers to an area or study which measures the chance of occurrence of a particular event.</p>
+                    <p class="mb-4">It is possible to determine the chance of loss using probability theory. Provided that there is a large number of loss exposure.</p>
+                    <p>This approach we may use to anticipate whether the risk/loss may happen or not. (usually used by insurance companies)</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md card-hover">
+                        <div class="flex justify-center mb-4">
+                            <div class="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                                <i class="fas fa-dice text-green-500 dark:text-green-300 text-2xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-center mb-3">A Priori Probability</h3>
+                        <p class="mb-3">Determined when the total number of possible events are known are rare.</p>
+                        <p class="mb-3"><strong>Example:</strong> The probability of getting a six on a roll of dice is 1/6.</p>
+                        <p>This concept has a limited practical application in the study of risk because situations where a number of possible outcome are known are very rare.</p>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md card-hover">
+                        <div class="flex justify-center mb-4">
+                            <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                                <i class="fas fa-chart-bar text-blue-500 dark:text-blue-300 text-2xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-center mb-3">Empirical Probability</h3>
+                        <p class="mb-3">Determined on the basis of historical data.</p>
+                        <p class="mb-3"><strong>Example:</strong> Road accidents.</p>
+                        <p>The underlying concept that makes it possible for empirical probability to be measured accurately is that as the number of observations increases, the predicted loss tends to approach the actual loss (the law of large numbers).</p>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md card-hover">
+                        <div class="flex justify-center mb-4">
+                            <div class="w-16 h-16 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
+                                <i class="fas fa-brain text-purple-500 dark:text-purple-300 text-2xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-center mb-3">Judgmental Probability</h3>
+                        <p class="mb-3">Determined based on the judgment of the person predicting the outcome.</p>
+                        <p class="mb-3">It is used when there is lack of historical data or credible statistics.</p>
+                        <p><strong>Example:</strong> Astronaut program by Malaysia. The insurance company in Malaysia uses judgmental probability due to lack of credible statistics.</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-between">
+                    <a href="#concepts" class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 px-4 py-2 rounded-md flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i> Previous
+                    </a>
+                    <a href="#classification" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md flex items-center">
+                        Next: Classification of Risk <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Classification of Risk Section -->
+            <section id="classification" class="mb-12 pt-8">
+                <h2 class="text-2xl font-bold text-primary mb-6">1.4 Classification of Risk</h2>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Basic Categories of Risk</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-primary bg-opacity-10 dark:bg-opacity-30 p-4 rounded-lg">
+                            <h4 class="font-bold mb-2 text-primary">Differentiate by effects</h4>
+                            <ul class="list-disc ml-5 space-y-1">
+                                <li>Fundamental Risk</li>
+                                <li>Particular Risk</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-primary bg-opacity-10 dark:bg-opacity-30 p-4 rounded-lg">
+                            <h4 class="font-bold mb-2 text-primary">Differentiate by outcomes</h4>
+                            <ul class="list-disc ml-5 space-y-1">
+                                <li>Pure Risk</li>
+                                <li>Speculative Risk</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-primary bg-opacity-10 dark:bg-opacity-30 p-4 rounded-lg">
+                            <h4 class="font-bold mb-2 text-primary">Differentiate by financial</h4>
+                            <ul class="list-disc ml-5 space-y-1">
+                                <li>Financial Risk</li>
+                                <li>Non-Financial Risk</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Differentiate by Effects -->
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Differentiate by Effects</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm">
+                            <h4 class="font-bold text-lg mb-2 text-primary">Fundamental Risk</h4>
+                            <p class="mb-3">Affects the entire economy or large number of persons/groups within the economy</p>
+                            <p class="mb-2"><strong>Examples:</strong></p>
+                            <ul class="list-disc ml-5">
+                                <li>Flood</li>
+                                <li>Typhoon</li>
+                                <li>Inflation</li>
+                                <li>Mass Unemployment</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm">
+                            <h4 class="font-bold text-lg mb-2 text-primary">Particular Risk</h4>
+                            <p class="mb-3">Affects an individual due to the individual action or choice (individual responsibility)</p>
+                            <p class="mb-2"><strong>Examples:</strong></p>
+                            <ul class="list-disc ml-5">
+                                <li>Crossing a road</li>
+                                <li>Driving a car</li>
+                                <li>Swimming</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Differentiate by Outcomes -->
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Differentiate by Outcomes</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm">
+                            <h4 class="font-bold text-lg mb-2 text-primary">Pure Risk</h4>
+                            <p class="mb-3">Exists when there is both possibility of loss or no loss</p>
+                            <p class="mb-3"><strong>Example:</strong> The car driver faces the risk of a potential collision loss</p>
+                            <ul class="list-disc ml-5">
+                                <li>If the collision occur, the owner will suffer financial loss</li>
+                                <li>If no collision occur, the owner financial remain unchanged</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm">
+                            <h4 class="font-bold text-lg mb-2 text-primary">Speculative Risk</h4>
+                            <p class="mb-3">Exists when there is possibility of profit, loss or no loss</p>
+                            <p class="mb-3"><strong>Example:</strong> Investment in a capital project might be profitable, failure or reach breakeven</p>
+                            <p><em>**Speculative risks are rarely insured</em></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Differentiate by Financial -->
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Differentiate by Financial</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm">
+                            <h4 class="font-bold text-lg mb-2 text-primary">Financial Risk</h4>
+                            <p class="mb-3">Outcome can be measured by monetary terms</p>
+                            <p><strong>Example:</strong> Property damages (can be measured in terms of loss or profit)</p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm">
+                            <h4 class="font-bold text-lg mb-2 text-primary">Non-Financial Risk</h4>
+                            <p class="mb-3">Outcome cannot be measured by monetary terms</p>
+                            <p><strong>Example:</strong> Choice of career (will affect ones quality of life)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between">
+                    <a href="#probability" class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 px-4 py-2 rounded-md flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i> Previous
+                    </a>
+                    <a href="#types" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md flex items-center">
+                        Next: Types of Pure Risk <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Types of Pure Risk Section -->
+            <section id="types" class="mb-12 pt-8">
+                <h2 class="text-2xl font-bold text-primary mb-6">1.5 Types of Pure Risk</h2>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <p class="mb-6">Pure risk can be divided into three (3) types:</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="bg-primary bg-opacity-10 dark:bg-opacity-30 p-4 rounded-lg text-center">
+                            <i class="fas fa-user-shield text-primary text-3xl mb-2"></i>
+                            <h4 class="font-bold">Personal Risk</h4>
+                            <p class="mt-2">Risk directly affecting an individual</p>
+                        </div>
+                        
+                        <div class="bg-primary bg-opacity-10 dark:bg-opacity-30 p-4 rounded-lg text-center">
+                            <i class="fas fa-home text-primary text-3xl mb-2"></i>
+                            <h4 class="font-bold">Property Risk</h4>
+                            <p class="mt-2">Risk of destruction or theft of property</p>
+                        </div>
+                        
+                        <div class="bg-primary bg-opacity-10 dark:bg-opacity-30 p-4 rounded-lg text-center">
+                            <i class="fas fa-balance-scale text-primary text-3xl mb-2"></i>
+                            <h4 class="font-bold">Liability Risk</h4>
+                            <p class="mt-2">Risk of being legally liable for damages to others</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Types of Personal Risk -->
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Types of Personal Risk</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="card-hover bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm">
+                            <h4 class="font-bold text-lg mb-2 text-primary">Risk of Premature Death</h4>
+                            <ul class="list-disc ml-5">
+                                <li>Give raise to great financial losses</li>
+                                <li>Loss of human value</li>
+                                <li>Additional expenses incurred</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card-hover bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm">
+                            <h4 class="font-bold text-lg mb-2 text-primary">Risk of Old Age</h4>
+                            <p>The major risk associated with old age is the possibility of insufficient income during retirement</p>
+                        </div>
+                        
+                        <div class="card-hover bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm">
+                            <h4 class="font-bold text-lg mb-2 text-primary">Risk of Poor Health</h4>
+                            <p class="mb-2">Risk of poor health is associated with the risks of:</p>
+                            <ul class="list-disc ml-5">
+                                <li>Medical expenses</li>
+                                <li>Loss of earned income</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card-hover bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm">
+                            <h4 class="font-bold text-lg mb-2 text-primary">Risk of Unemployment</h4>
+                            <p class="mb-2">Major risk associated with unemployment are:</p>
+                            <ul class="list-disc ml-5">
+                                <li>Loss of earned income</li>
+                                <li>Depletion of accumulated financial assets</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Types of Property Risk -->
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Types of Property Risk</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="card-hover bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm">
+                            <h4 class="font-bold text-lg mb-2 text-primary">Direct Loss</h4>
+                            <p>Damage to a property by peril</p>
+                            <p class="mt-2"><strong>Example:</strong> Loss of value of the house as a result of fire (the peril)</p>
+                        </div>
+                        
+                        <div class="card-hover bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm">
+                            <h4 class="font-bold text-lg mb-2 text-primary">Indirect Loss</h4>
+                            <p>A loss in consequence of a direct loss; i.e. property damage</p>
+                            <p class="mt-2"><strong>Example:</strong> Loss of profit as result of business interruption following damage on the business premises</p>
+                        </div>
+                        
+                        <div class="card-hover bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm">
+                            <h4 class="font-bold text-lg mb-2 text-primary">Extra Expenses</h4>
+                            <p>Extra expenses incurred as a result of the loss</p>
+                            <p class="mt-2"><strong>Example:</strong> Renovation/re-fixing of damaged property</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Liability Risk -->
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Liability Risk</h3>
+                    
+                    <div class="bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm">
+                        <h4 class="font-bold text-lg mb-2 text-primary">Liability Risk</h4>
+                        <ul class="list-disc ml-5 space-y-2">
+                            <li>Risk of being sued because of neglect, malpractice, or causing wilful injury either to another person or to someone else's property</li>
+                            <li>Possibility of financial loss if you are found liable, or the financial loss incurred just defending yourself, even if you are not found liable</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="flex justify-between">
+                    <a href="#classification" class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 px-4 py-2 rounded-md flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i> Previous
+                    </a>
+                    <a href="#quiz" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md flex items-center">
+                        Next: Knowledge Check <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Knowledge Check Section -->
+            <section id="quiz" class="mb-12 pt-8">
+                <h2 class="text-2xl font-bold text-primary mb-6">Knowledge Check</h2>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+                    <div id="quiz-container">
+                        <div class="quiz-question" data-question="1">
+                            <h3 class="text-xl font-semibold mb-4">Question 1: Which of the following is NOT a type of hazard?</h3>
+                            <div class="space-y-3">
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Physical hazard</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Moral hazard</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Morale hazard</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="true">
+                                    <span>Financial hazard</span>
+                                </div>
+                            </div>
+                            <div class="mt-4 hidden" id="feedback-1"></div>
+                        </div>
+                        
+                        <div class="quiz-question hidden" data-question="2">
+                            <h3 class="text-xl font-semibold mb-4">Question 2: A situation with possible outcomes of profit, loss, or breaking even is known as:</h3>
+                            <div class="space-y-3">
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Pure risk</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="true">
+                                    <span>Speculative risk</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Fundamental risk</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Particular risk</span>
+                                </div>
+                            </div>
+                            <div class="mt-4 hidden" id="feedback-2"></div>
+                        </div>
+                        
+                        <div class="quiz-question hidden" data-question="3">
+                            <h3 class="text-xl font-semibold mb-4">Question 3: Which probability theory is based on historical data?</h3>
+                            <div class="space-y-3">
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>A Priori Probability</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="true">
+                                    <span>Empirical Probability</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Judgmental Probability</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Statistical Probability</span>
+                                </div>
+                            </div>
+                            <div class="mt-4 hidden" id="feedback-3"></div>
+                        </div>
+                        
+                        <div class="quiz-question hidden" data-question="4">
+                            <h3 class="text-xl font-semibold mb-4">Question 4: Loss of profit as a result of business interruption is an example of:</h3>
+                            <div class="space-y-3">
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Direct property loss</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="true">
+                                    <span>Indirect property loss</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Liability risk</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Extra expense</span>
+                                </div>
+                            </div>
+                            <div class="mt-4 hidden" id="feedback-4"></div>
+                        </div>
+                        
+                        <div class="quiz-question hidden" data-question="5">
+                            <h3 class="text-xl font-semibold mb-4">Question 5: Which of the following is an example of a particular risk?</h3>
+                            <div class="space-y-3">
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Flood</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Inflation</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="true">
+                                    <span>Driving a car</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Unemployment</span>
+                                </div>
+                            </div>
+                            <div class="mt-4 hidden" id="feedback-5"></div>
+                        </div>
+                        
+                        <div id="quiz-results" class="hidden">
+                            <h3 class="text-xl font-semibold mb-4">Quiz Results</h3>
+                            <p class="mb-3">You scored: <span id="quiz-score">0</span>/5</p>
+                            <div id="quiz-message" class="mb-4"></div>
+                            <button id="retry-quiz" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md">Try Again</button>
+                        </div>
+                        
+                        <div class="flex justify-center mt-6">
+                            <button id="next-question" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md hidden">Next Question</button>
+                            <button id="submit-quiz" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md hidden">Submit Quiz</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between">
+                    <a href="#types" class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 px-4 py-2 rounded-md flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i> Previous
+                    </a>
+                    <a href="#intro" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md flex items-center">
+                        Back to Top <i class="fas fa-arrow-up ml-2"></i>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Check for dark mode preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        
+        // Listen for changes in color scheme preference
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+        
+        // Theme toggle
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+        });
+        
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', () => {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-translate-x-full');
+        });
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            const sidebar = document.getElementById('sidebar');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            
+            if (window.innerWidth < 768 && 
+                !sidebar.contains(e.target) && 
+                e.target !== mobileMenuButton && 
+                !mobileMenuButton.contains(e.target) && 
+                !sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.add('-translate-x-full');
+            }
+        });
+        
+        // Flip card function
+        function toggleFlip(card) {
+            card.classList.toggle('flipped');
+        }
+        
+        // Calculate scroll progress
+        function updateScrollProgress() {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            
+            document.getElementById('progress-bar').style.width = scrolled + '%';
+            document.getElementById('progress-text').innerText = 'Progress: ' + Math.round(scrolled) + '%';
+            
+            // Add animation to progress bar
+            document.getElementById('progress-bar').classList.add('progress-animate');
+            setTimeout(() => {
+                document.getElementById('progress-bar').classList.remove('progress-animate');
+            }, 500);
+        }
+        
+        window.addEventListener('scroll', updateScrollProgress);
+        
+        // Quiz functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizOptions = document.querySelectorAll('.quiz-option');
+            const nextButton = document.getElementById('next-question');
+            const submitButton = document.getElementById('submit-quiz');
+            const retryButton = document.getElementById('retry-quiz');
+            let currentQuestion = 1;
+            let score = 0;
+            let answered = false;
+            
+            // Show first question's next button
+            nextButton.classList.remove('hidden');
+            
+            // Add click event to all quiz options
+            quizOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    if (answered) return;
+                    
+                    // Mark as answered
+                    answered = true;
+                    
+                    // Check if answer is correct
+                    const isCorrect = this.getAttribute('data-correct') === 'true';
+                    const questionNumber = this.closest('.quiz-question').getAttribute('data-question');
+                    
+                    // Update score
+                    if (isCorrect) {
+                        score++;
+                        this.classList.add('correct');
+                        document.getElementById(`feedback-${questionNumber}`).innerHTML = '<div class="bg-green-100 dark:bg-green-900 p-3 rounded-md">Correct! Well done.</div>';
+                    } else {
+                        this.classList.add('incorrect');
+                        
+                        // Find the correct answer and highlight it
+                        const correctOption = Array.from(this.closest('.quiz-question').querySelectorAll('.quiz-option'))
+                            .find(opt => opt.getAttribute('data-correct') === 'true');
+                        correctOption.classList.add('correct');
+                        
+                        document.getElementById(`feedback-${questionNumber}`).innerHTML = '<div class="bg-red-100 dark:bg-red-900 p-3 rounded-md">Incorrect! The highlighted answer is correct.</div>';
+                    }
+                    
+                    // Show feedback
+                    document.getElementById(`feedback-${questionNumber}`).classList.remove('hidden');
+                    
+                    // Disable all options for this question
+                    const allOptions = this.closest('.quiz-question').querySelectorAll('.quiz-option');
+                    allOptions.forEach(opt => {
+                        opt.style.pointerEvents = 'none';
+                    });
+                    
+                    // Show appropriate button
+                    if (currentQuestion < 5) {
+                        nextButton.classList.remove('hidden');
+                    } else {
+                        submitButton.classList.remove('hidden');
+                    }
+                });
+            });
+            
+            // Next question button
+            nextButton.addEventListener('click', function() {
+                // Hide current question
+                document.querySelector(`.quiz-question[data-question="${currentQuestion}"]`).classList.add('hidden');
+                
+                // Show next question
+                currentQuestion++;
+                document.querySelector(`.quiz-question[data-question="${currentQuestion}"]`).classList.remove('hidden');
+                
+                // Reset answered state
+                answered = false;
+                
+                // Hide next button until answer is selected
+                nextButton.classList.add('hidden');
+                
+                // If last question, show submit button instead of next
+                if (currentQuestion === 5) {
+                    nextButton.classList.add('hidden');
+                }
+            });
+            
+            // Submit quiz button
+            submitButton.addEventListener('click', function() {
+                // Hide the last question
+                document.querySelector(`.quiz-question[data-question="${currentQuestion}"]`).classList.add('hidden');
+                
+                // Hide submit button
+                submitButton.classList.add('hidden');
+                
+                // Show results
+                document.getElementById('quiz-results').classList.remove('hidden');
+                document.getElementById('quiz-score').textContent = score;
+                
+                // Display message based on score
+                const message = document.getElementById('quiz-message');
+                if (score === 5) {
+                    message.innerHTML = 'Perfect score! You have a excellent understanding of the concepts.';
+                } else if (score >= 3) {
+                    message.innerHTML = 'Good job! You have a good grasp of the material.';
+                } else {
+                    message.innerHTML = 'Consider reviewing the material again to strengthen your understanding.';
+                }
+            });
+            
+            // Retry quiz button
+            retryButton.addEventListener('click', function() {
+                // Reset all quiz state
+                score = 0;
+                currentQuestion = 1;
+                answered = false;
+                
+                // Hide results
+                document.getElementById('quiz-results').classList.add('hidden');
+                
+                // Show first question
+                document.querySelectorAll('.quiz-question').forEach(q => q.classList.add('hidden'));
+                document.querySelector('.quiz-question[data-question="1"]').classList.remove('hidden');
+                
+                // Reset options
+                quizOptions.forEach(option => {
+                    option.classList.remove('correct', 'incorrect');
+                    option.style.pointerEvents = 'auto';
+                });
+                
+                // Hide feedback
+                for (let i = 1; i <= 5; i++) {
+                    const feedback = document.getElementById(`feedback-${i}`);
+                    if (feedback) {
+                        feedback.classList.add('hidden');
+                        feedback.innerHTML = '';
+                    }
+                }
+                
+                // Show next button for first question
+                nextButton.classList.remove('hidden');
+                submitButton.classList.add('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
