@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Microlearning: Shari’ah Contracts</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Marked.js for Markdown parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    :root {
+      --primary-color: #5D5CDE;
+      --primary-dark: #4A49B8;
+      --primary-light: #8281E6;
+      --text-dark: #333333;
+      --text-light: #FFFFFF;
+      --bg-light: #FFFFFF;
+      --bg-dark: #181818;
+      --secondary-light: #F5F5F5;
+      --secondary-dark: #2A2A2A;
+    }
+    /* Global Styles */
+    .course-app {
+      transition: background-color 0.3s, color 0.3s;
+    }
+    /* Quiz Styles */
+    .quiz-option {
+      transition: all 0.3s ease;
+    }
+    .quiz-option:hover {
+      transform: translateX(5px);
+    }
+    .quiz-option.correct {
+      background-color: #4ade80 !important;
+      color: var(--text-dark) !important;
+    }
+    .quiz-option.incorrect {
+      background-color: #f87171 !important;
+      color: var(--text-dark) !important;
+    }
+    /* Progress bar animation */
+    @keyframes progressAnimation {
+      0% { width: 0; }
+    }
+    .progress-animation {
+      animation: progressAnimation 1s ease-out forwards;
+    }
+    /* Content transition */
+    .content-transition {
+      transition: opacity 0.3s ease;
+    }
+    /* Lesson content styling */
+    .lesson-content h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      margin-top: 1.5rem;
+    }
+    .lesson-content h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      margin-top: 1.25rem;
+    }
+    .lesson-content h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      margin-top: 1rem;
+    }
+    .lesson-content p {
+      margin-bottom: 1rem;
+      line-height: 1.7;
+    }
+    .lesson-content ul, .lesson-content ol {
+      margin-left: 2rem;
+      margin-bottom: 1rem;
+    }
+    .lesson-content ul {
+      list-style-type: disc;
+    }
+    .lesson-content ol {
+      list-style-type: decimal;
+    }
+    .lesson-content code {
+      background-color: rgba(0,0,0,0.1);
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.25rem;
+      font-family: monospace;
+    }
+    .lesson-content pre {
+      background-color: rgba(0,0,0,0.1);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      margin-bottom: 1rem;
+    }
+    .dark .lesson-content code, .dark .lesson-content pre {
+      background-color: rgba(255,255,255,0.1);
+    }
+  </style>
+</head>
+<body class="font-sans antialiased">
+  <div id="app" class="course-app min-h-screen"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      initApp(prefersDarkMode);
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        updateTheme(e.matches);
+      });
+    });
+
+    /* Course Data based on Chapter 2: Shari’ah Contracts for Islamic Financial Institutions */
+    const courseData = {
+      title: "Shari’ah Contracts for Islamic Financial Institutions",
+      modules: [
+        {
+          id: 1,
+          title: "Elements of Shari’ah Contracts",
+          lessons: [
+            {
+              id: 1,
+              title: "Introduction & Essential Elements",
+              videoId: "", // Optional YouTube video ID if available
+              content: `
+# Elements of Shari’ah Contracts
+
+**Key Topics:**
+- Form of contract
+- Subject matter and contracting parties
+- Conditions for a valid contract
+
+**Overview:**
+During the Prophet’s time, examples from his life served as guidance in formulating contracts. Islamic contracts emphasize transparency, mutual consent, and avoiding prohibited elements such as riba and gharar.
+
+![Contract Illustration](https://api.storyset.com/v1/illustration/contract/outline?color=5D5CDE)
+
+Explore the essential elements and conditions needed for a valid Shari’ah contract.
+              `
+            }
+          ],
+          quiz: {
+            title: "Quiz: Essential Elements",
+            questions: [
+              {
+                question: "Which of the following is a key element in a valid Shari’ah contract?",
+                options: [
+                  "Gharar (excessive uncertainty)",
+                  "Mutual consent (Redho)",
+                  "Riba (interest)",
+                  "Coercion"
+                ],
+                correctAnswer: 1
+              }
+            ]
+          }
+        },
+        {
+          id: 2,
+          title: "Classification of Shari’ah Contracts",
+          lessons: [
+            {
+              id: 2,
+              title: "Types & Classifications",
+              videoId: "",
+              content: `
+# Classification of Shari’ah Contracts
+
+**Main Categories:**
+- Trading Contracts
+- Participating Contracts
+- Supporting Contracts
+
+**Details:**
+- **Trading Contracts:** Include sale-based contracts (e.g., Murabahah, Bai Salam).
+- **Participating Contracts:** Include profit sharing (e.g., Musharakah, Mudharabah).
+- **Supporting Contracts:** Include security and custody contracts (e.g., Rahn, Kafalah).
+
+![Classification Illustration](https://api.storyset.com/v1/illustration/classification/outline?color=5D5CDE)
+              `
+            }
+          ],
+          quiz: {
+            title: "Quiz: Contract Classifications",
+            questions: [
+              {
+                question: "Which category includes Murabahah?",
+                options: [
+                  "Trading Contracts",
+                  "Participating Contracts",
+                  "Supporting Contracts",
+                  "None of the above"
+                ],
+                correctAnswer: 0
+              }
+            ]
+          }
+        },
+        {
+          id: 3,
+          title: "Exchange Based Contracts",
+          lessons: [
+            {
+              id: 3,
+              title: "Murabahah & Bai Salam",
+              videoId: "",
+              content: `
+# Exchange Based Contracts
+
+**Focus Areas:**
+- **Murabahah (Cost Plus Profit):**
+  1. Bank purchases the asset.
+  2. Sells to customer with a known profit margin.
+- **Bai Salam (Advance Payment Sale):**
+  1. Full payment is made in advance.
+  2. Delivery occurs in the future.
+
+**Process Flow:**
+Diagrams illustrate the steps for both contracts.
+
+![Exchange Contract Illustration](https://api.storyset.com/v1/illustration/exchange/outline?color=5D5CDE)
+              `
+            }
+          ],
+          quiz: {
+            title: "Quiz: Exchange Contracts",
+            questions: [
+              {
+                question: "What distinguishes Bai Salam from a typical sale?",
+                options: [
+                  "Payment is made after delivery",
+                  "Payment is made in advance",
+                  "No profit margin is applied",
+                  "It involves leasing"
+                ],
+                correctAnswer: 1
+              }
+            ]
+          }
+        },
+        {
+          id: 4,
+          title: "Partnership Contracts",
+          lessons: [
+            {
+              id: 4,
+              title: "Musyarakah & Mudharabah",
+              videoId: "",
+              content: `
+# Partnership Contracts
+
+**Key Concepts:**
+- **Musyarakah:** Joint investment with profit and loss sharing.
+- **Mudharabah:** Profit sharing between capital provider and entrepreneur.
+
+**Example Process:**
+For Mudharabah, one party supplies the funds while the other manages the venture. Profits are shared as pre-agreed.
+
+![Partnership Illustration](https://api.storyset.com/v1/illustration/partnership/outline?color=5D5CDE)
+              `
+            }
+          ],
+          quiz: {
+            title: "Quiz: Partnership Contracts",
+            questions: [
+              {
+                question: "In a Mudharabah contract, who bears the loss?",
+                options: [
+                  "The entrepreneur",
+                  "The capital provider",
+                  "Both share equally",
+                  "No one bears the loss"
+                ],
+                correctAnswer: 1
+              }
+            ]
+          }
+        },
+        {
+          id: 5,
+          title: "Charitable & Agency Contracts",
+          lessons: [
+            {
+              id: 5,
+              title: "Hibah, Wadiah & Wakalah",
+              videoId: "",
+              content: `
+# Charitable & Agency Contracts
+
+**Overview:**
+- **Hibah (Gift):** Voluntary transfer without expectation of return.
+- **Wadiah (Safekeeping):** Deposits held safely by banks.
+- **Wakalah (Agency):** Agent carries out tasks on behalf of a principal.
+
+![Agency Illustration](https://api.storyset.com/v1/illustration/agency/outline?color=5D5CDE)
+
+These contracts are vital for ensuring trust and efficiency in Islamic financial operations.
+              `
+            }
+          ],
+          quiz: {
+            title: "Quiz: Charitable & Agency Contracts",
+            questions: [
+              {
+                question: "Which contract is based on the concept of safekeeping?",
+                options: [
+                  "Hibah",
+                  "Wadiah",
+                  "Wakalah",
+                  "Mudharabah"
+                ],
+                correctAnswer: 1
+              }
+            ]
+          }
+        },
+        {
+          id: 6,
+          title: "Security & Supporting Contracts",
+          lessons: [
+            {
+              id: 6,
+              title: "Kafalah, Rahn, and Others",
+              videoId: "",
+              content: `
+# Security & Supporting Contracts
+
+**Key Points:**
+- **Kafalah (Guarantee):** Guarantor provides security for a debtor.
+- **Rahn (Pledge):** Assets are pledged as security for loans.
+- **Additional Supporting Contracts:** Such as Ibraa’ and Wa’d.
+
+![Security Illustration](https://api.storyset.com/v1/illustration/security/outline?color=5D5CDE)
+              `
+            }
+          ],
+          quiz: {
+            title: "Quiz: Security & Supporting Contracts",
+            questions: [
+              {
+                question: "What is the primary purpose of a Rahn contract?",
+                options: [
+                  "To guarantee a debt",
+                  "To share profits",
+                  "To advance payment for future delivery",
+                  "To form a partnership"
+                ],
+                correctAnswer: 0
+              }
+            ]
+          }
+        }
+      ]
+    };
+
+    // Initialize the app with user progress
+    function initApp(darkMode) {
+      const userProgress = JSON.parse(localStorage.getItem('courseProgress')) || {
+        currentModule: 1,
+        currentLesson: 1,
+        completedLessons: [],
+        quizScores: {}
+      };
+      const app = document.getElementById('app');
+      updateTheme(darkMode);
+      renderApp(app, courseData, userProgress);
+    }
+
+    // Update theme based on dark mode preference
+    function updateTheme(isDark) {
+      const app = document.getElementById('app');
+      if (isDark) {
+        app.classList.add('dark', 'bg-gray-900', 'text-gray-100');
+        app.classList.remove('bg-white', 'text-gray-800');
+      } else {
+        app.classList.add('bg-white', 'text-gray-800');
+        app.classList.remove('dark', 'bg-gray-900', 'text-gray-100');
+      }
+    }
+
+    // Render main app structure
+    function renderApp(appElement, courseData, userProgress) {
+      const currentModule = courseData.modules.find(m => m.id === userProgress.currentModule) || courseData.modules[0];
+      const currentLesson = currentModule.lessons.find(l => l.id === userProgress.currentLesson) || currentModule.lessons[0];
+
+      const totalLessons = courseData.modules.reduce((total, module) => total + module.lessons.length, 0);
+      const completedCount = userProgress.completedLessons.length;
+      const progressPercentage = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
+
+      appElement.innerHTML = `
+        <div class="flex flex-col min-h-screen">
+          <!-- Header -->
+          <header class="bg-gradient-to-r from-indigo-600 to-indigo-500 text-white p-4 shadow-md">
+            <div class="container mx-auto">
+              <div class="flex flex-col md:flex-row justify-between items-center">
+                <h1 class="text-2xl font-bold tracking-tight">${courseData.title}</h1>
+                <div class="flex items-center mt-2 md:mt-0">
+                  <div class="mr-4 hidden md:block">
+                    <div class="text-sm font-medium mb-1">Your Progress</div>
+                    <div class="w-48 h-2 bg-indigo-200 rounded-full overflow-hidden">
+                      <div class="h-full bg-white progress-animation rounded-full" style="width: ${progressPercentage}%"></div>
+                    </div>
+                    <div class="text-xs mt-1 text-right">${progressPercentage}% Complete</div>
+                  </div>
+                  <button id="sidebar-toggle" class="p-2 rounded-md hover:bg-indigo-700 transition-colors md:hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <!-- Mobile Progress Bar -->
+              <div class="mt-3 md:hidden">
+                <div class="flex justify-between text-xs mb-1">
+                  <span>Progress</span>
+                  <span>${progressPercentage}%</span>
+                </div>
+                <div class="w-full h-2 bg-indigo-200 rounded-full overflow-hidden">
+                  <div class="h-full bg-white progress-animation rounded-full" style="width: ${progressPercentage}%"></div>
+                </div>
+              </div>
+            </div>
+          </header>
+          
+          <!-- Main Content -->
+          <div class="flex-grow flex flex-col md:flex-row">
+            <!-- Sidebar Navigation -->
+            <div id="sidebar" class="md:w-64 bg-gray-100 dark:bg-gray-800 md:min-h-screen hidden md:block">
+              <nav class="p-4">
+                <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Course Modules</h2>
+                <ul class="space-y-1">
+                  ${courseData.modules.map(module => `
+                    <li>
+                      <div class="px-3 py-2 rounded-md ${currentModule.id === module.id ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300' : 'hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200'} font-medium cursor-pointer transition-colors" data-module-id="${module.id}">
+                        ${module.title}
+                      </div>
+                      ${currentModule.id === module.id ? `
+                        <ul class="ml-4 mt-2 space-y-1">
+                          ${module.lessons.map(lesson => `
+                            <li>
+                              <div class="px-3 py-2 rounded-md text-sm ${currentLesson.id === lesson.id ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300' : 'hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200'} cursor-pointer transition-colors flex items-center" data-lesson-id="${lesson.id}">
+                                <span class="mr-2">${userProgress.completedLessons.includes(lesson.id) ? '✓' : '○'}</span>
+                                ${lesson.title}
+                              </div>
+                            </li>
+                          `).join('')}
+                          <li>
+                            <div class="px-3 py-2 rounded-md text-sm hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 cursor-pointer transition-colors flex items-center" data-quiz-id="${module.id}">
+                              <span class="mr-2">${userProgress.quizScores[module.id] !== undefined ? '✓' : '○'}</span>
+                              ${module.quiz.title}
+                            </div>
+                          </li>
+                        </ul>
+                      ` : ''}
+                    </li>
+                  `).join('')}
+                </ul>
+              </nav>
+            </div>
+
+            <!-- Content Area -->
+            <main class="flex-grow p-4 md:p-6 bg-white dark:bg-gray-900">
+              <div id="content-area" class="container mx-auto max-w-4xl content-transition">
+                ${renderLessonContent(currentLesson, currentModule)}
+              </div>
+            </main>
+          </div>
+          
+          <!-- Footer -->
+          <footer class="bg-gray-100 dark:bg-gray-800 p-4 text-center text-gray-600 dark:text-gray-400 text-sm">
+            <div class="container mx-auto">
+              <p>&copy; ${new Date().getFullYear()} Microlearning Platform. All rights reserved.</p>
+              <p class="mt-1">Created for educational purposes.</p>
+            </div>
+          </footer>
+        </div>
+      `;
+      setupEventListeners(appElement, courseData, userProgress);
+    }
+
+    // Render lesson content
+    function renderLessonContent(lesson, module) {
+      return `
+        <div class="space-y-6">
+          <div class="flex justify-between items-center">
+            <div>
+              <h2 class="text-2xl font-bold">${lesson.title}</h2>
+              <p class="text-gray-600 dark:text-gray-400">${module.title}</p>
+            </div>
+            <div>
+              <button id="mark-complete" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors">
+                Mark as Complete
+              </button>
+            </div>
+          </div>
+          <!-- Optional Video Embed -->
+          ${lesson.videoId ? `
+            <div class="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
+              <iframe 
+                class="w-full h-full"
+                src="https://www.youtube.com/embed/${lesson.videoId}" 
+                title="${lesson.title}"
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+              </iframe>
+            </div>
+          ` : ''}
+          <!-- Lesson Content -->
+          <div class="lesson-content prose dark:prose-invert max-w-none">
+            ${marked.parse(lesson.content)}
+          </div>
+          <!-- Navigation Buttons -->
+          <div class="flex justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
+            <button id="prev-lesson" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-md transition-colors">
+              Previous Lesson
+            </button>
+            <button id="next-lesson" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors">
+              Next Lesson
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // Render quiz content
+    function renderQuizContent(module, userProgress) {
+      const quiz = module.quiz;
+      const quizScore = userProgress.quizScores[module.id];
+      const hasCompletedQuiz = quizScore !== undefined;
+      
+      if (hasCompletedQuiz) {
+        return `
+          <div class="space-y-6">
+            <div>
+              <h2 class="text-2xl font-bold">${quiz.title}</h2>
+              <p class="text-gray-600 dark:text-gray-400">${module.title}</p>
+            </div>
+            <div class="bg-indigo-50 dark:bg-indigo-900/30 p-6 rounded-lg">
+              <div class="text-center">
+                <div class="text-4xl font-bold text-indigo-600 dark:text-indigo-400">${quizScore}%</div>
+                <p class="text-lg mt-2 mb-4">
+                  ${quizScore >= 70 ? 'Congratulations! You passed the quiz.' : 'You need to score at least 70% to pass.'}
+                </p>
+                <button id="retake-quiz" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors">
+                  Retake Quiz
+                </button>
+              </div>
+            </div>
+            <div class="flex justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
+              <button id="prev-lesson" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-md transition-colors">
+                Back to Lessons
+              </button>
+              <button id="next-module" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors">
+                Next Module
+              </button>
+            </div>
+          </div>
+        `;
+      }
+      return `
+        <div class="space-y-6">
+          <div>
+            <h2 class="text-2xl font-bold">${quiz.title}</h2>
+            <p class="text-gray-600 dark:text-gray-400">${module.title}</p>
+          </div>
+          <div class="bg-indigo-50 dark:bg-indigo-900/30 p-6 rounded-lg">
+            <p class="mb-4">Complete this quiz to test your understanding of ${module.title}. You need to score at least 70% to pass.</p>
+            <form id="quiz-form" class="space-y-6">
+              ${quiz.questions.map((q, qIndex) => `
+                <div class="quiz-question p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                  <h3 class="font-medium text-lg mb-3">Question ${qIndex + 1}: ${q.question}</h3>
+                  <div class="space-y-2">
+                    ${q.options.map((option, oIndex) => `
+                      <div class="quiz-option flex items-center p-3 rounded-md cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700" data-question="${qIndex}" data-option="${oIndex}">
+                        <div class="h-5 w-5 rounded-full border-2 border-indigo-500 dark:border-indigo-400 mr-3 flex-shrink-0 flex items-center justify-center">
+                          <div class="selected-indicator h-3 w-3 rounded-full bg-indigo-500 dark:bg-indigo-400 hidden"></div>
+                        </div>
+                        <div>${option}</div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              `).join('')}
+              <div class="text-center">
+                <button type="submit" id="submit-quiz" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-medium rounded-md transition-colors">
+                  Submit Quiz
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      `;
+    }
+
+    // Setup main event listeners
+    function setupEventListeners(appElement, courseData, userProgress) {
+      const contentArea = appElement.querySelector('#content-area');
+      const sidebar = appElement.querySelector('#sidebar');
+      const sidebarToggle = appElement.querySelector('#sidebar-toggle');
+
+      appElement.querySelectorAll('[data-module-id]').forEach(element => {
+        element.addEventListener('click', () => {
+          const moduleId = parseInt(element.dataset.moduleId);
+          userProgress.currentModule = moduleId;
+          const module = courseData.modules.find(m => m.id === moduleId);
+          if (module && module.lessons.length > 0) {
+            userProgress.currentLesson = module.lessons[0].id;
+          }
+          saveUserProgress(userProgress);
+          renderApp(appElement, courseData, userProgress);
+        });
+      });
+
+      appElement.querySelectorAll('[data-lesson-id]').forEach(element => {
+        element.addEventListener('click', () => {
+          const lessonId = parseInt(element.dataset.lessonId);
+          userProgress.currentLesson = lessonId;
+          saveUserProgress(userProgress);
+          contentArea.style.opacity = '0';
+          setTimeout(() => {
+            renderApp(appElement, courseData, userProgress);
+            contentArea.style.opacity = '1';
+          }, 300);
+        });
+      });
+
+      appElement.querySelectorAll('[data-quiz-id]').forEach(element => {
+        element.addEventListener('click', () => {
+          const moduleId = parseInt(element.dataset.quizId);
+          const module = courseData.modules.find(m => m.id === moduleId);
+          contentArea.style.opacity = '0';
+          setTimeout(() => {
+            contentArea.innerHTML = renderQuizContent(module, userProgress);
+            setupQuizEventListeners(appElement, module, userProgress, courseData);
+            contentArea.style.opacity = '1';
+          }, 300);
+        });
+      });
+
+      const markCompleteBtn = appElement.querySelector('#mark-complete');
+      if (markCompleteBtn) {
+        markCompleteBtn.addEventListener('click', () => {
+          if (!userProgress.completedLessons.includes(userProgress.currentLesson)) {
+            userProgress.completedLessons.push(userProgress.currentLesson);
+            saveUserProgress(userProgress);
+            renderApp(appElement, courseData, userProgress);
+          }
+        });
+      }
+
+      const prevLessonBtn = appElement.querySelector('#prev-lesson');
+      const nextLessonBtn = appElement.querySelector('#next-lesson');
+      if (prevLessonBtn) {
+        prevLessonBtn.addEventListener('click', () => {
+          navigateLesson(appElement, courseData, userProgress, 'prev');
+        });
+      }
+      if (nextLessonBtn) {
+        nextLessonBtn.addEventListener('click', () => {
+          navigateLesson(appElement, courseData, userProgress, 'next');
+        });
+      }
+      if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', () => {
+          sidebar.classList.toggle('hidden');
+        });
+      }
+    }
+
+    // Setup quiz-specific event listeners
+    function setupQuizEventListeners(appElement, module, userProgress, courseData) {
+      const contentArea = appElement.querySelector('#content-area');
+      const quizForm = appElement.querySelector('#quiz-form');
+      const retakeQuizBtn = appElement.querySelector('#retake-quiz');
+      const nextModuleBtn = appElement.querySelector('#next-module');
+      const prevLessonBtn = appElement.querySelector('#prev-lesson');
+
+      const quizOptions = appElement.querySelectorAll('.quiz-option');
+      quizOptions.forEach(option => {
+        option.addEventListener('click', () => {
+          const questionIndex = parseInt(option.dataset.question);
+          appElement.querySelectorAll(`.quiz-option[data-question="${questionIndex}"]`).forEach(opt => {
+            opt.classList.remove('bg-indigo-100', 'dark:bg-indigo-900/50');
+            opt.querySelector('.selected-indicator').classList.add('hidden');
+          });
+          option.classList.add('bg-indigo-100', 'dark:bg-indigo-900/50');
+          option.querySelector('.selected-indicator').classList.remove('hidden');
+        });
+      });
+
+      if (quizForm) {
+        quizForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const selectedAnswers = [];
+          for (let i = 0; i < module.quiz.questions.length; i++) {
+            const selectedOption = appElement.querySelector(`.quiz-option[data-question="${i}"].bg-indigo-100`);
+            selectedAnswers[i] = selectedOption ? parseInt(selectedOption.dataset.option) : null;
+          }
+          if (selectedAnswers.includes(null)) {
+            alert('Please answer all questions before submitting.');
+            return;
+          }
+          let correctCount = 0;
+          for (let i = 0; i < module.quiz.questions.length; i++) {
+            if (selectedAnswers[i] === module.quiz.questions[i].correctAnswer) {
+              correctCount++;
+            }
+          }
+          const score = Math.round((correctCount / module.quiz.questions.length) * 100);
+          userProgress.quizScores[module.id] = score;
+          saveUserProgress(userProgress);
+          contentArea.style.opacity = '0';
+          setTimeout(() => {
+            contentArea.innerHTML = renderQuizContent(module, userProgress);
+            setupQuizEventListeners(appElement, module, userProgress, courseData);
+            contentArea.style.opacity = '1';
+          }, 300);
+        });
+      }
+
+      if (retakeQuizBtn) {
+        retakeQuizBtn.addEventListener('click', () => {
+          delete userProgress.quizScores[module.id];
+          saveUserProgress(userProgress);
+          contentArea.style.opacity = '0';
+          setTimeout(() => {
+            contentArea.innerHTML = renderQuizContent(module, userProgress);
+            setupQuizEventListeners(appElement, module, userProgress, courseData);
+            contentArea.style.opacity = '1';
+          }, 300);
+        });
+      }
+      if (nextModuleBtn) {
+        nextModuleBtn.addEventListener('click', () => {
+          const currentModuleIndex = courseData.modules.findIndex(m => m.id === module.id);
+          if (currentModuleIndex < courseData.modules.length - 1) {
+            const nextModule = courseData.modules[currentModuleIndex + 1];
+            userProgress.currentModule = nextModule.id;
+            if (nextModule.lessons.length > 0) {
+              userProgress.currentLesson = nextModule.lessons[0].id;
+            }
+            saveUserProgress(userProgress);
+            renderApp(appElement, courseData, userProgress);
+          }
+        });
+      }
+      if (prevLessonBtn) {
+        prevLessonBtn.addEventListener('click', () => {
+          renderApp(appElement, courseData, userProgress);
+        });
+      }
+    }
+
+    // Navigate between lessons
+    function navigateLesson(appElement, courseData, userProgress, direction) {
+      const currentModule = courseData.modules.find(m => m.id === userProgress.currentModule);
+      const lessonIndex = currentModule.lessons.findIndex(l => l.id === userProgress.currentLesson);
+      if (direction === 'next') {
+        if (lessonIndex < currentModule.lessons.length - 1) {
+          userProgress.currentLesson = currentModule.lessons[lessonIndex + 1].id;
+        } else {
+          const contentArea = appElement.querySelector('#content-area');
+          contentArea.style.opacity = '0';
+          setTimeout(() => {
+            contentArea.innerHTML = renderQuizContent(currentModule, userProgress);
+            setupQuizEventListeners(appElement, currentModule, userProgress, courseData);
+            contentArea.style.opacity = '1';
+          }, 300);
+          return;
+        }
+      } else if (direction === 'prev') {
+        if (lessonIndex > 0) {
+          userProgress.currentLesson = currentModule.lessons[lessonIndex - 1].id;
+        } else {
+          const moduleIndex = courseData.modules.findIndex(m => m.id === userProgress.currentModule);
+          if (moduleIndex > 0) {
+            const prevModule = courseData.modules[moduleIndex - 1];
+            userProgress.currentModule = prevModule.id;
+            if (prevModule.lessons.length > 0) {
+              userProgress.currentLesson = prevModule.lessons[prevModule.lessons.length - 1].id;
+            }
+          }
+        }
+      }
+      saveUserProgress(userProgress);
+      const contentArea = appElement.querySelector('#content-area');
+      contentArea.style.opacity = '0';
+      setTimeout(() => {
+        renderApp(appElement, courseData, userProgress);
+        contentArea.style.opacity = '1';
+      }, 300);
+    }
+
+    // Save user progress
+    function saveUserProgress(userProgress) {
+      try {
+        localStorage.setItem('courseProgress', JSON.stringify(userProgress));
+      } catch (e) {
+        console.log('Unable to save progress');
+      }
+    }
+  </script>
+</body>
+</html>
