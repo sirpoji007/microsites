@@ -1,653 +1,1901 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Microlearning: Shari’ah Contracts</title>
-<!-- Tailwind CSS -->
-<script src="https://cdn.tailwindcss.com"></script>
-<!-- Marked.js for Markdown parsing -->
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<style>
-    :root {
-      --primary-color: #5D5CDE;
-      --primary-dark: #4A49B8;
-      --primary-light: #8281E6;
-      --text-dark: #333333;
-      --text-light: #FFFFFF;
-      --bg-light: #FFFFFF;
-      --bg-dark: #181818;
-      --secondary-light: #F5F5F5;
-      --secondary-dark: #2A2A2A;
-    }
-    /* Global Styles */
-    .course-app {
-      transition: background-color 0.3s, color 0.3s;
-    }
-    /* Quiz Styles */
-    .quiz-option {
-      transition: all 0.3s ease;
-    }
-    .quiz-option:hover {
-      transform: translateX(5px);
-    }
-    .quiz-option.correct {
-      background-color: #4ade80 !important;
-      color: var(--text-dark) !important;
-    }
-    .quiz-option.incorrect {
-      background-color: #f87171 !important;
-      color: var(--text-dark) !important;
-    }
-    /* Progress bar animation */
-    @keyframes progressAnimation {
-      0% { width: 0; }
-    }
-    .progress-animation {
-      animation: progressAnimation 1s ease-out forwards;
-    }
-    /* Content transition */
-    .content-transition {
-      transition: opacity 0.3s ease;
-    }
-    /* Lesson content styling */
-    .lesson-content h1 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      margin-top: 1.5rem;
-    }
-    .lesson-content h2 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 0.75rem;
-      margin-top: 1.25rem;
-    }
-    .lesson-content h3 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      margin-top: 1rem;
-    }
-    .lesson-content p {
-      margin-bottom: 1rem;
-      line-height: 1.7;
-    }
-    .lesson-content ul, .lesson-content ol {
-      margin-left: 2rem;
-      margin-bottom: 1rem;
-    }
-    .lesson-content ul {
-      list-style-type: disc;
-    }
-    .lesson-content ol {
-      list-style-type: decimal;
-    }
-    .lesson-content code {
-      background-color: rgba(0,0,0,0.1);
-      padding: 0.2rem 0.4rem;
-      border-radius: 0.25rem;
-      font-family: monospace;
-    }
-    .lesson-content pre {
-      background-color: rgba(0,0,0,0.1);
-      padding: 1rem;
-      border-radius: 0.5rem;
-      overflow-x: auto;
-      margin-bottom: 1rem;
-    }
-    .dark .lesson-content code, .dark .lesson-content pre {
-      background-color: rgba(255,255,255,0.1);
-    }
-</style>
-</head>
-<body class="font-sans antialiased">
-<div class="course-app min-h-screen" id="app"></div>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      initApp(prefersDarkMode);
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        updateTheme(e.matches);
-      });
-    });
-
-    /* Course Data based on Chapter 2: Shari’ah Contracts for Islamic Financial Institutions */
-    const courseData = {
-      title: "Shari’ah Contracts for Islamic Financial Institutions",
-      modules: [
-        {
-          id: 1,
-          title: "Elements of Shari’ah Contracts",
-          lessons: [
-            {
-              id: 1,
-              title: "Introduction & Essential Elements",
-              videoId: "", // Optional YouTube video ID if available
-              content: `
-# Elements of Shari’ah Contracts
-
-**Key Topics:**
-- Form of contract
-- Subject matter and contracting parties
-- Conditions for a valid contract
-
-**Overview:**
-During the Prophet’s time, examples from his life served as guidance in formulating contracts. Islamic contracts emphasize transparency, mutual consent, and avoiding prohibited elements such as riba and gharar.
-
-![Contract Illustration](https://i.imgur.com/h1E4aoW.png)
-
-Explore the essential elements and conditions needed for a valid Shari’ah contract.
-              `
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Islamic Finance Microlearning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        secondary: '#4CAF50',
+                        accent: '#FFC107',
+                        success: '#28a745',
+                        info: '#17a2b8',
+                        warning: '#ffc107',
+                        danger: '#dc3545',
+                    }
+                }
             }
-          ],
-          quiz: {
-            title: "Quiz: Essential Elements",
-            questions: [
-              {
-                question: "Which of the following is a key element in a valid Shari’ah contract?",
-                options: [
-                  "Gharar (excessive uncertainty)",
-                  "Mutual consent (Redho)",
-                  "Riba (interest)",
-                  "Coercion"
-                ],
-                correctAnswer: 1
-              }
-            ]
-          }
-        },
-        {
-          id: 2,
-          title: "Classification of Shari’ah Contracts",
-          lessons: [
-            {
-              id: 2,
-              title: "Types & Classifications",
-              videoId: "",
-              content: `
-# Classification of Shari’ah Contracts
-
-**Main Categories:**
-- Trading Contracts
-- Participating Contracts
-- Supporting Contracts
-
-**Details:**
-- **Trading Contracts:** Include sale-based contracts (e.g., Murabahah, Bai Salam).
-- **Participating Contracts:** Include profit sharing (e.g., Musharakah, Mudharabah).
-- **Supporting Contracts:** Include security and custody contracts (e.g., Rahn, Kafalah).
-
-![Classification Illustration](https://i.imgur.com/egTC7lQ.png)
-              `
-            }
-          ],
-          quiz: {
-            title: "Quiz: Contract Classifications",
-            questions: [
-              {
-                question: "Which category includes Murabahah?",
-                options: [
-                  "Trading Contracts",
-                  "Participating Contracts",
-                  "Supporting Contracts",
-                  "None of the above"
-                ],
-                correctAnswer: 0
-              }
-            ]
-          }
-        },
-        {
-          id: 3,
-          title: "Exchange Based Contracts",
-          lessons: [
-            {
-              id: 3,
-              title: "Murabahah & Bai Salam",
-              videoId: "",
-              content: `
-# Exchange Based Contracts
-
-**Focus Areas:**
-- **Murabahah (Cost Plus Profit):**
-  1. Bank purchases the asset.
-  2. Sells to customer with a known profit margin.
-- **Bai Salam (Advance Payment Sale):**
-  1. Full payment is made in advance.
-  2. Delivery occurs in the future.
-
-**Process Flow:**
-Diagrams illustrate the steps for both contracts.
-
-![Exchange Contract Illustration](https://i.imgur.com/Gdxmjud.png)
-              `
-            }
-          ],
-          quiz: {
-            title: "Quiz: Exchange Contracts",
-            questions: [
-              {
-                question: "What distinguishes Bai Salam from a typical sale?",
-                options: [
-                  "Payment is made after delivery",
-                  "Payment is made in advance",
-                  "No profit margin is applied",
-                  "It involves leasing"
-                ],
-                correctAnswer: 1
-              }
-            ]
-          }
-        },
-        {
-          id: 4,
-          title: "Partnership Contracts",
-          lessons: [
-            {
-              id: 4,
-              title: "Musyarakah & Mudharabah",
-              videoId: "",
-              content: `
-# Partnership Contracts
-
-**Key Concepts:**
-- **Musyarakah:** Joint investment with profit and loss sharing.
-- **Mudharabah:** Profit sharing between capital provider and entrepreneur.
-
-**Example Process:**
-For Mudharabah, one party supplies the funds while the other manages the venture. Profits are shared as pre-agreed.
-
-![Partnership Illustration](https://i.imgur.com/VsAVkRV.png)
-              `
-            }
-          ],
-          quiz: {
-            title: "Quiz: Partnership Contracts",
-            questions: [
-              {
-                question: "In a Mudharabah contract, who bears the loss?",
-                options: [
-                  "The entrepreneur",
-                  "The capital provider",
-                  "Both share equally",
-                  "No one bears the loss"
-                ],
-                correctAnswer: 1
-              }
-            ]
-          }
-        },
-        {
-          id: 5,
-          title: "Charitable & Agency Contracts",
-          lessons: [
-            {
-              id: 5,
-              title: "Hibah, Wadiah & Wakalah",
-              videoId: "",
-              content: `
-# Charitable & Agency Contracts
-
-**Overview:**
-- **Hibah (Gift):** Voluntary transfer without expectation of return.
-- **Wadiah (Safekeeping):** Deposits held safely by banks.
-- **Wakalah (Agency):** Agent carries out tasks on behalf of a principal.
-
-![Agency Illustration](https://i.imgur.com/JjTsxzH.png)
-
-These contracts are vital for ensuring trust and efficiency in Islamic financial operations.
-              `
-            }
-          ],
-          quiz: {
-            title: "Quiz: Charitable & Agency Contracts",
-            questions: [
-              {
-                question: "Which contract is based on the concept of safekeeping?",
-                options: [
-                  "Hibah",
-                  "Wadiah",
-                  "Wakalah",
-                  "Mudharabah"
-                ],
-                correctAnswer: 1
-              }
-            ]
-          }
-        },
-        {
-          id: 6,
-          title: "Security & Supporting Contracts",
-          lessons: [
-            {
-              id: 6,
-              title: "Kafalah, Rahn, and Others",
-              videoId: "",
-              content: `
-# Security & Supporting Contracts
-
-**Key Points:**
-- **Kafalah (Guarantee):** Guarantor provides security for a debtor.
-- **Rahn (Pledge):** Assets are pledged as security for loans.
-- **Additional Supporting Contracts:** Such as Ibraa’ and Wa’d.
-
-![Security Illustration](https://i.imgur.com/3Zp9Md9.png)
-              `
-            }
-          ],
-          quiz: {
-            title: "Quiz: Security & Supporting Contracts",
-            questions: [
-              {
-                question: "What is the primary purpose of a Rahn contract?",
-                options: [
-                  "To guarantee a debt",
-                  "To share profits",
-                  "To advance payment for future delivery",
-                  "To form a partnership"
-                ],
-                correctAnswer: 0
-              }
-            ]
-          }
         }
-      ]
-    };
+    </script>
+    <style>
+        .flashcard {
+            perspective: 1000px;
+            height: 200px;
+            margin-bottom: 20px;
+        }
+        
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border-radius: 0.5rem;
+        }
+        
+        .flashcard-back {
+            transform: rotateY(180deg);
+        }
 
-    // Initialize the app with user progress
-    function initApp(darkMode) {
-      const userProgress = JSON.parse(localStorage.getItem('courseProgress')) || {
-        currentModule: 1,
-        currentLesson: 1,
-        completedLessons: [],
-        quizScores: {}
-      };
-      const app = document.getElementById('app');
-      updateTheme(darkMode);
-      renderApp(app, courseData, userProgress);
-    }
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
 
-    // Update theme based on dark mode preference
-    function updateTheme(isDark) {
-      const app = document.getElementById('app');
-      if (isDark) {
-        app.classList.add('dark', 'bg-gray-900', 'text-gray-100');
-        app.classList.remove('bg-white', 'text-gray-800');
-      } else {
-        app.classList.add('bg-white', 'text-gray-800');
-        app.classList.remove('dark', 'bg-gray-900', 'text-gray-100');
-      }
-    }
+        /* Diagram styles */
+        .contract-diagram {
+            position: relative;
+            width: 100%;
+            height: 450px;
+            margin: 20px 0;
+        }
+        
+        .contract-node {
+            position: absolute;
+            background-color: var(--node-color);
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+        
+        .contract-node:hover {
+            transform: scale(1.1);
+        }
+        
+        .contract-line {
+            position: absolute;
+            height: 2px;
+            background-color: #ccc;
+            z-index: 1;
+            transform-origin: left center;
+        }
 
-    // Render main app structure
-    function renderApp(appElement, courseData, userProgress) {
-      const currentModule = courseData.modules.find(m => m.id === userProgress.currentModule) || courseData.modules[0];
-      const currentLesson = currentModule.lessons.find(l => l.id === userProgress.currentLesson) || currentModule.lessons[0];
-
-      const totalLessons = courseData.modules.reduce((total, module) => total + module.lessons.length, 0);
-      const completedCount = userProgress.completedLessons.length;
-      const progressPercentage = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
-
-      appElement.innerHTML = `
-        <div class="flex flex-col min-h-screen">
-          <!-- Header -->
-          <header class="bg-gradient-to-r from-indigo-600 to-indigo-500 text-white p-4 shadow-md">
-            <div class="container mx-auto">
-              <div class="flex flex-col md:flex-row justify-between items-center">
-                <h1 class="text-2xl font-bold tracking-tight">${courseData.title}</h1>
-                <div class="flex items-center mt-2 md:mt-0">
-                  <div class="mr-4 hidden md:block">
-                    <div class="text-sm font-medium mb-1">Your Progress</div>
-                    <div class="w-48 h-2 bg-indigo-200 rounded-full overflow-hidden">
-                      <div class="h-full bg-white progress-animation rounded-full" style="width: ${progressPercentage}%"></div>
+        /* Quiz styles */
+        .quiz-option {
+            transition: all 0.3s ease;
+        }
+        
+        .quiz-option:hover {
+            transform: translateX(5px);
+        }
+        
+        .quiz-option.selected {
+            background-color: rgba(93, 92, 222, 0.1);
+            border-color: #5D5CDE;
+        }
+        
+        .quiz-option.correct {
+            background-color: rgba(76, 175, 80, 0.1);
+            border-color: #4CAF50;
+        }
+        
+        .quiz-option.incorrect {
+            background-color: rgba(220, 53, 69, 0.1);
+            border-color: #dc3545;
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-primary text-white p-4 shadow-md">
+            <div class="container mx-auto flex justify-between items-center">
+                <h1 class="text-xl md:text-2xl font-bold">Islamic Finance Microlearning</h1>
+                <div class="flex space-x-4 items-center">
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-opacity-20 hover:bg-white focus:outline-none">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:block"></i>
+                    </button>
+                    <div class="hidden md:block">
+                        <span id="user-progress-text">0% Complete</span>
+                        <svg class="progress-ring ml-2 inline-block" width="24" height="24">
+                            <circle
+                                class="progress-ring__circle"
+                                stroke="#ffffff"
+                                stroke-width="3"
+                                fill="transparent"
+                                r="10"
+                                cx="12"
+                                cy="12"
+                            />
+                        </svg>
                     </div>
-                    <div class="text-xs mt-1 text-right">${progressPercentage}% Complete</div>
-                  </div>
-                  <button id="sidebar-toggle" class="p-2 rounded-md hover:bg-indigo-700 transition-colors md:hidden">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                  </button>
                 </div>
-              </div>
-              <!-- Mobile Progress Bar -->
-              <div class="mt-3 md:hidden">
-                <div class="flex justify-between text-xs mb-1">
-                  <span>Progress</span>
-                  <span>${progressPercentage}%</span>
-                </div>
-                <div class="w-full h-2 bg-indigo-200 rounded-full overflow-hidden">
-                  <div class="h-full bg-white progress-animation rounded-full" style="width: ${progressPercentage}%"></div>
-                </div>
-              </div>
             </div>
-          </header>
-          
-          <!-- Main Content -->
-          <div class="flex-grow flex flex-col md:flex-row">
+        </header>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col md:flex-row">
             <!-- Sidebar Navigation -->
-            <div id="sidebar" class="md:w-64 bg-gray-100 dark:bg-gray-800 md:min-h-screen hidden md:block">
-              <nav class="p-4">
-                <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Course Modules</h2>
-                <ul class="space-y-1">
-                  ${courseData.modules.map(module => `
-                    <li>
-                      <div class="px-3 py-2 rounded-md ${currentModule.id === module.id ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300' : 'hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200'} font-medium cursor-pointer transition-colors" data-module-id="${module.id}">
-                        ${module.title}
-                      </div>
-                      ${currentModule.id === module.id ? `
-                        <ul class="ml-4 mt-2 space-y-1">
-                          ${module.lessons.map(lesson => `
-                            <li>
-                              <div class="px-3 py-2 rounded-md text-sm ${currentLesson.id === lesson.id ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300' : 'hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200'} cursor-pointer transition-colors flex items-center" data-lesson-id="${lesson.id}">
-                                <span class="mr-2">${userProgress.completedLessons.includes(lesson.id) ? '✓' : '○'}</span>
-                                ${lesson.title}
-                              </div>
-                            </li>
-                          `).join('')}
-                          <li>
-                            <div class="px-3 py-2 rounded-md text-sm hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 cursor-pointer transition-colors flex items-center" data-quiz-id="${module.id}">
-                              <span class="mr-2">${userProgress.quizScores[module.id] !== undefined ? '✓' : '○'}</span>
-                              ${module.quiz.title}
-                            </div>
-                          </li>
-                        </ul>
-                      ` : ''}
-                    </li>
-                  `).join('')}
-                </ul>
-              </nav>
-            </div>
+            <aside class="w-full md:w-64 bg-gray-100 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+                <nav class="p-4 sticky top-0">
+                    <div class="mb-4">
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </span>
+                            <input type="text" id="search-input" placeholder="Search topics..." 
+                                class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary text-base">
+                        </div>
+                    </div>
+                    <ul class="space-y-2">
+                        <li>
+                            <button data-section="introduction" class="nav-item w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 font-medium">
+                                Introduction
+                            </button>
+                        </li>
+                        <li>
+                            <button data-section="elements" class="nav-item w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 font-medium">
+                                Elements of Contracts
+                            </button>
+                        </li>
+                        <li>
+                            <button data-section="classification" class="nav-item w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 font-medium">
+                                Classification of Contracts
+                            </button>
+                        </li>
+                        <li>
+                            <button data-section="exchange" class="nav-item w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 font-medium">
+                                Exchange Based Contracts
+                            </button>
+                        </li>
+                        <li>
+                            <button data-section="partnership" class="nav-item w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 font-medium">
+                                Partnership Contracts
+                            </button>
+                        </li>
+                        <li>
+                            <button data-section="security" class="nav-item w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 font-medium">
+                                Security Contracts
+                            </button>
+                        </li>
+                        <li>
+                            <button data-section="charitable" class="nav-item w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 font-medium">
+                                Charitable Contracts
+                            </button>
+                        </li>
+                        <li>
+                            <button data-section="agency" class="nav-item w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 font-medium">
+                                Agency Contracts
+                            </button>
+                        </li>
+                        <li>
+                            <button data-section="supporting" class="nav-item w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 font-medium">
+                                Supporting Contracts
+                            </button>
+                        </li>
+                        <li>
+                            <button data-section="quiz" class="nav-item w-full text-left px-4 py-2 rounded-lg bg-primary text-white hover:bg-opacity-90 transition-colors duration-200 font-medium">
+                                <i class="fas fa-question-circle mr-2"></i> Final Quiz
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
 
             <!-- Content Area -->
-            <main class="flex-grow p-4 md:p-6 bg-white dark:bg-gray-900">
-              <div id="content-area" class="container mx-auto max-w-4xl content-transition">
-                ${renderLessonContent(currentLesson, currentModule)}
-              </div>
+            <main class="flex-1 p-4 md:p-8 overflow-y-auto">
+                <div id="content-area" class="container mx-auto">
+                    <!-- Introduction Section -->
+                    <section id="introduction" class="mb-10 content-section">
+                        <h2 class="text-2xl md:text-3xl font-bold mb-6 text-primary">Introduction to Shari'ah Contracts</h2>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+                            <h3 class="text-xl font-semibold mb-4">Historical Context</h3>
+                            <p class="mb-4">During Prophet Muhammad's lifetime, Islamic methods of finance often drew upon examples from the Prophet's experiences. There are many sayings about the Prophet (pbuh) buying on credit, taking financing and sometimes giving personal property as a security or lien.</p>
+                            <p>It was reported that Prophet Muhammad (pbuh) used the mudharabah contract to trade with Khadijah's capital which involved the Prophet (pbuh) traveling to Syria. Muslims in Arabia during that period and also in the pre-historic period had widely practiced shirkah or musharakah (full partnership) when operating large commercial entreprises under a profit-and-loss-sharing principle.</p>
+                        </div>
+
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                            <h3 class="text-xl font-semibold mb-4">Theory of Contract in Islam</h3>
+                            <p class="mb-4">In Islamic finance, contracts are foundational and must adhere to specific principles:</p>
+                            
+                            <ul class="list-disc pl-6 mb-4">
+                                <li class="mb-2">Must be based on divine sources (Quran & Sunnah)</li>
+                                <li class="mb-2">Must involve mutual consent (Redho)</li>
+                                <li class="mb-2">Any transfer of wealth or property has to be made through a valid contract or 'aqad</li>
+                            </ul>
+                            
+                            <p class="font-semibold mt-4">Key Prohibitions:</p>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+                                <div class="bg-red-100 dark:bg-red-900 p-4 rounded-lg text-center">
+                                    <h4 class="font-bold">Riba</h4>
+                                    <p class="text-sm">(Interest/Usury)</p>
+                                </div>
+                                <div class="bg-red-100 dark:bg-red-900 p-4 rounded-lg text-center">
+                                    <h4 class="font-bold">Gharar</h4>
+                                    <p class="text-sm">(Excessive Uncertainty)</p>
+                                </div>
+                                <div class="bg-red-100 dark:bg-red-900 p-4 rounded-lg text-center">
+                                    <h4 class="font-bold">Maysir</h4>
+                                    <p class="text-sm">(Gambling/Speculation)</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Flashcards -->
+                        <h3 class="text-xl font-semibold mt-8 mb-4">Key Concepts Flashcards</h3>
+                        <p class="mb-4">Click on the cards to flip them and learn key terms:</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front bg-primary text-white">
+                                        <h3 class="text-xl">Riba</h3>
+                                    </div>
+                                    <div class="flashcard-back bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600">
+                                        <p>Refers to interest or usury. Any predetermined excess or advantage that is paid/received over and above the principal amount in a loan transaction.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front bg-primary text-white">
+                                        <h3 class="text-xl">Gharar</h3>
+                                    </div>
+                                    <div class="flashcard-back bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600">
+                                        <p>Excessive uncertainty or ambiguity in contracts. Transactions must have transparency and certainty in the fundamental terms.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front bg-primary text-white">
+                                        <h3 class="text-xl">Maysir</h3>
+                                    </div>
+                                    <div class="flashcard-back bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600">
+                                        <p>Gambling or speculation. Any transaction that involves betting or gambling where the outcome is entirely based on chance.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Elements of Contracts Section -->
+                    <section id="elements" class="mb-10 content-section hidden">
+                        <h2 class="text-2xl md:text-3xl font-bold mb-6 text-primary">Elements of Shari'ah Contracts</h2>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+                            <h3 class="text-xl font-semibold mb-4">Essential Elements (Rukun) of Contracts</h3>
+                            <p class="mb-4">For a contract to be valid in Islamic finance, it must contain these essential elements:</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center hover:shadow-md transition-shadow">
+                                    <div class="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">1</div>
+                                    <h4 class="font-bold mb-2">Contracting Parties</h4>
+                                    <p class="text-sm">The individuals or entities entering into the contract</p>
+                                </div>
+                                
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center hover:shadow-md transition-shadow">
+                                    <div class="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">2</div>
+                                    <h4 class="font-bold mb-2">Subject Matter</h4>
+                                    <p class="text-sm">The asset, service, or transaction being contracted</p>
+                                </div>
+                                
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center hover:shadow-md transition-shadow">
+                                    <div class="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">3</div>
+                                    <h4 class="font-bold mb-2">Form of Contract</h4>
+                                    <p class="text-sm">Offer (ijab) and acceptance (qabul)</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                            <h3 class="text-xl font-semibold mb-4">Conditions for Valid Contracts</h3>
+                            
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600">
+                                    <thead>
+                                        <tr>
+                                            <th class="py-2 px-4 border-b border-gray-300 dark:border-gray-600 text-left">Element</th>
+                                            <th class="py-2 px-4 border-b border-gray-300 dark:border-gray-600 text-left">Conditions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600 font-medium">Contracting Parties</td>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600">
+                                                <ul class="list-disc pl-5">
+                                                    <li>Capable of taking responsibility</li>
+                                                    <li>Not prohibited from dealing with their property</li>
+                                                    <li>No coercion is exerted</li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600 font-medium">Subject Matter</td>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600">
+                                                <ul class="list-disc pl-5">
+                                                    <li>Must exist</li>
+                                                    <li>Must be pure/halal</li>
+                                                    <li>Have use according to Shariah</li>
+                                                    <li>Owned by seller</li>
+                                                    <li>Capable of being delivered</li>
+                                                    <li>Known and specific</li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600 font-medium">Form of Contract (Offer & Acceptance)</td>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600">
+                                                <ul class="list-disc pl-5">
+                                                    <li>Known currency</li>
+                                                    <li>Absolute amount</li>
+                                                    <li>Is absolute - in definite and decisive language</li>
+                                                    <li>Acceptance must agree with the offer</li>
+                                                    <li>Made at one and the same meeting</li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Classification Section -->
+                    <section id="classification" class="mb-10 content-section hidden">
+                        <h2 class="text-2xl md:text-3xl font-bold mb-6 text-primary">Classification of Shari'ah Contracts</h2>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+                            <h3 class="text-xl font-semibold mb-4">Primary Classification</h3>
+                            
+                            <div class="flex flex-col md:flex-row items-center justify-center gap-6 mb-8">
+                                <div class="bg-blue-100 dark:bg-blue-900 rounded-lg p-6 text-center w-full md:w-1/2">
+                                    <h4 class="text-lg font-bold mb-3">Profit-Making Contracts</h4>
+                                    <p>Commercial contracts with the purpose of generating profit through exchange or participation</p>
+                                </div>
+                                
+                                <div class="bg-green-100 dark:bg-green-900 rounded-lg p-6 text-center w-full md:w-1/2">
+                                    <h4 class="text-lg font-bold mb-3">Charitable Contracts (Tabarru')</h4>
+                                    <p>Non-profit contracts aimed at providing assistance or charity without expecting return</p>
+                                </div>
+                            </div>
+                            
+                            <h3 class="text-xl font-semibold mb-4">Detailed Classification</h3>
+                            
+                            <!-- Interactive Classification Diagram -->
+                            <div class="contract-diagram" id="contract-diagram">
+                                <!-- JavaScript will populate this -->
+                            </div>
+                            
+                            <div id="contract-detail" class="mt-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                                <h4 class="font-bold mb-2">Select a contract type from the diagram above for details</h4>
+                                <p>Click on any node in the diagram to see details about that contract classification.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                            <h3 class="text-xl font-semibold mb-4">Applications in Islamic Banking</h3>
+                            
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600">
+                                    <thead>
+                                        <tr>
+                                            <th class="py-2 px-4 border-b border-gray-300 dark:border-gray-600 text-left">Banking Products</th>
+                                            <th class="py-2 px-4 border-b border-gray-300 dark:border-gray-600 text-left">Shari'ah Contracts Used</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600 font-medium">Deposit-taking Products</td>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600">
+                                                Wadi'ah Yad Amanah; Wadiah Yad Dhamanah, Mudarabah; al-Qard
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600 font-medium">Sales-based Products</td>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600">
+                                                Bai Bithaman Ajil, Murabahah, Bai al-Inah, Bai al-Tawarruq
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600 font-medium">Lease-based Products</td>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600">
+                                                Ijarah Wa Istisna; Ijarah Thumma Al-Bai', Ijarah Muntahia Bitamleek
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600 font-medium">Equity-based Products</td>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600">
+                                                Mudarabah, Musyarakah
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600 font-medium">Fee-based Products</td>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600">
+                                                Kafalah/Dhaman (Guarantee); Wakalah (agency)
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600 font-medium">Hybrid Products</td>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600">
+                                                Musyarakah Mutanaqisah (Diminishing Partnership), Al Ijarah Thumma Al Bai, etc.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Exchange Based Contracts Section -->
+                    <section id="exchange" class="mb-10 content-section hidden">
+                        <h2 class="text-2xl md:text-3xl font-bold mb-6 text-primary">Exchange Based Contracts</h2>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+                            <h3 class="text-xl font-semibold mb-4">Overview of Exchange Contracts</h3>
+                            <p class="mb-4">Exchange contracts involve the transfer of ownership or usufruct rights in return for compensation. These form the foundation of many Islamic banking products.</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                    <h4 class="font-bold text-lg mb-2 text-primary">Murabahah <span class="text-sm font-normal">(مرابحة)</span></h4>
+                                    <p class="text-sm mb-2">Cost-plus financing transaction where the seller discloses the actual cost and adds a profit margin</p>
+                                    <button class="contract-detail-btn mt-2 text-primary hover:underline text-sm" data-contract="murabahah">View details</button>
+                                </div>
+                                
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                    <h4 class="font-bold text-lg mb-2 text-primary">Bay' Al-Istisna' <span class="text-sm font-normal">(استصناع)</span></h4>
+                                    <p class="text-sm mb-2">Manufacturing contract where a commodity is purchased before production</p>
+                                    <button class="contract-detail-btn mt-2 text-primary hover:underline text-sm" data-contract="istisna">View details</button>
+                                </div>
+                                
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                    <h4 class="font-bold text-lg mb-2 text-primary">Bay' Al-Salam <span class="text-sm font-normal">(سلم)</span></h4>
+                                    <p class="text-sm mb-2">Forward contract with full advance payment for future delivery</p>
+                                    <button class="contract-detail-btn mt-2 text-primary hover:underline text-sm" data-contract="salam">View details</button>
+                                </div>
+                                
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                    <h4 class="font-bold text-lg mb-2 text-primary">Bay' Al-Dayn <span class="text-sm font-normal">(بيع الدين)</span></h4>
+                                    <p class="text-sm mb-2">Sale of debt, commonly used in Islamic capital market instruments</p>
+                                    <button class="contract-detail-btn mt-2 text-primary hover:underline text-sm" data-contract="dayn">View details</button>
+                                </div>
+                                
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                    <h4 class="font-bold text-lg mb-2 text-primary">Ijarah <span class="text-sm font-normal">(إجارة)</span></h4>
+                                    <p class="text-sm mb-2">Leasing contract where the lessor rents out an asset for a specified period</p>
+                                    <button class="contract-detail-btn mt-2 text-primary hover:underline text-sm" data-contract="ijarah">View details</button>
+                                </div>
+                                
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                    <h4 class="font-bold text-lg mb-2 text-primary">Bai Bithaman Ajil <span class="text-sm font-normal">(بيع بثمن آجل)</span></h4>
+                                    <p class="text-sm mb-2">Deferred payment sale where payment is made at a later date</p>
+                                    <button class="contract-detail-btn mt-2 text-primary hover:underline text-sm" data-contract="bba">View details</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Contract Detail View -->
+                        <div id="exchange-contract-detail" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hidden">
+                            <button id="back-to-exchange" class="text-primary hover:underline mb-4 flex items-center">
+                                <i class="fas fa-arrow-left mr-2"></i> Back to all exchange contracts
+                            </button>
+                            
+                            <div id="contract-content">
+                                <!-- JavaScript will populate this -->
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Partnership Contracts Section -->
+                    <section id="partnership" class="mb-10 content-section hidden">
+                        <h2 class="text-2xl md:text-3xl font-bold mb-6 text-primary">Partnership Contracts</h2>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+                            <h3 class="text-xl font-semibold mb-4">Types of Partnership Contracts</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                                <!-- Mudharabah -->
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+                                    <div class="bg-yellow-100 dark:bg-yellow-900 p-4">
+                                        <h4 class="font-bold text-lg">Mudharabah <span class="text-sm font-normal">(مضاربة)</span></h4>
+                                        <p class="text-sm italic">Profit-sharing partnership</p>
+                                    </div>
+                                    
+                                    <div class="p-4">
+                                        <p class="mb-4">A partnership where one party provides capital while the other provides expertise and management.</p>
+                                        
+                                        <h5 class="font-semibold mb-2">Key Features:</h5>
+                                        <ul class="list-disc pl-5 mb-4">
+                                            <li>Capital provider (Rab al-mal) provides 100% of the capital</li>
+                                            <li>Entrepreneur (Mudarib) provides expertise and management</li>
+                                            <li>Profits shared according to pre-agreed ratio</li>
+                                            <li>Financial losses borne entirely by capital provider (unless caused by negligence)</li>
+                                        </ul>
+                                        
+                                        <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
+                                            <h5 class="font-semibold mb-2">Application in Islamic Banking:</h5>
+                                            <p class="text-sm">Used in deposit accounts, investment products, and project financing</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Musharakah -->
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+                                    <div class="bg-blue-100 dark:bg-blue-900 p-4">
+                                        <h4 class="font-bold text-lg">Musharakah <span class="text-sm font-normal">(مشاركة)</span></h4>
+                                        <p class="text-sm italic">Joint venture/full partnership</p>
+                                    </div>
+                                    
+                                    <div class="p-4">
+                                        <p class="mb-4">A partnership where all partners contribute capital and share in both profit and loss.</p>
+                                        
+                                        <h5 class="font-semibold mb-2">Key Features:</h5>
+                                        <ul class="list-disc pl-5 mb-4">
+                                            <li>All partners contribute capital</li>
+                                            <li>All partners may participate in management</li>
+                                            <li>Profits shared according to pre-agreed ratio</li>
+                                            <li>Losses shared in proportion to capital contribution</li>
+                                        </ul>
+                                        
+                                        <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
+                                            <h5 class="font-semibold mb-2">Application in Islamic Banking:</h5>
+                                            <p class="text-sm">Used in project financing, home financing (diminishing musharakah), and joint ventures</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Interactive Comparison Chart -->
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                            <h3 class="text-xl font-semibold mb-4">Comparison: Mudharabah vs. Musharakah</h3>
+                            
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600">
+                                    <thead>
+                                        <tr>
+                                            <th class="py-2 px-4 border-b border-gray-300 dark:border-gray-600 text-left">Feature</th>
+                                            <th class="py-2 px-4 border-b border-gray-300 dark:border-gray-600 text-left">Mudharabah</th>
+                                            <th class="py-2 px-4 border-b border-gray-300 dark:border-gray-600 text-left">Musharakah</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600 font-medium">Capital Contribution</td>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600">One party only (Rab al-mal)</td>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600">All partners</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600 font-medium">Management</td>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600">Entrepreneur (Mudarib) only</td>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600">All partners or designated partners</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600 font-medium">Profit Sharing</td>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600">According to pre-agreed ratio</td>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600">According to pre-agreed ratio</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600 font-medium">Loss Bearing</td>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600">Capital provider only</td>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600">All partners (proportional to capital)</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600 font-medium">Liability</td>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600">Limited to capital amount</td>
+                                            <td class="py-3 px-4 border-b border-gray-300 dark:border-gray-600">Typically limited to capital amount</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Diagram illustrating process flows -->
+                            <h4 class="font-semibold mt-6 mb-3">Process Flow Illustration</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4">
+                                    <h5 class="font-medium mb-3 text-center">Mudharabah Process</h5>
+                                    <img src="https://pfst.cf2.poecdn.net/base_dHh2YXZzdncxZ256/8ebea9b74fcf15fe48fe3b00b825c01b.png" alt="Mudharabah Process Flow" class="mx-auto">
+                                </div>
+                                
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4">
+                                    <h5 class="font-medium mb-3 text-center">Musharakah Process</h5>
+                                    <img src="https://pfst.cf2.poecdn.net/base_ajFicmhseXEyZjM1/e9fce89e5b12ac6c2fd7efa03fcbcc9e.png" alt="Musharakah Process Flow" class="mx-auto">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Security Contracts Section -->
+                    <section id="security" class="mb-10 content-section hidden">
+                        <h2 class="text-2xl md:text-3xl font-bold mb-6 text-primary">Security Contracts</h2>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+                            <h3 class="text-xl font-semibold mb-4">Overview of Security Contracts</h3>
+                            <p class="mb-4">Security contracts in Islamic finance provide mechanisms to secure financial obligations and mitigate risks while adhering to Shari'ah principles.</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                                <!-- Kafalah Contract -->
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+                                    <div class="bg-green-100 dark:bg-green-900 p-4">
+                                        <h4 class="font-bold text-lg">Kafalah <span class="text-sm font-normal">(كفالة)</span></h4>
+                                        <p class="text-sm italic">Guarantee/Surety</p>
+                                    </div>
+                                    
+                                    <div class="p-4">
+                                        <p class="mb-4">A contract where a person (guarantor) guarantees the performance or obligation of a third party.</p>
+                                        
+                                        <h5 class="font-semibold mb-2">Essential Elements:</h5>
+                                        <ul class="list-disc pl-5 mb-4">
+                                            <li>Dhamin (guarantor)</li>
+                                            <li>Madmun lah (creditor)</li>
+                                            <li>Madhmun anh (debtor)</li>
+                                            <li>Madhmun bih (debt)</li>
+                                            <li>Contract (Offer and Acceptance)</li>
+                                        </ul>
+                                        
+                                        <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
+                                            <h5 class="font-semibold mb-2">Rules:</h5>
+                                            <ul class="list-disc pl-5 text-sm">
+                                                <li>Can have multiple guarantors</li>
+                                                <li>Cannot take remuneration for personal guarantee</li>
+                                                <li>Can set duration and ceiling amount</li>
+                                                <li>Can be restricted by conditions</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Rahn Contract -->
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+                                    <div class="bg-purple-100 dark:bg-purple-900 p-4">
+                                        <h4 class="font-bold text-lg">Rahn <span class="text-sm font-normal">(رهن)</span></h4>
+                                        <p class="text-sm italic">Pledge/Collateral</p>
+                                    </div>
+                                    
+                                    <div class="p-4">
+                                        <p class="mb-4">A contract where an asset is placed as collateral for a debt, giving the creditor the right to claim from the pledged asset in case of default.</p>
+                                        
+                                        <h5 class="font-semibold mb-2">Essential Elements:</h5>
+                                        <ul class="list-disc pl-5 mb-4">
+                                            <li>Pledgor (rahin)</li>
+                                            <li>Pledgee (murtahin)</li>
+                                            <li>Pledged asset (marhun)</li>
+                                            <li>Obligation/Debt (marhun bih)</li>
+                                            <li>Contract (Offer and Acceptance)</li>
+                                        </ul>
+                                        
+                                        <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
+                                            <h5 class="font-semibold mb-2">Features:</h5>
+                                            <ul class="list-disc pl-5 text-sm">
+                                                <li>Pledgee has right to possession until redemption</li>
+                                                <li>One pledge can be taken as security for multiple debts</li>
+                                                <li>Borrowed property can be used as a pledge</li>
+                                                <li>Only court can sell pledge to satisfy debt</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Process Flow for Security Contracts -->
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                            <h3 class="text-xl font-semibold mb-4">Process Flow: Rahn (Pledge)</h3>
+                            
+                            <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4 max-w-2xl mx-auto">
+                                <img src="https://pfst.cf2.poecdn.net/base_dHh2YXZzdncxZ256/0c8b74cd77f9e2a08b48a4f49dd2bf02.png" alt="Rahn Process Flow" class="mx-auto">
+                                
+                                <ol class="mt-4 pl-5 list-decimal">
+                                    <li class="mb-2">Bank provides financing to the customer</li>
+                                    <li class="mb-2">Customer pawns a valuable item as collateral</li>
+                                    <li class="mb-2">Customer pays the debt</li>
+                                    <li class="mb-2">Bank returns the collateral to the customer</li>
+                                </ol>
+                            </div>
+                            
+                            <div class="mt-6 p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
+                                <h4 class="font-semibold mb-2">Did You Know?</h4>
+                                <p>In Malay culture, people often buy and collect jewelry so that it can be pawned/pledged for cash in times of hardship.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Charitable Contracts Section -->
+                    <section id="charitable" class="mb-10 content-section hidden">
+                        <h2 class="text-2xl md:text-3xl font-bold mb-6 text-primary">Charitable Contracts</h2>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+                            <h3 class="text-xl font-semibold mb-4">Overview of Charitable Contracts</h3>
+                            <p class="mb-4">Charitable contracts (Tabarru') in Islamic finance are unilateral contracts where one party voluntarily gives something to another without expecting any compensation.</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                                <!-- Hibah Contract -->
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+                                    <div class="bg-red-100 dark:bg-red-900 p-4">
+                                        <h4 class="font-bold text-lg">Hibah <span class="text-sm font-normal">(هبة)</span></h4>
+                                        <p class="text-sm italic">Gift</p>
+                                    </div>
+                                    
+                                    <div class="p-4">
+                                        <p class="mb-4">A voluntary transfer of ownership of an asset during the lifetime of the donor without any consideration or expectation of return.</p>
+                                        
+                                        <h5 class="font-semibold mb-2">Essential Elements:</h5>
+                                        <ul class="list-disc pl-5 mb-4">
+                                            <li>Donor (wahib)</li>
+                                            <li>Donee (mawhub lahu)</li>
+                                            <li>Gift (mawhub)</li>
+                                            <li>Offer and acceptance (ijab and qabul)</li>
+                                        </ul>
+                                        
+                                        <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
+                                            <h5 class="font-semibold mb-2">Application in Islamic Banking:</h5>
+                                            <p class="text-sm">Used in reward systems for deposit accounts, particularly those operated under the Wadiah contract, where banks pay customers a gift despite not being contractually obligated.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Wadiah Contract -->
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+                                    <div class="bg-indigo-100 dark:bg-indigo-900 p-4">
+                                        <h4 class="font-bold text-lg">Wadiah <span class="text-sm font-normal">(وديعة)</span></h4>
+                                        <p class="text-sm italic">Safekeeping</p>
+                                    </div>
+                                    
+                                    <div class="p-4">
+                                        <p class="mb-4">A contract where a person deposits assets with another person or institution for safekeeping.</p>
+                                        
+                                        <h5 class="font-semibold mb-2">Types of Wadiah:</h5>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                                                <h6 class="font-medium mb-1">Wadiah Yad Amanah</h6>
+                                                <p class="text-sm">Safe custody based on trust where the custodian cannot use the deposits</p>
+                                            </div>
+                                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                                                <h6 class="font-medium mb-1">Wadiah Yad Dhamanah</h6>
+                                                <p class="text-sm">Guaranteed safe custody where the custodian can use the deposits and guarantees return</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
+                                            <h5 class="font-semibold mb-2">Application in Islamic Banking:</h5>
+                                            <p class="text-sm">Used in deposit-taking activities, current accounts, savings accounts, and safe deposit boxes</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Process Flow for Wadiah -->
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                            <h3 class="text-xl font-semibold mb-4">Process Flow: Wadiah (Safekeeping)</h3>
+                            
+                            <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4 max-w-2xl mx-auto">
+                                <img src="https://pfst.cf2.poecdn.net/base_dHh2YXZzdncxZ256/e8c0bdc9dcdc15e5ab7c58e71daaf4bf.png" alt="Wadiah Process Flow" class="mx-auto">
+                                
+                                <ol class="mt-4 pl-5 list-decimal">
+                                    <li class="mb-2">You place money in a bank, and the bank guarantees to return the money to you</li>
+                                    <li class="mb-2">You are allowed to withdraw the money anytime</li>
+                                    <li class="mb-2">Bank may charge a fee for looking after your money</li>
+                                    <li class="mb-2">Bank may pay hibah (gift) if it deems fit, though not obligated to do so</li>
+                                </ol>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                <div class="p-4 bg-green-100 dark:bg-green-900 rounded-lg">
+                                    <h4 class="font-semibold mb-2">Benefits of Wadiah Accounts</h4>
+                                    <ul class="list-disc pl-5">
+                                        <li>Security for depositors' funds</li>
+                                        <li>Easy access to funds</li>
+                                        <li>Possibility of receiving hibah (gift) from the bank</li>
+                                        <li>Shari'ah-compliant alternative to conventional deposits</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
+                                    <h4 class="font-semibold mb-2">Key Shari'ah Considerations</h4>
+                                    <ul class="list-disc pl-5">
+                                        <li>Hibah must be entirely at bank's discretion (not promised or fixed)</li>
+                                        <li>In Wadiah Yad Dhamanah, the bank guarantees the principal</li>
+                                        <li>The bank must use the deposits in Shari'ah-compliant activities</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Agency Contracts Section -->
+                    <section id="agency" class="mb-10 content-section hidden">
+                        <h2 class="text-2xl md:text-3xl font-bold mb-6 text-primary">Agency Contracts</h2>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+                            <h3 class="text-xl font-semibold mb-4">Wakalah (Agency)</h3>
+                            <p class="mb-4">Wakalah is a contract where a person (principal) asks another party (agent) to act on his behalf for a specific task, typically for a fee. This concept is widely used in Islamic banking and finance.</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                                <div class="p-4 border border-gray-300 dark:border-gray-600 rounded-lg">
+                                    <h4 class="font-semibold mb-3">Essential Elements</h4>
+                                    <ul class="list-disc pl-5">
+                                        <li>Muwakkil (Principal)</li>
+                                        <li>Wakil (Agent)</li>
+                                        <li>Muwakkal bih (The task to be performed)</li>
+                                        <li>Contract (Offer and Acceptance)</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="p-4 border border-gray-300 dark:border-gray-600 rounded-lg">
+                                    <h4 class="font-semibold mb-3">Duties of an Agent</h4>
+                                    <ul class="list-disc pl-5">
+                                        <li>Act as safe custodian</li>
+                                        <li>Act on behalf of principal in certain contracts</li>
+                                        <li>Must mention that they act on behalf of principal</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                                <h4 class="font-semibold mb-3">Examples in Islamic Banking</h4>
+                                <ol class="list-decimal pl-5">
+                                    <li class="mb-2">A bank acting as agent for payment or remittance services</li>
+                                    <li class="mb-2">Investment accounts where the bank acts as an agent to invest funds</li>
+                                    <li class="mb-2">Letter of credit where bank acts as agent for the customer</li>
+                                    <li class="mb-2">Takaful operator acting as agent to manage investments</li>
+                                </ol>
+                            </div>
+                        </div>
+                        
+                        <!-- Process Flow for Wakalah -->
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                            <h3 class="text-xl font-semibold mb-4">Process Flow: Wakalah (Agency)</h3>
+                            
+                            <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4 max-w-2xl mx-auto">
+                                <img src="https://pfst.cf2.poecdn.net/base_dHh2YXZzdncxZ256/e2b4ec36cda38e6c9cc24b5ae4b21433.png" alt="Wakalah Process Flow" class="mx-auto">
+                                
+                                <ol class="mt-4 pl-5 list-decimal">
+                                    <li class="mb-2">The investor appoints the bank to be his agent</li>
+                                    <li class="mb-2">The bank invests the money/conducts business delegated to it</li>
+                                    <li class="mb-2">The principal amount and expected returns are given back to the investor</li>
+                                    <li class="mb-2">Surplus returns may be distributed to the bank as performance incentive or shared between investor and bank</li>
+                                    <li class="mb-2">If returns are below expectations, the principal is returned with a waiver of the wakalah fee or compensation (in case of bank's negligence)</li>
+                                </ol>
+                            </div>
+                            
+                            <!-- Interactive Flashcards for Wakalah -->
+                            <h4 class="font-semibold mt-6 mb-3">Key Concepts in Wakalah</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front bg-primary text-white">
+                                            <h3 class="text-xl">Types of Wakalah</h3>
+                                        </div>
+                                        <div class="flashcard-back bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600">
+                                            <ul class="text-left pl-5 list-disc">
+                                                <li>General Wakalah (Wakalah Ammah): Agent has wide discretion</li>
+                                                <li>Specific Wakalah (Wakalah Khassah): Agent limited to specific tasks</li>
+                                                <li>Restricted Wakalah (Wakalah Muqayyadah): Subject to specific conditions</li>
+                                                <li>Unrestricted Wakalah (Wakalah Mutlaqah): Agent has freedom to act</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front bg-primary text-white">
+                                            <h3 class="text-xl">Termination of Wakalah</h3>
+                                        </div>
+                                        <div class="flashcard-back bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600">
+                                            <ul class="text-left pl-5 list-disc">
+                                                <li>Completion of the assigned task</li>
+                                                <li>Death of principal or agent</li>
+                                                <li>Dismissal by the principal</li>
+                                                <li>Resignation of the agent</li>
+                                                <li>Destruction of the subject matter</li>
+                                                <li>Withdrawal of legal capacity of either party</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Supporting Contracts Section -->
+                    <section id="supporting" class="mb-10 content-section hidden">
+                        <h2 class="text-2xl md:text-3xl font-bold mb-6 text-primary">Supporting Contracts</h2>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+                            <h3 class="text-xl font-semibold mb-4">Types of Supporting Contracts</h3>
+                            <p class="mb-4">Supporting contracts in Islamic finance provide auxiliary mechanisms that help facilitate and strengthen other core contracts and transactions.</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                    <h4 class="font-bold text-lg mb-2 text-primary">Hiwalah <span class="text-sm font-normal">(حوالة)</span></h4>
+                                    <p class="text-sm mb-2">Transfer of debt from one debtor to another</p>
+                                    <button class="supporting-contract-btn mt-2 text-primary hover:underline text-sm" data-contract="hiwalah">View details</button>
+                                </div>
+                                
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                    <h4 class="font-bold text-lg mb-2 text-primary">Muqasah <span class="text-sm font-normal">(مقاصة)</span></h4>
+                                    <p class="text-sm mb-2">Debt settlement by contra-transaction or set-off</p>
+                                    <button class="supporting-contract-btn mt-2 text-primary hover:underline text-sm" data-contract="muqasah">View details</button>
+                                </div>
+                                
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                    <h4 class="font-bold text-lg mb-2 text-primary">Ibra' <span class="text-sm font-normal">(إبراء)</span></h4>
+                                    <p class="text-sm mb-2">Rebate or partial refund for early settlement</p>
+                                    <button class="supporting-contract-btn mt-2 text-primary hover:underline text-sm" data-contract="ibra">View details</button>
+                                </div>
+                                
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                    <h4 class="font-bold text-lg mb-2 text-primary">Wa'd <span class="text-sm font-normal">(وعد)</span></h4>
+                                    <p class="text-sm mb-2">Unilateral promise to perform certain actions in the future</p>
+                                    <button class="supporting-contract-btn mt-2 text-primary hover:underline text-sm" data-contract="wad">View details</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Supporting Contract Detail View -->
+                        <div id="supporting-contract-detail" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hidden">
+                            <button id="back-to-supporting" class="text-primary hover:underline mb-4 flex items-center">
+                                <i class="fas fa-arrow-left mr-2"></i> Back to all supporting contracts
+                            </button>
+                            
+                            <div id="supporting-content">
+                                <!-- JavaScript will populate this -->
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Quiz Section -->
+                    <section id="quiz" class="mb-10 content-section hidden">
+                        <h2 class="text-2xl md:text-3xl font-bold mb-6 text-primary">Test Your Knowledge</h2>
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                            <div id="quiz-container">
+                                <div id="quiz-progress" class="mb-4">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span id="quiz-question-number">Question 1 of 10</span>
+                                        <span id="quiz-score">Score: 0/0</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                                        <div id="quiz-progress-bar" class="bg-primary h-2.5 rounded-full" style="width: 10%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div id="quiz-question" class="mb-6">
+                                    <h3 class="text-xl font-semibold mb-3">Which of the following is a type of partnership contract in Islamic finance?</h3>
+                                </div>
+                                
+                                <div id="quiz-options" class="space-y-3 mb-6">
+                                    <div class="quiz-option p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700" data-correct="false">
+                                        <div class="flex items-center">
+                                            <div class="h-6 w-6 border border-gray-400 dark:border-gray-500 rounded-full mr-3 flex-shrink-0"></div>
+                                            <span>Murabahah</span>
+                                        </div>
+                                    </div>
+                                    <div class="quiz-option p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700" data-correct="true">
+                                        <div class="flex items-center">
+                                            <div class="h-6 w-6 border border-gray-400 dark:border-gray-500 rounded-full mr-3 flex-shrink-0"></div>
+                                            <span>Mudharabah</span>
+                                        </div>
+                                    </div>
+                                    <div class="quiz-option p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700" data-correct="false">
+                                        <div class="flex items-center">
+                                            <div class="h-6 w-6 border border-gray-400 dark:border-gray-500 rounded-full mr-3 flex-shrink-0"></div>
+                                            <span>Ijarah</span>
+                                        </div>
+                                    </div>
+                                    <div class="quiz-option p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700" data-correct="false">
+                                        <div class="flex items-center">
+                                            <div class="h-6 w-6 border border-gray-400 dark:border-gray-500 rounded-full mr-3 flex-shrink-0"></div>
+                                            <span>Kafalah</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="quiz-feedback" class="mb-6 p-4 rounded-lg hidden">
+                                    <!-- Feedback will be shown here -->
+                                </div>
+                                
+                                <div class="flex justify-between">
+                                    <button id="quiz-prev" class="px-4 py-2 bg-gray-300 dark:bg-gray-700 rounded-lg text-gray-800 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                        <i class="fas fa-arrow-left mr-2"></i> Previous
+                                    </button>
+                                    <button id="quiz-next" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-opacity-90">
+                                        Next <i class="fas fa-arrow-right ml-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="quiz-results" class="text-center py-8 hidden">
+                                <h3 class="text-2xl font-bold mb-4">Quiz Completed!</h3>
+                                <div id="quiz-final-score" class="mb-6 text-xl">You scored: 7/10</div>
+                                
+                                <div class="mb-6">
+                                    <canvas id="quiz-chart" width="300" height="300"></canvas>
+                                </div>
+                                
+                                <div id="quiz-feedback-summary" class="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-left">
+                                    <h4 class="font-semibold mb-2">Areas to Review:</h4>
+                                    <ul id="quiz-review-areas" class="list-disc pl-5">
+                                        <!-- Will be populated by JavaScript -->
+                                    </ul>
+                                </div>
+                                
+                                <div class="flex justify-center space-x-4">
+                                    <button id="quiz-restart" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-opacity-90">
+                                        <i class="fas fa-redo mr-2"></i> Restart Quiz
+                                    </button>
+                                    <button id="quiz-explore" class="px-6 py-2 border border-primary text-primary dark:text-white rounded-lg hover:bg-primary hover:bg-opacity-10">
+                                        <i class="fas fa-book mr-2"></i> Explore Topics
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
             </main>
-          </div>
-          
-          <!-- Footer -->
-          <footer class="bg-gray-100 dark:bg-gray-800 p-4 text-center text-gray-600 dark:text-gray-400 text-sm">
-            <div class="container mx-auto">
-              <p>&copy; ${new Date().getFullYear()} Microlearning Platform. All rights reserved.</p>
-              <p class="mt-1">Created for educational purposes.</p>
-            </div>
-          </footer>
         </div>
-      `;
-      setupEventListeners(appElement, courseData, userProgress);
-    }
+    </div>
 
-    // Render lesson content
-    function renderLessonContent(lesson, module) {
-      return `
-        <div class="space-y-6">
-          <div class="flex justify-between items-center">
-            <div>
-              <h2 class="text-2xl font-bold">${lesson.title}</h2>
-              <p class="text-gray-600 dark:text-gray-400">${module.title}</p>
-            </div>
-            <div>
-              <button id="mark-complete" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors">
-                Mark as Complete
-              </button>
-            </div>
-          </div>
-          <!-- Optional Video Embed -->
-          ${lesson.videoId ? `
-            <div class="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
-              <iframe 
-                  class="w-full h-full"
-                  src="https://www.youtube.com/embed/${lesson.videoId}" 
-                  title="${lesson.title}"
-                  frameborder="0" 
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                  allowfullscreen>
-                </iframe>
-            </div>
-          ` : ''}
-          <!-- Lesson Content -->
-          <div class="lesson-content prose dark:prose-invert max-w-none">
-            ${marked.parse(lesson.content)}
-          </div>
-          <!-- Navigation Buttons -->
-          <div class="flex justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
-            <button id="prev-lesson" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-md transition-colors">
-              Previous Lesson
-            </button>
-            <button id="next-lesson" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors">
-              Next Lesson
-            </button>
-          </div>
-        </div>
-      `;
-    }
-
-    // Setup main event listeners
-    function setupEventListeners(appElement, courseData, userProgress) {
-      const contentArea = appElement.querySelector('#content-area');
-      const sidebar = appElement.querySelector('#sidebar');
-      const sidebarToggle = appElement.querySelector('#sidebar-toggle');
-
-      appElement.querySelectorAll('[data-module-id]').forEach(element => {
-        element.addEventListener('click', () => {
-          const moduleId = parseInt(element.dataset.moduleId);
-          userProgress.currentModule = moduleId;
-          const module = courseData.modules.find(m => m.id === moduleId);
-          if (module && module.lessons.length > 0) {
-            userProgress.currentLesson = module.lessons[0].id;
-          }
-          saveUserProgress(userProgress);
-          renderApp(appElement, courseData, userProgress);
-        });
-      });
-
-      appElement.querySelectorAll('[data-lesson-id]').forEach(element => {
-        element.addEventListener('click', () => {
-          const lessonId = parseInt(element.dataset.lessonId);
-          userProgress.currentLesson = lessonId;
-          saveUserProgress(userProgress);
-          contentArea.style.opacity = '0';
-          setTimeout(() => {
-            renderApp(appElement, courseData, userProgress);
-            contentArea.style.opacity = '1';
-          }, 300);
-        });
-      });
-
-      appElement.querySelectorAll('[data-quiz-id]').forEach(element => {
-        element.addEventListener('click', () => {
-          const moduleId = parseInt(element.dataset.quizId);
-          const module = courseData.modules.find(m => m.id === moduleId);
-          contentArea.style.opacity = '0';
-          setTimeout(() => {
-            contentArea.innerHTML = renderQuizContent(module, userProgress);
-            setupQuizEventListeners(appElement, module, userProgress, courseData);
-            contentArea.style.opacity = '1';
-          }, 300);
-        });
-      });
-
-      const markCompleteBtn = appElement.querySelector('#mark-complete');
-      if (markCompleteBtn) {
-        markCompleteBtn.addEventListener('click', () => {
-          if (!userProgress.completedLessons.includes(userProgress.currentLesson)) {
-            userProgress.completedLessons.push(userProgress.currentLesson);
-            saveUserProgress(userProgress);
-            renderApp(appElement, courseData, userProgress);
-          }
-        });
-      }
-
-      const prevLessonBtn = appElement.querySelector('#prev-lesson');
-      const nextLessonBtn = appElement.querySelector('#next-lesson');
-      if (prevLessonBtn) {
-        prevLessonBtn.addEventListener('click', () => {
-          navigateLesson(appElement, courseData, userProgress, 'prev');
-        });
-      }
-      if (nextLessonBtn) {
-        nextLessonBtn.addEventListener('click', () => {
-          navigateLesson(appElement, courseData, userProgress, 'next');
-        });
-      }
-      if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', () => {
-          sidebar.classList.toggle('hidden');
-        });
-      }
-    }
-
-    // Navigate between lessons
-    function navigateLesson(appElement, courseData, userProgress, direction) {
-      const currentModule = courseData.modules.find(m => m.id === userProgress.currentModule);
-      const lessonIndex = currentModule.lessons.findIndex(l => l.id === userProgress.currentLesson);
-      if (direction === 'next') {
-        if (lessonIndex < currentModule.lessons.length - 1) {
-          userProgress.currentLesson = currentModule.lessons[lessonIndex + 1].id;
-        } else {
-          const contentArea = appElement.querySelector('#content-area');
-          contentArea.style.opacity = '0';
-          setTimeout(() => {
-            contentArea.innerHTML = renderQuizContent(currentModule, userProgress);
-            setupQuizEventListeners(appElement, currentModule, userProgress, courseData);
-            contentArea.style.opacity = '1';
-          }, 300);
-          return;
-        }
-      } else if (direction === 'prev') {
-        if (lessonIndex > 0) {
-          userProgress.currentLesson = currentModule.lessons[lessonIndex - 1].id;
-        } else {
-          const moduleIndex = courseData.modules.findIndex(m => m.id === userProgress.currentModule);
-          if (moduleIndex > 0) {
-            const prevModule = courseData.modules[moduleIndex - 1];
-            userProgress.currentModule = prevModule.id;
-            if (prevModule.lessons.length > 0) {
-              userProgress.currentLesson = prevModule.lessons[prevModule.lessons.length - 1].id;
+    <!-- JavaScript Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for dark mode preference
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.classList.add('dark');
             }
-          }
-        }
-      }
-      saveUserProgress(userProgress);
-      const contentArea = appElement.querySelector('#content-area');
-      contentArea.style.opacity = '0';
-      setTimeout(() => {
-        renderApp(appElement, courseData, userProgress);
-        contentArea.style.opacity = '1';
-      }, 300);
-    }
-
-    // Save user progress
-    function saveUserProgress(userProgress) {
-      try {
-        localStorage.setItem('courseProgress', JSON.stringify(userProgress));
-      } catch (e) {
-        console.log('Unable to save progress');
-      }
-    }
-</script>
+            
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+                if (event.matches) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            });
+            
+            // Theme toggle
+            document.getElementById('theme-toggle').addEventListener('click', function() {
+                document.documentElement.classList.toggle('dark');
+            });
+            
+            // Navigation
+            const contentSections = document.querySelectorAll('.content-section');
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            function showSection(sectionId) {
+                contentSections.forEach(section => {
+                    section.classList.add('hidden');
+                });
+                document.getElementById(sectionId).classList.remove('hidden');
+                
+                // Update active nav item
+                navItems.forEach(item => {
+                    if (item.dataset.section === sectionId) {
+                        item.classList.add('bg-gray-200', 'dark:bg-gray-700');
+                    } else {
+                        item.classList.remove('bg-gray-200', 'dark:bg-gray-700');
+                    }
+                });
+                
+                // Update progress
+                updateProgress();
+            }
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    showSection(this.dataset.section);
+                });
+            });
+            
+            // Initial section
+            showSection('introduction');
+            
+            // Search functionality
+            const searchInput = document.getElementById('search-input');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                if (searchTerm.length < 2) return;
+                
+                // Simple search implementation
+                const searchResults = [];
+                navItems.forEach(item => {
+                    const section = item.dataset.section;
+                    const sectionElement = document.getElementById(section);
+                    const sectionText = sectionElement.textContent.toLowerCase();
+                    
+                    if (sectionText.includes(searchTerm)) {
+                        searchResults.push(section);
+                    }
+                });
+                
+                if (searchResults.length > 0) {
+                    showSection(searchResults[0]);
+                }
+            });
+            
+            // Progress tracking
+            const visitedSections = new Set();
+            
+            function updateProgress() {
+                const currentSection = Array.from(contentSections).find(section => !section.classList.contains('hidden'));
+                if (currentSection) {
+                    visitedSections.add(currentSection.id);
+                }
+                
+                const progressPercent = Math.round((visitedSections.size / (contentSections.length - 1)) * 100);
+                document.getElementById('user-progress-text').textContent = `${progressPercent}% Complete`;
+                
+                // Update the progress ring
+                const circle = document.querySelector('.progress-ring__circle');
+                const radius = circle.r.baseVal.value;
+                const circumference = radius * 2 * Math.PI;
+                circle.style.strokeDasharray = `${circumference} ${circumference}`;
+                circle.style.strokeDashoffset = circumference - (progressPercent / 100) * circumference;
+            }
+            
+            // Classification diagram
+            function setupClassificationDiagram() {
+                const diagram = document.getElementById('contract-diagram');
+                const contractDetail = document.getElementById('contract-detail');
+                
+                if (!diagram) return;
+                
+                // Clear any existing elements
+                diagram.innerHTML = '';
+                
+                // Define contract types
+                const contractTypes = [
+                    {
+                        id: 'exchange',
+                        name: 'Contracts of Exchange',
+                        color: '#4CAF50',
+                        x: 50,
+                        y: 50,
+                        examples: 'Bai\' (Sale), Murabahah, Istisna\', Salam, Ijarah',
+                        description: 'Contracts that transfer ownership of goods or services for consideration'
+                    },
+                    {
+                        id: 'security',
+                        name: 'Contracts of Security',
+                        color: '#FF9800',
+                        x: 200,
+                        y: 50,
+                        examples: 'Kafalah (Guarantee), Rahn (Pledge), Hiwalah (Transfer of Debt)',
+                        description: 'Concerned with providing securities to protect interests of contract parties'
+                    },
+                    {
+                        id: 'partnership',
+                        name: 'Contracts of Partnership',
+                        color: '#2196F3',
+                        x: 350,
+                        y: 50,
+                        examples: 'Musharakah, Mudharabah',
+                        description: 'Joint ventures where parties share capital, management, profits and liabilities'
+                    },
+                    {
+                        id: 'custody',
+                        name: 'Safe Custody Contracts',
+                        color: '#9C27B0',
+                        x: 50,
+                        y: 200,
+                        examples: 'Wadiah (Deposit)',
+                        description: 'Property is deposited for safekeeping without transfer of ownership or use'
+                    },
+                    {
+                        id: 'usufruct',
+                        name: 'Usufruct Contracts',
+                        color: '#E91E63',
+                        x: 200,
+                        y: 200,
+                        examples: 'Ijarah (Leasing), Ariyah (Lending), Qard (Loan)',
+                        description: 'Transfer right to use property\'s benefits from owner to user'
+                    },
+                    {
+                        id: 'service',
+                        name: 'Service Contracts',
+                        color: '#00BCD4',
+                        x: 350,
+                        y: 200,
+                        examples: 'Wakalah (Agency), Ju\'alah (Reward), Istisna\' (Manufacturing)',
+                        description: 'One party is requested to perform work with or without consideration'
+                    },
+                    {
+                        id: 'charitable',
+                        name: 'Charitable Contracts',
+                        color: '#673AB7',
+                        x: 200,
+                        y: 350,
+                        examples: 'Hibah (Gift), Wasiyyah (Bequest), Waqf (Endowment), Ibra\' (Waiving of Debt)',
+                        description: 'Unilateral contracts that favor the recipient without compensation'
+                    }
+                ];
+                
+                // Create contract nodes
+                contractTypes.forEach(contract => {
+                    // Create node
+                    const node = document.createElement('div');
+                    node.className = 'contract-node';
+                    node.style.top = `${contract.y}px`;
+                    node.style.left = `${contract.x}px`;
+                    node.style.setProperty('--node-color', contract.color);
+                    node.textContent = contract.name;
+                    node.dataset.id = contract.id;
+                    
+                    // Add event listener
+                    node.addEventListener('click', () => {
+                        contractDetail.innerHTML = `
+                            <h4 class="font-bold mb-2">${contract.name}</h4>
+                            <p class="mb-3">${contract.description}</p>
+                            <div class="mt-2">
+                                <h5 class="font-medium mb-1">Examples:</h5>
+                                <p>${contract.examples}</p>
+                            </div>
+                        `;
+                    });
+                    
+                    diagram.appendChild(node);
+                });
+                
+                // Create lines connecting central node to others
+                contractTypes.forEach((contract, i) => {
+                    if (i > 0) {
+                        // Create line to previous node
+                        const prev = contractTypes[i-1];
+                        const line = document.createElement('div');
+                        line.className = 'contract-line';
+                        
+                        // Calculate line parameters
+                        const x1 = prev.x + 60; // Half of node width
+                        const y1 = prev.y + 60; // Half of node height
+                        const x2 = contract.x + 60;
+                        const y2 = contract.y + 60;
+                        
+                        const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+                        const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+                        
+                        // Apply styles
+                        line.style.width = `${length}px`;
+                        line.style.left = `${x1}px`;
+                        line.style.top = `${y1}px`;
+                        line.style.transform = `rotate(${angle}deg)`;
+                        
+                        diagram.appendChild(line);
+                    }
+                });
+            }
+            
+            setupClassificationDiagram();
+            
+            // Exchange contracts detail
+            const exchangeContractDetail = document.getElementById('exchange-contract-detail');
+            const backToExchangeBtn = document.getElementById('back-to-exchange');
+            const contractContent = document.getElementById('contract-content');
+            const contractDetailBtns = document.querySelectorAll('.contract-detail-btn');
+            
+            const exchangeContractsData = {
+                murabahah: {
+                    title: 'Murabahah (Cost Plus Financing)',
+                    arabic: 'مرابحة',
+                    description: 'A sale contract where the seller explicitly declares the cost incurred on the commodities to be sold and sells them to another person by adding some profit or markup, which is known to the buyer.',
+                    processFlow: [
+                        'The customer identifies the item to be acquired.',
+                        'The bank purchases the item from the owner on a cash basis.',
+                        'The bank sells the item to the customer at cost plus profit on a credit basis.',
+                        'The customer pays the bank within the agreed terms of financing.'
+                    ],
+                    features: [
+                        'The cost price and profit must be known to the buyer at the time of the contract',
+                        'The commodity must exist and be owned by the seller at the time of sale',
+                        'The payment may be made in a lump sum or installments',
+                        'Cannot be used for interest-based loans'
+                    ],
+                    diagram: 'https://pfst.cf2.poecdn.net/base_dHh2YXZzdncxZ256/8946edf2f2e0d598c7af43243c8a9aa1.png'
+                },
+                istisna: {
+                    title: 'Bay\' Al-Istisna\' (Manufacturing Sale)',
+                    arabic: 'استصناع',
+                    description: 'A contract where a buyer places an order for a specific item to be manufactured with specific details, at a determined price, to be delivered on a specified future date.',
+                    processFlow: [
+                        'Customer requests the bank to construct a specified asset at a pre-agreed price.',
+                        'The bank delegates a contractor to construct the asset.',
+                        'Bank and contractor sign a purchase agreement.',
+                        'Upon completion, the contractor delivers the asset to the customer.'
+                    ],
+                    features: [
+                        'Subject matter does not exist at the time of contract',
+                        'Cost price and specifications must be agreed upon',
+                        'Material is supplied by the manufacturer',
+                        'Payment can be deferred or made in installments'
+                    ],
+                    diagram: 'https://pfst.cf2.poecdn.net/base_dHh2YXZzdncxZ256/6e7e58b6c81df4be6cfb5731e23e3e83.png'
+                },
+                salam: {
+                    title: 'Bay\' Al-Salam (Forward Contract)',
+                    arabic: 'سلم',
+                    description: 'A forward contract where the buyer pays the full price of a commodity in advance, but the delivery of the commodity is deferred to a future date.',
+                    processFlow: [
+                        'Buyer pays full price upfront for future delivery of specific goods.',
+                        'Seller agrees to deliver goods at a future date.',
+                        'Goods must be quantifiable and determinable to avoid uncertainty.',
+                        'Delivery date and place must be specified.'
+                    ],
+                    features: [
+                        'Full price must be paid at the time of contract',
+                        'Only suitable for goods that can be specified exactly',
+                        'Cannot be used for specific, unique items',
+                        'Commonly used for agricultural products and commodities'
+                    ],
+                    diagram: 'https://pfst.cf2.poecdn.net/base_dHh2YXZzdncxZ256/4d96e3af9f9e1566e59881ac94b6c04c.png'
+                },
+                dayn: {
+                    title: 'Bay\' Al-Dayn (Sale of Debt)',
+                    arabic: 'بيع الدين',
+                    description: 'A transaction involving the sale of debt/receivables to a third party. This concept is used in developing Islamic capital market instruments.',
+                    processFlow: [
+                        'Debt must be created through a contract of deferred payment sale of goods/services.',
+                        'Goods must have been delivered or services rendered.',
+                        'Trading of the debt must be on cash terms.',
+                        'Sold to third parties at discount or premium.'
+                    ],
+                    features: [
+                        'Some jurists only permit sales to the original debtor',
+                        'Others allow it with conditions like transparency',
+                        'Used for Islamic bonds and securities',
+                        'Must avoid resembling conventional interest-based bonds'
+                    ],
+                    diagram: 'https://pfst.cf2.poecdn.net/base_dHh2YXZzdncxZ256/a39b3c9dfbc60e1a57dd90bebbf9c7d3.png'
+                },
+                ijarah: {
+                    title: 'Ijarah (Leasing)',
+                    arabic: 'إجارة',
+                    description: 'A contract whereby the owner of an asset transfers the right to use the asset (usufruct) to another person for an agreed period at an agreed consideration.',
+                    processFlow: [
+                        'Client identifies an asset and approaches the bank for Ijarah.',
+                        'Bank purchases the asset and becomes the owner.',
+                        'Bank leases the asset to the client for a specified period.',
+                        'Client pays periodic rentals to the bank.',
+                        'Upon completion, asset returns to bank or transfers to client.'
+                    ],
+                    features: [
+                        'Bank retains ownership of the asset throughout the lease period',
+                        'Major maintenance is responsibility of the lessor (bank)',
+                        'Rentals may be fixed or variable',
+                        'Two contracts can be combined: leasing and subsequent purchase (Ijarah Thumma Bai)'
+                    ],
+                    diagram: 'https://pfst.cf2.poecdn.net/base_dHh2YXZzdncxZ256/ac13d54edcba5a45ae7f62b7f7c38f1d.png'
+                },
+                bba: {
+                    title: 'Bai Bithaman Ajil (Deferred Payment Sale)',
+                    arabic: 'بيع بثمن آجل',
+                    description: 'A sale where payment of the price is deferred to a future date. The seller and buyer agree on a price including the seller\'s profit margin, payable by the buyer in installments.',
+                    processFlow: [
+                        'Customer identifies an asset they wish to purchase.',
+                        'Customer approaches bank for BBA and promises to buy.',
+                        'Bank buys the asset from the owner on cash basis.',
+                        'Bank sells asset to customer at mark-up price payable in installments.'
+                    ],
+                    features: [
+                        'Price must be fixed at the time of contract',
+                        'Asset must exist at the time of contract',
+                        'Shariah does not require cost price to be disclosed',
+                        'Commonly used for home and property financing'
+                    ],
+                    diagram: 'https://pfst.cf2.poecdn.net/base_dHh2YXZzdncxZ256/be2e0536f3b98bde304f15dddff02fb0.png'
+                }
+            };
+            
+            contractDetailBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const contractId = this.dataset.contract;
+                    const contractData = exchangeContractsData[contractId];
+                    
+                    if (contractData) {
+                        contractContent.innerHTML = `
+                            <h3 class="text-2xl font-bold mb-2">${contractData.title} <span class="text-lg font-normal">(${contractData.arabic})</span></h3>
+                            
+                            <p class="mb-6">${contractData.description}</p>
+                            
+                            <div class="mb-6">
+                                <h4 class="text-lg font-semibold mb-3">Process Flow</h4>
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4">
+                                    <img src="${contractData.diagram}" alt="${contractData.title} Process Flow" class="mx-auto mb-4">
+                                    
+                                    <ol class="list-decimal pl-5">
+                                        ${contractData.processFlow.map(step => `<li class="mb-2">${step}</li>`).join('')}
+                                    </ol>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 class="text-lg font-semibold mb-3">Key Features</h4>
+                                <ul class="list-disc pl-5">
+                                    ${contractData.features.map(feature => `<li class="mb-2">${feature}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `;
+                        
+                        document.getElementById('exchange').classList.add('hidden');
+                        exchangeContractDetail.classList.remove('hidden');
+                    }
+                });
+            });
+            
+            backToExchangeBtn.addEventListener('click', function() {
+                exchangeContractDetail.classList.add('hidden');
+                document.getElementById('exchange').classList.remove('hidden');
+            });
+            
+            // Supporting contracts detail
+            const supportingContractDetail = document.getElementById('supporting-contract-detail');
+            const backToSupportingBtn = document.getElementById('back-to-supporting');
+            const supportingContent = document.getElementById('supporting-content');
+            const supportingContractBtns = document.querySelectorAll('.supporting-contract-btn');
+            
+            const supportingContractsData = {
+                hiwalah: {
+                    title: 'Hiwalah (Transfer of Debt)',
+                    arabic: 'حوالة',
+                    description: 'Hiwalah is the transfer of debt from one debtor to another. It is a mechanism that allows for the transfer of a debt obligation from the original debtor to a third party.',
+                    types: [
+                        {
+                            name: 'Hiwalah al-haqq (Transfer of right)',
+                            desc: 'Transfer of the right to claim from one person to another'
+                        },
+                        {
+                            name: 'Hiwalah al-dayn (Transfer of debt)',
+                            desc: 'Transfer of the right to demand debt from the debtor to another liable person'
+                        }
+                    ],
+                    processFlow: [
+                        'A owes B an amount (e.g., RM5,000).',
+                        'A is supposed to pay the debt to B.',
+                        'A transfers the obligation to pay the debt to C.',
+                        'C pays the debt to B.'
+                    ],
+                    features: [
+                        'Can be restricted (muqayyadah) or unrestricted (mutlaqah)',
+                        'In restricted hiwalah, C is earlier indebted to A',
+                        'Requires consent of all parties involved',
+                        'Used in modern Islamic banking for fund transfers and trade financing'
+                    ],
+                    diagram: 'https://pfst.cf2.poecdn.net/base_dHh2YXZzdncxZ256/f5fbce9a5c86da2eee70b9a93cb53a9f.png'
+                },
+                muqasah: {
+                    title: 'Muqasah (Set-off)',
+                    arabic: 'مقاصة',
+                    description: 'Muqasah refers to the setting off of a debt that is due to a debtor by a creditor who is at the same time indebted to the debtor. It is a form of implicit settlement between two parties.',
+                    processFlow: [
+                        'Party A owes Party B a specific amount.',
+                        'Party B also owes Party A a similar amount.',
+                        'Through muqasah, the debts cancel each other out.',
+                        'No physical exchange of money is needed.'
+                    ],
+                    features: [
+                        'Both debts must be of the same type and quality',
+                        'Debts must be equal in amount for complete set-off',
+                        'If amounts differ, partial set-off can occur with remaining balance payable',
+                        'Used in Islamic banking for netting arrangements and clearing systems'
+                    ],
+                    example: 'Ahmad owes Ali RM2,000. Then, Ali owes Ahmad the same amount. Through muqasah, the two parties are no longer in debt with each other.'
+                },
+                ibra: {
+                    title: 'Ibra\' (Rebate)',
+                    arabic: 'إبراء',
+                    description: 'Ibra\' refers to a rebate or partial refund given by a creditor to a debtor, typically when the debtor settles the debt earlier than the stipulated time. It is an act of waiving the right to collect the debt in full.',
+                    processFlow: [
+                        'Customer has a deferred payment obligation to the bank.',
+                        'Customer decides to settle the obligation earlier than scheduled.',
+                        'Bank provides a rebate (ibra\') on the remaining profit portion.',
+                        'Customer pays a reduced final settlement amount.'
+                    ],
+                    features: [
+                        'Must be voluntary from the creditor',
+                        'Cannot be stipulated as a condition in the original contract',
+                        'Amount of rebate may be determined by bank policies',
+                        'Commonly used in Islamic home financing and personal financing'
+                    ],
+                    quote: '"And if the debtor is in a hard time (has no money), then grant him time till it is easy for him to repay; but if you remit it by way of charity, that is better for you if you did but know" (Al-Quran, 2: 280)'
+                },
+                wad: {
+                    title: 'Wa\'d (Promise)',
+                    arabic: 'وعد',
+                    description: 'Wa\'d is a unilateral promise which connotes an expression of willingness of a person or a group of persons on a particular subject matter. It is binding on the promisor but does not bind the promisee until a contract is concluded.',
+                    processFlow: [
+                        'One party makes a promise to do something in the future.',
+                        'The promise is unilateral and binds only the promisor.',
+                        'The promisee is not obligated to accept.',
+                        'A contract is formed only after formal acceptance.'
+                    ],
+                    features: [
+                        'Morally binding on the promisor',
+                        'Can be legally binding in modern Islamic finance',
+                        'Used in structuring complex Islamic financial products',
+                        'Essential in products like forward currency transactions and sukuk structures'
+                    ],
+                    example: 'A makes a promise to sell his car to B for the amount of RM50,000. B stays silent. As such, A\'s promise is unilateral in nature and does not bind B to accept the offer. It will only be binding upon both parties after the sale contract (\'aqd al-bay\') is concluded.'
+                }
+            };
+            
+            supportingContractBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const contractId = this.dataset.contract;
+                    const contractData = supportingContractsData[contractId];
+                    
+                    if (contractData) {
+                        supportingContent.innerHTML = `
+                            <h3 class="text-2xl font-bold mb-2">${contractData.title} <span class="text-lg font-normal">(${contractData.arabic})</span></h3>
+                            
+                            <p class="mb-6">${contractData.description}</p>
+                            
+                            ${contractData.types ? `
+                                <div class="mb-6">
+                                    <h4 class="text-lg font-semibold mb-3">Types</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        ${contractData.types.map(type => `
+                                            <div class="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                                                <h5 class="font-medium mb-1">${type.name}</h5>
+                                                <p class="text-sm">${type.desc}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            <div class="mb-6">
+                                <h4 class="text-lg font-semibold mb-3">Process Flow</h4>
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4">
+                                    ${contractData.diagram ? `<img src="${contractData.diagram}" alt="${contractData.title} Process Flow" class="mx-auto mb-4">` : ''}
+                                    
+                                    <ol class="list-decimal pl-5">
+                                        ${contractData.processFlow.map(step => `<li class="mb-2">${step}</li>`).join('')}
+                                    </ol>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <h4 class="text-lg font-semibold mb-3">Key Features</h4>
+                                <ul class="list-disc pl-5">
+                                    ${contractData.features.map(feature => `<li class="mb-2">${feature}</li>`).join('')}
+                                </ul>
+                            </div>
+                            
+                            ${contractData.example ? `
+                                <div class="p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
+                                    <h4 class="font-semibold mb-2">Example</h4>
+                                    <p>${contractData.example}</p>
+                                </div>
+                            ` : ''}
+                            
+                            ${contractData.quote ? `
+                                <div class="p-4 mt-4 bg-blue-100 dark:bg-blue-900 rounded-lg italic">
+                                    <p>${contractData.quote}</p>
+                                </div>
+                            ` : ''}
+                        `;
+                        
+                        document.getElementById('supporting').classList.add('hidden');
+                        supportingContractDetail.classList.remove('hidden');
+                    }
+                });
+            });
+            
+            backToSupportingBtn.addEventListener('click', function() {
+                supportingContractDetail.classList.add('hidden');
+                document.getElementById('supporting').classList.remove('hidden');
+            });
+            
+            // Quiz functionality
+            const quizData = [
+                {
+                    question: "Which of the following is a type of partnership contract in Islamic finance?",
+                    options: ["Murabahah", "Mudharabah", "Ijarah", "Kafalah"],
+                    correctIndex: 1,
+                    topic: "Partnership Contracts"
+                },
+                {
+                    question: "In which contract does the seller disclose the cost price and add a profit margin?",
+                    options: ["Ijarah", "Istisna'", "Murabahah", "Salam"],
+                    correctIndex: 2,
+                    topic: "Exchange Based Contracts"
+                },
+                {
+                    question: "What is the name of the contract where full payment is made upfront for future delivery?",
+                    options: ["Murabahah", "Istisna'", "Ijarah", "Salam"],
+                    correctIndex: 3,
+                    topic: "Exchange Based Contracts"
+                },
+                {
+                    question: "In Musharakah contracts, how are losses shared among partners?",
+                    options: ["Based on pre-agreed ratio", "Proportional to capital contribution", "Equally regardless of capital", "Based on management responsibility"],
+                    correctIndex: 1,
+                    topic: "Partnership Contracts"
+                },
+                {
+                    question: "Which Islamic contract is used for collateral against a debt?",
+                    options: ["Wakalah", "Hibah", "Rahn", "Ijarah"],
+                    correctIndex: 2,
+                    topic: "Security Contracts"
+                },
+                {
+                    question: "In which type of Wadiah does the custodian guarantee the deposits?",
+                    options: ["Wadiah Yad Amanah", "Wadiah Yad Dhamanah", "Wadiah Muqayyadah", "Wadiah Musharak"],
+                    correctIndex: 1,
+                    topic: "Charitable Contracts"
+                },
+                {
+                    question: "Which of the following is prohibited in Islamic contracts?",
+                    options: ["Profits", "Risks", "Riba (Interest)", "Partnerships"],
+                    correctIndex: 2,
+                    topic: "Elements of Contracts"
+                },
+                {
+                    question: "What type of contract is Hiwalah?",
+                    options: ["Exchange contract", "Partnership contract", "Supporting contract (transfer of debt)", "Charitable contract"],
+                    correctIndex: 2,
+                    topic: "Supporting Contracts"
+                },
+                {
+                    question: "In Mudharabah contracts, who bears the financial loss?",
+                    options: ["The entrepreneur (Mudarib)", "The capital provider (Rab al-mal)", "Both parties based on profit ratio", "Both parties equally"],
+                    correctIndex: 1,
+                    topic: "Partnership Contracts"
+                },
+                {
+                    question: "Which element is NOT essential in a valid Islamic contract?",
+                    options: ["Contracting parties", "Form of contract (offer and acceptance)", "Interest on delayed payment", "Subject matter"],
+                    correctIndex: 2,
+                    topic: "Elements of Contracts"
+                }
+            ];
+            
+            let currentQuizQuestion = 0;
+            let quizScore = 0;
+            let quizAnswered = false;
+            const weakTopics = {};
+            
+            function loadQuizQuestion() {
+                const quiz = quizData[currentQuizQuestion];
+                document.getElementById('quiz-question').innerHTML = `<h3 class="text-xl font-semibold mb-3">${quiz.question}</h3>`;
+                
+                const optionsContainer = document.getElementById('quiz-options');
+                optionsContainer.innerHTML = '';
+                
+                quiz.options.forEach((option, index) => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'quiz-option p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700';
+                    optionDiv.dataset.index = index;
+                    optionDiv.dataset.correct = (index === quiz.correctIndex);
+                    
+                    optionDiv.innerHTML = `
+                        <div class="flex items-center">
+                            <div class="h-6 w-6 border border-gray-400 dark:border-gray-500 rounded-full mr-3 flex-shrink-0"></div>
+                            <span>${option}</span>
+                        </div>
+                    `;
+                    
+                    optionsContainer.appendChild(optionDiv);
+                });
+                
+                document.getElementById('quiz-question-number').textContent = `Question ${currentQuizQuestion + 1} of ${quizData.length}`;
+                document.getElementById('quiz-progress-bar').style.width = `${((currentQuizQuestion + 1) / quizData.length) * 100}%`;
+                
+                // Reset state
+                quizAnswered = false;
+                document.getElementById('quiz-feedback').classList.add('hidden');
+                document.getElementById('quiz-next').textContent = currentQuizQuestion < quizData.length - 1 ? 'Next' : 'Finish Quiz';
+                document.getElementById('quiz-prev').disabled = currentQuizQuestion === 0;
+                
+                // Add event listeners to options
+                document.querySelectorAll('.quiz-option').forEach(option => {
+                    option.addEventListener('click', selectQuizOption);
+                });
+            }
+            
+            function selectQuizOption() {
+                if (quizAnswered) return;
+                
+                // Mark selected
+                document.querySelectorAll('.quiz-option').forEach(option => {
+                    option.classList.remove('selected', 'correct', 'incorrect');
+                });
+                
+                this.classList.add('selected');
+                
+                // Show feedback
+                const isCorrect = this.dataset.correct === 'true';
+                const feedback = document.getElementById('quiz-feedback');
+                
+                feedback.className = `mb-6 p-4 rounded-lg ${isCorrect ? 'bg-green-100 dark:bg-green-900' : 'bg-red-100 dark:bg-red-900'}`;
+                feedback.innerHTML = isCorrect 
+                    ? '<i class="fas fa-check-circle mr-2"></i> Correct! Well done.' 
+                    : `<i class="fas fa-times-circle mr-2"></i> Incorrect. The correct answer is: ${quizData[currentQuizQuestion].options[quizData[currentQuizQuestion].correctIndex]}`;
+                feedback.classList.remove('hidden');
+                
+                // Mark correct/incorrect
+                document.querySelectorAll('.quiz-option').forEach(option => {
+                    if (option.dataset.correct === 'true') {
+                        option.classList.add('correct');
+                    } else if (option === this && !isCorrect) {
+                        option.classList.add('incorrect');
+                    }
+                });
+                
+                // Update score
+                if (isCorrect) {
+                    quizScore++;
+                } else {
+                    // Track weak topics
+                    const topic = quizData[currentQuizQuestion].topic;
+                    weakTopics[topic] = (weakTopics[topic] || 0) + 1;
+                }
+                
+                document.getElementById('quiz-score').textContent = `Score: ${quizScore}/${currentQuizQuestion + 1}`;
+                
+                quizAnswered = true;
+            }
+            
+            function showQuizResults() {
+                document.getElementById('quiz-container').classList.add('hidden');
+                document.getElementById('quiz-results').classList.remove('hidden');
+                
+                document.getElementById('quiz-final-score').textContent = `You scored: ${quizScore}/${quizData.length}`;
+                
+                // Generate review areas list
+                const reviewList = document.getElementById('quiz-review-areas');
+                reviewList.innerHTML = '';
+                
+                Object.entries(weakTopics).sort((a, b) => b[1] - a[1]).forEach(([topic, count]) => {
+                    const li = document.createElement('li');
+                    li.textContent = `${topic} (${count} incorrect)`;
+                    reviewList.appendChild(li);
+                });
+                
+                if (reviewList.children.length === 0) {
+                    reviewList.innerHTML = '<li>Great job! You didn\'t have any weak areas.</li>';
+                }
+                
+                // Create chart
+                const ctx = document.getElementById('quiz-chart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Correct', 'Incorrect'],
+                        datasets: [{
+                            data: [quizScore, quizData.length - quizScore],
+                            backgroundColor: [
+                                '#4CAF50',
+                                '#dc3545'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Initialize quiz
+            loadQuizQuestion();
+            
+            // Quiz navigation
+            document.getElementById('quiz-next').addEventListener('click', function() {
+                if (!quizAnswered && currentQuizQuestion < quizData.length) {
+                    // Force selection of an answer
+                    document.getElementById('quiz-feedback').className = 'mb-6 p-4 rounded-lg bg-yellow-100 dark:bg-yellow-900';
+                    document.getElementById('quiz-feedback').innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i> Please select an answer before proceeding.';
+                    document.getElementById('quiz-feedback').classList.remove('hidden');
+                    return;
+                }
+                
+                currentQuizQuestion++;
+                
+                if (currentQuizQuestion < quizData.length) {
+                    loadQuizQuestion();
+                } else {
+                    showQuizResults();
+                }
+            });
+            
+            document.getElementById('quiz-prev').addEventListener('click', function() {
+                if (currentQuizQuestion > 0) {
+                    currentQuizQuestion--;
+                    loadQuizQuestion();
+                }
+            });
+            
+            document.getElementById('quiz-restart').addEventListener('click', function() {
+                currentQuizQuestion = 0;
+                quizScore = 0;
+                Object.keys(weakTopics).forEach(key => delete weakTopics[key]);
+                
+                document.getElementById('quiz-results').classList.add('hidden');
+                document.getElementById('quiz-container').classList.remove('hidden');
+                loadQuizQuestion();
+            });
+            
+            document.getElementById('quiz-explore').addEventListener('click', function() {
+                document.getElementById('quiz-results').classList.add('hidden');
+                
+                // If there are weak topics, navigate to the first one
+                const weakTopicsList = Object.keys(weakTopics);
+                if (weakTopicsList.length > 0) {
+                    const firstWeakTopic = weakTopicsList[0];
+                    const topicMap = {
+                        "Elements of Contracts": "elements",
+                        "Classification of Contracts": "classification",
+                        "Exchange Based Contracts": "exchange",
+                        "Partnership Contracts": "partnership",
+                        "Security Contracts": "security",
+                        "Charitable Contracts": "charitable",
+                        "Agency Contracts": "agency",
+                        "Supporting Contracts": "supporting"
+                    };
+                    
+                    if (topicMap[firstWeakTopic]) {
+                        showSection(topicMap[firstWeakTopic]);
+                    } else {
+                        showSection('introduction');
+                    }
+                } else {
+                    showSection('introduction');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
