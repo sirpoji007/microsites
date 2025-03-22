@@ -1,0 +1,2140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Principles of Insurance | INS200</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    .dark {
+      background-color: #1a1a2e;
+      color: #e2e2e2;
+    }
+    
+    .card-flip {
+      perspective: 1000px;
+      height: 200px;
+    }
+    
+    .card-flip-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+    
+    .card-flip:hover .card-flip-inner {
+      transform: rotateY(180deg);
+    }
+    
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+    }
+    
+    .card-back {
+      transform: rotateY(180deg);
+    }
+    
+    .module-nav-item {
+      transition: all 0.3s ease;
+    }
+    
+    .module-nav-item:hover {
+      transform: translateY(-3px);
+    }
+    
+    .progress-container {
+      height: 8px;
+      width: 100%;
+      background-color: #f0f0f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-bar {
+      height: 100%;
+      background-color: #5D5CDE;
+      transition: width 0.5s ease-in-out;
+    }
+    
+    .dark .progress-container {
+      background-color: #333;
+    }
+    
+    .quiz-option {
+      transition: all 0.2s ease;
+    }
+    
+    .quiz-option:hover {
+      transform: translateX(5px);
+    }
+    
+    .quiz-option.correct {
+      background-color: rgba(72, 187, 120, 0.2);
+      border-color: #48bb78;
+    }
+    
+    .quiz-option.incorrect {
+      background-color: rgba(245, 101, 101, 0.2);
+      border-color: #f56565;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.5s ease-in;
+    }
+    
+    @keyframes slideInRight {
+      from { transform: translateX(30px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .slide-in {
+      animation: slideInRight 0.5s ease-out;
+    }
+    
+    /* Case study animation */
+    @keyframes highlightPulse {
+      0% { box-shadow: 0 0 0 0 rgba(93, 92, 222, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(93, 92, 222, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(93, 92, 222, 0); }
+    }
+    
+    .highlight-pulse {
+      animation: highlightPulse 2s infinite;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <div class="min-h-screen flex flex-col">
+    <!-- Header Section -->
+    <header class="bg-white dark:bg-gray-800 shadow-md">
+      <div class="container mx-auto py-4 px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center">
+          <div class="flex items-center">
+            <i class="fas fa-shield-alt text-indigo-600 text-2xl mr-3"></i>
+            <h1 class="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-white">Principles of Insurance</h1>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span id="progress-text" class="text-sm font-medium text-gray-600 dark:text-gray-300 hidden md:block">Progress: 0%</span>
+            <button id="theme-toggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 focus:outline-none">
+              <i class="fas fa-moon text-gray-600 dark:text-yellow-300"></i>
+            </button>
+          </div>
+        </div>
+        <div class="mt-3 progress-container">
+          <div id="progress-bar" class="progress-bar w-0"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Navigation Menu -->
+    <nav class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex overflow-x-auto py-2 space-x-4 no-scrollbar">
+          <button class="module-nav-item px-3 py-2 rounded-md text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30" data-target="intro">Introduction</button>
+          <button class="module-nav-item px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400" data-target="insurable-interest">Insurable Interest</button>
+          <button class="module-nav-item px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400" data-target="utmost-good-faith">Utmost Good Faith</button>
+          <button class="module-nav-item px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400" data-target="indemnity">Indemnity</button>
+          <button class="module-nav-item px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400" data-target="subrogation">Subrogation</button>
+          <button class="module-nav-item px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400" data-target="contribution">Contribution</button>
+          <button class="module-nav-item px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400" data-target="proximate-cause">Proximate Cause</button>
+          <button class="module-nav-item px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400" data-target="quiz">Quiz</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+      <!-- Introduction Module -->
+      <section id="intro" class="module-section py-8 px-4 sm:px-6 lg:px-8 container mx-auto fade-in">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Introduction to Principles of Insurance</h2>
+          <div class="flex flex-col md:flex-row">
+            <div class="md:w-1/2 pr-0 md:pr-8">
+              <p class="text-gray-700 dark:text-gray-300 mb-4">Insurance is regarded as an essential part of our modern life. There are many spheres of human activities in which insurance has been made compulsory, such as the requirement for vehicles to be insured.</p>
+              <p class="text-gray-700 dark:text-gray-300 mb-4">A contract of insurance is subject to the rules normally applicable to contracts in general, and valid contracts must have six essential features.</p>
+              <p class="text-gray-700 dark:text-gray-300">In this module, we will explore the six fundamental legal doctrines or principles of insurance that govern insurance contracts:</p>
+            </div>
+            <div class="md:w-1/2 mt-6 md:mt-0">
+              <img src="https://i.imgur.com/eVD1hDj.png" alt="Insurance Principles Concept" class="w-full h-auto rounded-lg shadow-sm">
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-8">
+            <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-lg shadow-sm flex flex-col items-center text-center transition-transform hover:scale-105">
+              <i class="fas fa-handshake text-indigo-600 dark:text-indigo-400 text-3xl mb-2"></i>
+              <h3 class="font-medium text-gray-900 dark:text-white">Insurable Interest</h3>
+            </div>
+            <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-lg shadow-sm flex flex-col items-center text-center transition-transform hover:scale-105">
+              <i class="fas fa-balance-scale text-indigo-600 dark:text-indigo-400 text-3xl mb-2"></i>
+              <h3 class="font-medium text-gray-900 dark:text-white">Utmost Good Faith</h3>
+            </div>
+            <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-lg shadow-sm flex flex-col items-center text-center transition-transform hover:scale-105">
+              <i class="fas fa-exchange-alt text-indigo-600 dark:text-indigo-400 text-3xl mb-2"></i>
+              <h3 class="font-medium text-gray-900 dark:text-white">Indemnity</h3>
+            </div>
+            <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-lg shadow-sm flex flex-col items-center text-center transition-transform hover:scale-105">
+              <i class="fas fa-clipboard-check text-indigo-600 dark:text-indigo-400 text-3xl mb-2"></i>
+              <h3 class="font-medium text-gray-900 dark:text-white">Subrogation</h3>
+            </div>
+            <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-lg shadow-sm flex flex-col items-center text-center transition-transform hover:scale-105">
+              <i class="fas fa-users text-indigo-600 dark:text-indigo-400 text-3xl mb-2"></i>
+              <h3 class="font-medium text-gray-900 dark:text-white">Contribution</h3>
+            </div>
+            <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-lg shadow-sm flex flex-col items-center text-center transition-transform hover:scale-105">
+              <i class="fas fa-link text-indigo-600 dark:text-indigo-400 text-3xl mb-2"></i>
+              <h3 class="font-medium text-gray-900 dark:text-white">Proximate Cause</h3>
+            </div>
+          </div>
+        </div>
+        
+        <div class="text-center">
+          <button class="next-module-btn bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-md shadow-sm transition duration-150 ease-in-out" data-next="insurable-interest">
+            Start Learning <i class="fas fa-arrow-right ml-2"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- Insurable Interest Module -->
+      <section id="insurable-interest" class="module-section hidden py-8 px-4 sm:px-6 lg:px-8 container mx-auto">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+            <i class="fas fa-handshake text-indigo-600 dark:text-indigo-400 mr-3"></i>
+            Insurable Interest
+          </h2>
+          
+          <div class="flex flex-col md:flex-row mb-8">
+            <div class="md:w-1/2 pr-0 md:pr-8">
+              <p class="text-gray-700 dark:text-gray-300 mb-4">Insurable interest is the right to insure arising out of a legally recognized financial interest which a person has in the subject matter of insurance.</p>
+              <p class="text-gray-700 dark:text-gray-300 mb-4">It is essential to understand two key concepts:</p>
+              <ul class="list-disc list-inside text-gray-700 dark:text-gray-300 mb-4 space-y-2">
+                <li><strong>Subject Matter of Insurance:</strong> The life, property, rights, or any potential legal liability insured under a policy.</li>
+                <li><strong>Subject Matter of Contract:</strong> The insured's financial interest in the subject matter of insurance.</li>
+              </ul>
+              <p class="text-gray-700 dark:text-gray-300">When must insurable interest exist? In general, it must exist at the time of inception of the insurance contract and at the time of loss for all classes of insurance, with two exceptions:</p>
+              <ul class="list-disc list-inside text-gray-700 dark:text-gray-300 mt-2 space-y-2">
+                <li>Life insurance: only required at the time of inception</li>
+                <li>Marine insurance: only required at the time of loss</li>
+              </ul>
+            </div>
+            <div class="md:w-1/2 mt-6 md:mt-0 flex justify-center">
+              <div class="bg-indigo-50 dark:bg-gray-700 p-4 rounded-lg w-full max-w-md">
+                <div class="mb-4 text-center">
+                  <h3 class="font-medium text-indigo-700 dark:text-indigo-400">Example: Fire Insurance on a House</h3>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm relative overflow-hidden">
+                  <div class="absolute top-2 right-2 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-200 text-xs font-medium px-2.5 py-0.5 rounded">INSURED FOR RM100,000</div>
+                  <div class="flex flex-col items-center">
+                    <div class="w-24 h-24 flex items-center justify-center bg-indigo-100 dark:bg-indigo-900/30 rounded-full mb-4">
+                      <i class="fas fa-home text-4xl text-indigo-600 dark:text-indigo-400"></i>
+                    </div>
+                    <div class="text-center space-y-3">
+                      <div>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">Subject matter of Insurance</span>
+                        <p class="font-medium text-gray-900 dark:text-white">The House</p>
+                      </div>
+                      <div>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">Subject matter of Contract</span>
+                        <p class="font-medium text-gray-900 dark:text-white">The financial interest (RM100,000)</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Application of Insurable Interest</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="card-flip">
+              <div class="card-flip-inner">
+                <div class="card-front bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800">
+                  <h4 class="font-medium text-lg text-gray-900 dark:text-white">Life Insurance</h4>
+                  <p class="text-gray-600 dark:text-gray-400 text-sm mt-2">(Hover to see examples)</p>
+                  <i class="fas fa-user-shield text-4xl text-indigo-600 dark:text-indigo-400 mt-3"></i>
+                </div>
+                <div class="card-back bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
+                  <ul class="text-left text-gray-700 dark:text-gray-300 text-sm space-y-2">
+                    <li>• Everyone has insurable interest in their own life</li>
+                    <li>• Spouses have mutual insurable interest in each other's lives</li>
+                    <li>• Parents have insurable interest in their children's lives</li>
+                    <li>• Creditors have insurable interest in debtors' lives to the extent of the loan plus interest</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card-flip">
+              <div class="card-flip-inner">
+                <div class="card-front bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800">
+                  <h4 class="font-medium text-lg text-gray-900 dark:text-white">Property Insurance</h4>
+                  <p class="text-gray-600 dark:text-gray-400 text-sm mt-2">(Hover to see examples)</p>
+                  <i class="fas fa-home text-4xl text-indigo-600 dark:text-indigo-400 mt-3"></i>
+                </div>
+                <div class="card-back bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
+                  <ul class="text-left text-gray-700 dark:text-gray-300 text-sm space-y-2">
+                    <li>• Property owners have insurable interest to the extent of the value of their property</li>
+                    <li>• Agents have insurable interest in property belonging to their principals</li>
+                    <li>• Part-owners have insurable interest to the extent of their financial involvement</li>
+                    <li>• Mortgagees have insurable interest in mortgaged property</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card-flip">
+              <div class="card-flip-inner">
+                <div class="card-front bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800">
+                  <h4 class="font-medium text-lg text-gray-900 dark:text-white">Liability Insurance</h4>
+                  <p class="text-gray-600 dark:text-gray-400 text-sm mt-2">(Hover to see examples)</p>
+                  <i class="fas fa-gavel text-4xl text-indigo-600 dark:text-indigo-400 mt-3"></i>
+                </div>
+                <div class="card-back bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
+                  <ul class="text-left text-gray-700 dark:text-gray-300 text-sm space-y-2">
+                    <li>• A person has interest in potential liability they may incur</li>
+                    <li>• This includes legal costs and expenses</li>
+                    <li>• However, one cannot insure fines arising from criminal acts</li>
+                    <li>• Companies can insure against liability arising from their business operations</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card-flip">
+              <div class="card-flip-inner">
+                <div class="card-front bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800">
+                  <h4 class="font-medium text-lg text-gray-900 dark:text-white">Reinsurance</h4>
+                  <p class="text-gray-600 dark:text-gray-400 text-sm mt-2">(Hover to see examples)</p>
+                  <i class="fas fa-shield-alt text-4xl text-indigo-600 dark:text-indigo-400 mt-3"></i>
+                </div>
+                <div class="card-back bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
+                  <ul class="text-left text-gray-700 dark:text-gray-300 text-sm space-y-2">
+                    <li>• An insurer has insurable interest in risks accepted by them</li>
+                    <li>• They will be financially affected if the subject matter is damaged</li>
+                    <li>• Insurers can reinsure risks they have accepted</li>
+                    <li>• This allows them to manage their exposure and spread risk</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8">
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Assignment of Insurance Policies</h3>
+            <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-4 rounded-r-md">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <i class="fas fa-exclamation-circle text-yellow-500 text-xl"></i>
+                </div>
+                <div class="ml-3">
+                  <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Important to know</h3>
+                  <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                    <p>Insurance contracts are personal contracts, and the assignment of a policy generally requires prior consent from the insurer.</p>
+                    <p class="mt-2">Exceptions to this rule include:</p>
+                    <ul class="list-disc list-inside mt-1">
+                      <li>Marine policies (especially cargo policies)</li>
+                      <li>Life policies</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex justify-between">
+          <button class="prev-module-btn bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-medium py-2 px-6 rounded-md shadow-sm transition duration-150 ease-in-out" data-prev="intro">
+            <i class="fas fa-arrow-left mr-2"></i> Previous
+          </button>
+          <button class="next-module-btn bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-md shadow-sm transition duration-150 ease-in-out" data-next="utmost-good-faith">
+            Next <i class="fas fa-arrow-right ml-2"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- Utmost Good Faith Module -->
+      <section id="utmost-good-faith" class="module-section hidden py-8 px-4 sm:px-6 lg:px-8 container mx-auto">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+            <i class="fas fa-balance-scale text-indigo-600 dark:text-indigo-400 mr-3"></i>
+            Utmost Good Faith (Uberrima Fides)
+          </h2>
+          
+          <div class="flex flex-col md:flex-row mb-8">
+            <div class="md:w-1/2 pr-0 md:pr-8">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Insurance vs. Ordinary Contracts</h3>
+              <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-lg mb-4">
+                <h4 class="font-medium text-indigo-700 dark:text-indigo-400 mb-2">Ordinary Commercial Contracts</h4>
+                <p class="text-gray-700 dark:text-gray-300 text-sm">In ordinary contracts, the rule of "caveat emptor" (let the buyer beware) applies. The buyer should ask questions if they need more information, and the seller must answer truthfully but is not required to volunteer information.</p>
+              </div>
+              
+              <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-lg">
+                <h4 class="font-medium text-indigo-700 dark:text-indigo-400 mb-2">Insurance Contracts</h4>
+                <p class="text-gray-700 dark:text-gray-300 text-sm">Insurance contracts require a higher standard. The insurer cannot examine all aspects of the proposed insurance, while the proposer knows everything about the risk. To solve this information imbalance, the law imposes a duty of <strong>utmost good faith</strong> on both parties.</p>
+              </div>
+            </div>
+            <div class="md:w-1/2 mt-6 md:mt-0">
+              <div class="relative">
+                <img src="https://i.imgur.com/SgR9tXi.png" alt="Utmost Good Faith Concept" class="w-full h-auto rounded-lg shadow-sm">
+              </div>
+              
+              <div class="mt-6 bg-white dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+                <h4 class="font-medium text-gray-900 dark:text-white mb-2">The Duty of Utmost Good Faith</h4>
+                <p class="text-gray-700 dark:text-gray-300 text-sm">It is the duty of the policyholder to disclose fully and accurately all material facts that they know, whether asked for or not by the insurer.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-indigo-50 dark:bg-indigo-900/30 p-6 rounded-lg mb-8">
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">What is a Material Fact?</h3>
+            <p class="text-gray-700 dark:text-gray-300 mb-4">A material fact is one that would influence a prudent underwriter in deciding whether to accept the risk or in fixing the premium.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-sm">
+                <div class="flex items-start">
+                  <div class="flex-shrink-0 mt-1">
+                    <i class="fas fa-check-circle text-green-500"></i>
+                  </div>
+                  <div class="ml-3">
+                    <h4 class="font-medium text-gray-900 dark:text-white">Example 1</h4>
+                    <p class="text-gray-700 dark:text-gray-300 text-sm">Excessive alcohol consumption may be material to a motor or personal accident insurance proposal, but not for marine insurance.</p>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-sm">
+                <div class="flex items-start">
+                  <div class="flex-shrink-0 mt-1">
+                    <i class="fas fa-check-circle text-green-500"></i>
+                  </div>
+                  <div class="ml-3">
+                    <h4 class="font-medium text-gray-900 dark:text-white">Example 2</h4>
+                    <p class="text-gray-700 dark:text-gray-300 text-sm">The same fact about alcohol consumption may not be material in motor insurance if the proposer is always chauffeur-driven.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Duration of the Duty</h3>
+              <div class="bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
+                <div class="p-4 border-b border-gray-200 dark:border-gray-600">
+                  <div class="flex items-center">
+                    <div class="bg-indigo-100 dark:bg-indigo-900/50 p-2 rounded-full">
+                      <i class="fas fa-hourglass-start text-indigo-600 dark:text-indigo-400"></i>
+                    </div>
+                    <div class="ml-3">
+                      <h4 class="font-medium text-gray-900 dark:text-white">Before Contract Formation</h4>
+                    </div>
+                  </div>
+                </div>
+                <div class="p-4">
+                  <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-2">
+                    <li class="flex items-start">
+                      <i class="fas fa-circle text-xs text-indigo-600 dark:text-indigo-400 mt-1 mr-2"></i>
+                      <span>The duty lasts until the completion of the insurance contract</span>
+                    </li>
+                    <li class="flex items-start">
+                      <i class="fas fa-circle text-xs text-indigo-600 dark:text-indigo-400 mt-1 mr-2"></i>
+                      <span>The proposer must notify any changes to the insurer</span>
+                    </li>
+                    <li class="flex items-start">
+                      <i class="fas fa-circle text-xs text-indigo-600 dark:text-indigo-400 mt-1 mr-2"></i>
+                      <span>Failure to do so makes the contract voidable</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">After Contract Formation</h3>
+              <div class="bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
+                <div class="p-4 border-b border-gray-200 dark:border-gray-600">
+                  <div class="flex items-center">
+                    <div class="bg-indigo-100 dark:bg-indigo-900/50 p-2 rounded-full">
+                      <i class="fas fa-hourglass-end text-indigo-600 dark:text-indigo-400"></i>
+                    </div>
+                    <div class="ml-3">
+                      <h4 class="font-medium text-gray-900 dark:text-white">During Policy Period</h4>
+                    </div>
+                  </div>
+                </div>
+                <div class="p-4">
+                  <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-2">
+                    <li class="flex items-start">
+                      <i class="fas fa-circle text-xs text-indigo-600 dark:text-indigo-400 mt-1 mr-2"></i>
+                      <span>The duty of disclosure normally terminates upon inception of the contract</span>
+                    </li>
+                    <li class="flex items-start">
+                      <i class="fas fa-circle text-xs text-indigo-600 dark:text-indigo-400 mt-1 mr-2"></i>
+                      <span>However, the duty may be extended throughout the policy period by specific policy conditions</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8">
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Breaches of Utmost Good Faith</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-white dark:bg-gray-700 p-5 rounded-lg shadow border border-gray-200 dark:border-gray-600">
+                <h4 class="font-medium text-red-600 dark:text-red-400 mb-3 flex items-center">
+                  <i class="fas fa-times-circle mr-2"></i>
+                  Non-Disclosure
+                </h4>
+                <p class="text-gray-700 dark:text-gray-300 text-sm">When the insured fails to provide the insurer with information relating to a material fact that they knew or should have known.</p>
+                <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                  <p class="text-sm text-gray-500 dark:text-gray-400">Result: Contract becomes voidable by the insurer</p>
+                </div>
+              </div>
+              
+              <div class="bg-white dark:bg-gray-700 p-5 rounded-lg shadow border border-gray-200 dark:border-gray-600">
+                <h4 class="font-medium text-red-600 dark:text-red-400 mb-3 flex items-center">
+                  <i class="fas fa-times-circle mr-2"></i>
+                  Misrepresentation
+                </h4>
+                <p class="text-gray-700 dark:text-gray-300 text-sm">When the insured provides incorrect information relating to a material fact.</p>
+                <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                  <p class="text-sm text-gray-500 dark:text-gray-400">Result: Contract becomes voidable and insurer can sue for damages</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-6">
+            <div class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+              <h4 class="font-medium text-gray-900 dark:text-white mb-2">Legal Doctrines Related to Utmost Good Faith</h4>
+              <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-3">
+                <li class="flex items-start">
+                  <div class="flex-shrink-0 mt-0.5">
+                    <i class="fas fa-certificate text-indigo-600 dark:text-indigo-400"></i>
+                  </div>
+                  <div class="ml-3">
+                    <span class="font-medium">Warranty:</span> A statement made by the insured that causes the insurer to enter the contract. Must be absolutely true or the insurer can avoid contractual obligations.
+                  </div>
+                </li>
+                <li class="flex items-start">
+                  <div class="flex-shrink-0 mt-0.5">
+                    <i class="fas fa-comment text-indigo-600 dark:text-indigo-400"></i>
+                  </div>
+                  <div class="ml-3">
+                    <span class="font-medium">Representation:</span> A statement made by an applicant in an insurance application.
+                  </div>
+                </li>
+                <li class="flex items-start">
+                  <div class="flex-shrink-0 mt-0.5">
+                    <i class="fas fa-eye-slash text-indigo-600 dark:text-indigo-400"></i>
+                  </div>
+                  <div class="ml-3">
+                    <span class="font-medium">Concealment:</span> A failure to disclose material information.
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex justify-between">
+          <button class="prev-module-btn bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-medium py-2 px-6 rounded-md shadow-sm transition duration-150 ease-in-out" data-prev="insurable-interest">
+            <i class="fas fa-arrow-left mr-2"></i> Previous
+          </button>
+          <button class="next-module-btn bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-md shadow-sm transition duration-150 ease-in-out" data-next="indemnity">
+            Next <i class="fas fa-arrow-right ml-2"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- Indemnity Module -->
+      <section id="indemnity" class="module-section hidden py-8 px-4 sm:px-6 lg:px-8 container mx-auto">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+            <i class="fas fa-exchange-alt text-indigo-600 dark:text-indigo-400 mr-3"></i>
+            Indemnity
+          </h2>
+          
+          <div class="flex flex-col md:flex-row mb-8">
+            <div class="md:w-1/2 pr-0 md:pr-8">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Principle of Indemnity</h3>
+              <p class="text-gray-700 dark:text-gray-300 mb-4">The principle of indemnity requires that when a loss arises under an insurance policy, the insured shall be restored to the same financial position after the loss as they enjoyed immediately before it.</p>
+              <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-lg">
+                <h4 class="font-medium text-indigo-700 dark:text-indigo-400 mb-2">Objectives</h4>
+                <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-2">
+                  <li class="flex items-start">
+                    <i class="fas fa-check text-green-500 mt-0.5 mr-2"></i>
+                    <span>To ensure the insured is neither better nor worse off than before the loss</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-check text-green-500 mt-0.5 mr-2"></i>
+                    <span>To prevent the insured from making a profit out of a loss</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div class="mt-4">
+                <h4 class="font-medium text-gray-900 dark:text-white mb-2">Contracts of Indemnity</h4>
+                <p class="text-gray-700 dark:text-gray-300 text-sm">When the insured has measurable insurable interest, the insurance contract will be a contract of indemnity (e.g., property, pecuniary, and liability insurance).</p>
+                <p class="text-gray-700 dark:text-gray-300 text-sm mt-2">Life insurance and personal accident contracts are generally considered non-indemnity contracts because the insurable interest tends to be unlimited.</p>
+              </div>
+            </div>
+            <div class="md:w-1/2 mt-6 md:mt-0">
+              <img src="https://i.imgur.com/xLUJRnA.png" alt="Indemnity Concept" class="w-full h-auto rounded-lg shadow-sm">
+              
+              <div class="mt-6 bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+                <h4 class="font-medium text-gray-900 dark:text-white mb-3">Methods of Providing Indemnity</h4>
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="flex items-center p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg">
+                    <i class="fas fa-money-bill-wave text-indigo-600 dark:text-indigo-400 text-xl mr-3"></i>
+                    <span class="text-gray-700 dark:text-gray-300 text-sm">Cash Payment</span>
+                  </div>
+                  <div class="flex items-center p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg">
+                    <i class="fas fa-tools text-indigo-600 dark:text-indigo-400 text-xl mr-3"></i>
+                    <span class="text-gray-700 dark:text-gray-300 text-sm">Repair</span>
+                  </div>
+                  <div class="flex items-center p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg">
+                    <i class="fas fa-exchange-alt text-indigo-600 dark:text-indigo-400 text-xl mr-3"></i>
+                    <span class="text-gray-700 dark:text-gray-300 text-sm">Replacement</span>
+                  </div>
+                  <div class="flex items-center p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg">
+                    <i class="fas fa-home text-indigo-600 dark:text-indigo-400 text-xl mr-3"></i>
+                    <span class="text-gray-700 dark:text-gray-300 text-sm">Reinstatement</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mb-8">
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Detailed Methods of Indemnity</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+                <div class="flex items-center mb-3">
+                  <div class="bg-indigo-100 dark:bg-indigo-900/50 p-2 rounded-full">
+                    <i class="fas fa-money-bill-wave text-indigo-600 dark:text-indigo-400"></i>
+                  </div>
+                  <h4 class="font-medium text-gray-900 dark:text-white ml-3">Cash Payment</h4>
+                </div>
+                <p class="text-gray-700 dark:text-gray-300 text-sm">In the vast majority of cases, the claim is settled by giving the insured cash or a cheque for the amount payable under the insurance policy.</p>
+              </div>
+              
+              <div class="bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+                <div class="flex items-center mb-3">
+                  <div class="bg-indigo-100 dark:bg-indigo-900/50 p-2 rounded-full">
+                    <i class="fas fa-tools text-indigo-600 dark:text-indigo-400"></i>
+                  </div>
+                  <h4 class="font-medium text-gray-900 dark:text-white ml-3">Repair</h4>
+                </div>
+                <p class="text-gray-700 dark:text-gray-300 text-sm">Insurance companies often authorize specific garages to repair damaged vehicles at reasonable costs. Some insurers even have their own repair facilities where insureds can have vehicles examined and repaired.</p>
+              </div>
+              
+              <div class="bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+                <div class="flex items-center mb-3">
+                  <div class="bg-indigo-100 dark:bg-indigo-900/50 p-2 rounded-full">
+                    <i class="fas fa-exchange-alt text-indigo-600 dark:text-indigo-400"></i>
+                  </div>
+                  <h4 class="font-medium text-gray-900 dark:text-white ml-3">Replacement</h4>
+                </div>
+                <p class="text-gray-700 dark:text-gray-300 text-sm">Often used for glass insurance. Broken windows and other items are replaced on behalf of insurers by glazing companies. Insurers typically receive discounts from these companies due to the volume of work provided.</p>
+              </div>
+              
+              <div class="bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+                <div class="flex items-center mb-3">
+                  <div class="bg-indigo-100 dark:bg-indigo-900/50 p-2 rounded-full">
+                    <i class="fas fa-home text-indigo-600 dark:text-indigo-400"></i>
+                  </div>
+                  <h4 class="font-medium text-gray-900 dark:text-white ml-3">Reinstatement</h4>
+                </div>
+                <p class="text-gray-700 dark:text-gray-300 text-sm">Used primarily in property insurance. The insurer promises to restore or rebuild a building damaged by fire or other covered perils.</p>
+              </div>
+            </div>
+          </div>
+          
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Measure of Indemnity</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div>
+              <h4 class="font-medium text-gray-900 dark:text-white mb-3">Total Loss</h4>
+              <div class="bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+                <div class="mb-3 pb-3 border-b border-gray-200 dark:border-gray-600">
+                  <p class="font-medium text-gray-900 dark:text-white">Method 1</p>
+                  <ul class="mt-2 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                    <li>• Reinstatement/replacement cost</li>
+                    <li>• Less allowance for new and better features</li>
+                  </ul>
+                </div>
+                <div>
+                  <p class="font-medium text-gray-900 dark:text-white">Method 2</p>
+                  <ul class="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                    <li>• Market value of a property similar to the one destroyed</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h4 class="font-medium text-gray-900 dark:text-white mb-3">Partial Loss</h4>
+              <div class="bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+                <p class="text-sm text-gray-700 dark:text-gray-300">For partial losses, the measure of indemnity used is the cost of repair. This typically includes:</p>
+                <ul class="mt-3 text-sm text-gray-700 dark:text-gray-300 space-y-2">
+                  <li class="flex items-start">
+                    <i class="fas fa-circle text-xs text-indigo-600 dark:text-indigo-400 mt-1 mr-2"></i>
+                    <span>Labor costs</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-circle text-xs text-indigo-600 dark:text-indigo-400 mt-1 mr-2"></i>
+                    <span>Materials</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-circle text-xs text-indigo-600 dark:text-indigo-400 mt-1 mr-2"></i>
+                    <span>Overhead expenses</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Factors Limiting Indemnity</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-white dark:bg-gray-700 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-gray-600">
+              <div class="p-3 bg-indigo-50 dark:bg-indigo-900/30">
+                <h4 class="font-medium text-indigo-700 dark:text-indigo-400 text-center">Sum Insured</h4>
+              </div>
+              <div class="p-4">
+                <p class="text-sm text-gray-700 dark:text-gray-300">Maximum amount the insurer will pay under the policy, regardless of the actual loss amount.</p>
+              </div>
+            </div>
+            
+            <div class="bg-white dark:bg-gray-700 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-gray-600">
+              <div class="p-3 bg-indigo-50 dark:bg-indigo-900/30">
+                <h4 class="font-medium text-indigo-700 dark:text-indigo-400 text-center">Average Condition</h4>
+              </div>
+              <div class="p-4">
+                <p class="text-sm text-gray-700 dark:text-gray-300">If property is under-insured, the insured becomes their own insurer for the proportion of under-insurance.</p>
+              </div>
+            </div>
+            
+            <div class="bg-white dark:bg-gray-700 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-gray-600">
+              <div class="p-3 bg-indigo-50 dark:bg-indigo-900/30">
+                <h4 class="font-medium text-indigo-700 dark:text-indigo-400 text-center">Policy Excess</h4>
+              </div>
+              <div class="p-4">
+                <p class="text-sm text-gray-700 dark:text-gray-300">An amount of each claim not covered by the policy that the insured must bear themselves.</p>
+              </div>
+            </div>
+            
+            <div class="bg-white dark:bg-gray-700 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-gray-600">
+              <div class="p-3 bg-indigo-50 dark:bg-indigo-900/30">
+                <h4 class="font-medium text-indigo-700 dark:text-indigo-400 text-center">Franchise</h4>
+              </div>
+              <div class="p-4">
+                <p class="text-sm text-gray-700 dark:text-gray-300">A threshold below which no claim is paid, but above which the entire claim is paid in full.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8">
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Policies Which Pay More Than Indemnity</h3>
+            <div class="bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
+              <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-200 dark:divide-gray-600">
+                <div class="p-4">
+                  <h4 class="font-medium text-gray-900 dark:text-white mb-2">Reinstatement Policies</h4>
+                  <p class="text-sm text-gray-700 dark:text-gray-300">Pays the cost of reinstating and replacing damaged premises and machines without deduction for wear and tear.</p>
+                </div>
+                <div class="p-4">
+                  <h4 class="font-medium text-gray-900 dark:text-white mb-2">Agreed Additional Costs</h4>
+                  <p class="text-sm text-gray-700 dark:text-gray-300">Covers additional costs incurred due to a loss (e.g., demolition costs, architect's fees, surveyor's fees).</p>
+                </div>
+                <div class="p-4">
+                  <h4 class="font-medium text-gray-900 dark:text-white mb-2">Valued Policies</h4>
+                  <p class="text-sm text-gray-700 dark:text-gray-300">Insured and insurer agree at the outset on the value, which is payable in the event of a total loss regardless of actual value at the time of loss.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8">
+            <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-4 rounded-r-md">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <i class="fas fa-lightbulb text-yellow-500 text-xl"></i>
+                </div>
+                <div class="ml-3">
+                  <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Key Point</h3>
+                  <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                    <p>The principle of indemnity prevents insurance from being used as a means of profit. It ensures that the insured receives fair compensation for their actual loss, while also protecting the insurer from excessive claims.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex justify-between">
+          <button class="prev-module-btn bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-medium py-2 px-6 rounded-md shadow-sm transition duration-150 ease-in-out" data-prev="utmost-good-faith">
+            <i class="fas fa-arrow-left mr-2"></i> Previous
+          </button>
+          <button class="next-module-btn bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-md shadow-sm transition duration-150 ease-in-out" data-next="subrogation">
+            Next <i class="fas fa-arrow-right ml-2"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- Subrogation Module -->
+      <section id="subrogation" class="module-section hidden py-8 px-4 sm:px-6 lg:px-8 container mx-auto">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+            <i class="fas fa-clipboard-check text-indigo-600 dark:text-indigo-400 mr-3"></i>
+            Subrogation
+          </h2>
+          
+          <div class="flex flex-col md:flex-row mb-8">
+            <div class="md:w-1/2 pr-0 md:pr-8">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">What is Subrogation?</h3>
+              <p class="text-gray-700 dark:text-gray-300 mb-4">Subrogation in the context of insurance can be defined as taking the rights belonging to an insured by the insurer after the insurer has indemnified the insured.</p>
+              
+              <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-lg mb-4">
+                <h4 class="font-medium text-indigo-700 dark:text-indigo-400 mb-2">The rights belonging to the insured may include:</h4>
+                <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-2">
+                  <li class="flex items-start">
+                    <i class="fas fa-check text-green-500 mt-0.5 mr-2"></i>
+                    <span>Rights against third parties who are also liable for the loss which is the subject of the claim</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-check text-green-500 mt-0.5 mr-2"></i>
+                    <span>The right of the insured in the salvage</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <p class="text-gray-700 dark:text-gray-300">Subrogation evolved to support the principle of indemnity. It prevents the insured from recovering twice for the same loss (once from the insurer and once from the third party).</p>
+            </div>
+            <div class="md:w-1/2 mt-6 md:mt-0">
+              <img src="https://i.imgur.com/YkUca2i.png" alt="Subrogation Concept" class="w-full h-auto rounded-lg shadow-sm">
+              
+              <div class="mt-6 bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+                <h4 class="font-medium text-gray-900 dark:text-white mb-2">Why Subrogation is Necessary:</h4>
+                <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-2">
+                  <li class="flex items-start">
+                    <i class="fas fa-circle text-xs text-indigo-600 dark:text-indigo-400 mt-1 mr-2"></i>
+                    <span>Prevents the insured from recovering more than their actual loss</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-circle text-xs text-indigo-600 dark:text-indigo-400 mt-1 mr-2"></i>
+                    <span>Places the burden of loss on the party who caused it</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-circle text-xs text-indigo-600 dark:text-indigo-400 mt-1 mr-2"></i>
+                    <span>Helps keep insurance premiums lower</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mb-8">
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Subrogation Example</h3>
+            <div class="bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
+              <div class="p-4 bg-indigo-50 dark:bg-indigo-900/30 border-b border-gray-200 dark:border-gray-600">
+                <h4 class="font-medium text-indigo-700 dark:text-indigo-400">Case Study</h4>
+              </div>
+              <div class="p-4">
+                <p class="text-gray-700 dark:text-gray-300 text-sm mb-4">An insured's house is damaged by a negligent driver who crashed into it. The total damage is RM60,000. The insurance company pays the insured RM40,000 for the covered portion of the loss.</p>
+                <p class="text-gray-700 dark:text-gray-300 text-sm mb-4">The insurance company is subrogated to the insured's right to sue the driver and collects RM12,000 from them before the driver is declared bankrupt.</p>
+                
+                <div class="mt-4">
+                  <h5 class="font-medium text-gray-900 dark:text-white mb-2">How should the RM12,000 be distributed?</h5>
+                  <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg highlight-pulse">
+                    <p class="text-indigo-700 dark:text-indigo-400 font-medium mb-2">The correct distribution:</p>
+                    <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                      <li>• First, the insured should be fully compensated for their uninsured loss (RM60,000 - RM40,000 = RM20,000)</li>
+                      <li>• Since the recovery (RM12,000) is less than the uninsured loss (RM20,000), the insured receives the entire recovery</li>
+                      <li>• The insured will receive: RM40,000 (from insurance) + RM12,000 (from recovery) = RM52,000</li>
+                      <li>• They still have an unrecovered loss of RM8,000</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Ways Subrogation Rights May Arise</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+              <div class="flex items-center mb-3">
+                <div class="bg-indigo-100 dark:bg-indigo-900/50 p-2 rounded-full mr-3">
+                  <i class="fas fa-gavel text-indigo-600 dark:text-indigo-400"></i>
+                </div>
+                <h4 class="font-medium text-gray-900 dark:text-white">Subrogation Arising from Tort</h4>
+              </div>
+              <p class="text-gray-700 dark:text-gray-300 text-sm">A frequent cause of subrogation is negligence.</p>
+              <p class="text-gray-700 dark:text-gray-300 text-sm mt-2">Example: Car A was hit by Car B driven negligently by Mr. B. Mr. A claimed from his motor insurer who subsequently exercised Mr. A's right against Mr. B, the tortfeasor.</p>
+            </div>
+            
+            <div class="bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+              <div class="flex items-center mb-3">
+                <div class="bg-indigo-100 dark:bg-indigo-900/50 p-2 rounded-full mr-3">
+                  <i class="fas fa-file-contract text-indigo-600 dark:text-indigo-400"></i>
+                </div>
+                <h4 class="font-medium text-gray-900 dark:text-white">Subrogation Arising Out of Contract</h4>
+              </div>
+              <p class="text-gray-700 dark:text-gray-300 text-sm">If a third party is bound by a contract to make payment for a loss suffered by another who has an insurance policy covering the same loss.</p>
+              <p class="text-gray-700 dark:text-gray-300 text-sm mt-2">Example: A shipper whose cargo is damaged while in the custody of a carrier may exercise rights against the carrier who is liable under the contract of carriage.</p>
+            </div>
+            
+            <div class="bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+              <div class="flex items-center mb-3">
+                <div class="bg-indigo-100 dark:bg-indigo-900/50 p-2 rounded-full mr-3">
+                  <i class="fas fa-balance-scale text-indigo-600 dark:text-indigo-400"></i>
+                </div>
+                <h4 class="font-medium text-gray-900 dark:text-white">Subrogation Arising Out of a Statute</h4>
+              </div>
+              <p class="text-gray-700 dark:text-gray-300 text-sm">A statute may provide an insured with an additional right of recovery for a loss suffered.</p>
+              <p class="text-gray-700 dark:text-gray-300 text-sm mt-2">Example: The Innkeepers Act 1952 enables a hotel guest to recover from the hotel owner the value of goods lost while in the custody of the hotel owner.</p>
+            </div>
+            
+            <div class="bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+              <div class="flex items-center mb-3">
+                <div class="bg-indigo-100 dark:bg-indigo-900/50 p-2 rounded-full mr-3">
+                  <i class="fas fa-recycle text-indigo-600 dark:text-indigo-400"></i>
+                </div>
+                <h4 class="font-medium text-gray-900 dark:text-white">Subrogation Arising Out of Salvage</h4>
+              </div>
+              <p class="text-gray-700 dark:text-gray-300 text-sm">A salvage is the wreckage of an insured object. Legally, the salvage belongs to the insured.</p>
+              <p class="text-gray-700 dark:text-gray-300 text-sm mt-2">However, if the insured wishes to be paid on a total loss basis, the insurer may take over their right in the salvage.</p>
+            </div>
+          </div>
+          
+          <div class="mt-8">
+            <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 p-4 rounded-r-md">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <i class="fas fa-exclamation-triangle text-red-500 text-xl"></i>
+                </div>
+                <div class="ml-3">
+                  <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Important Warning</h3>
+                  <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                    <p>If the insured waives their rights to sue a negligent third party before the loss occurs, they may jeopardize their right to collect on their own insurance coverage.</p>
+                    <p class="mt-2">Many insurance policies include clauses that prohibit the insured from taking actions that would impair the insurer's subrogation rights.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex justify-between">
+          <button class="prev-module-btn bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-medium py-2 px-6 rounded-md shadow-sm transition duration-150 ease-in-out" data-prev="indemnity">
+            <i class="fas fa-arrow-left mr-2"></i> Previous
+          </button>
+          <button class="next-module-btn bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-md shadow-sm transition duration-150 ease-in-out" data-next="contribution">
+            Next <i class="fas fa-arrow-right ml-2"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- Contribution Module -->
+      <section id="contribution" class="module-section hidden py-8 px-4 sm:px-6 lg:px-8 container mx-auto">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+            <i class="fas fa-users text-indigo-600 dark:text-indigo-400 mr-3"></i>
+            Contribution
+          </h2>
+          
+          <div class="flex flex-col md:flex-row mb-8">
+            <div class="md:w-1/2 pr-0 md:pr-8">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Definition and Importance</h3>
+              <div class="bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 mb-4">
+                <p class="text-gray-700 dark:text-gray-300 text-sm"><span class="font-medium">Contribution</span> can be defined as the amount which each insurer has to contribute to the cost of a loss when the loss is covered by two or more insurers.</p>
+              </div>
+              
+              <p class="text-gray-700 dark:text-gray-300 mb-4">The principle of contribution states that an insurer who has indemnified the insured may call upon other insurers who are similarly liable for the loss to contribute towards the payment.</p>
+              
+              <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-lg">
+                <h4 class="font-medium text-indigo-700 dark:text-indigo-400 mb-2">Importance of Contribution</h4>
+                <p class="text-gray-700 dark:text-gray-300 text-sm">It follows naturally from the principle of indemnity that if the insured is allowed to recover from more than one insurer for the same loss, they would be recovering more than the actual loss.</p>
+                <p class="text-gray-700 dark:text-gray-300 text-sm mt-2">Like subrogation, the principle of contribution evolved to support the principle of indemnity.</p>
+              </div>
+            </div>
+            <div class="md:w-1/2 mt-6 md:mt-0">
+              <img src="https://i.imgur.com/ZNBr33W.png" alt="Contribution Concept" class="w-full h-auto rounded-lg shadow-sm">
+              
+              <div class="mt-6 bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+                <h4 class="font-medium text-gray-900 dark:text-white mb-3">Example of Contribution</h4>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-3">Mr. A insures his RM200,000 house with three different insurers:</p>
+                <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1 mb-4">
+                  <li>• Insurer X for RM200,000</li>
+                  <li>• Insurer Y for RM200,000</li>
+                  <li>• Insurer Z for RM200,000</li>
+                </ul>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-3">If there's a claim of RM90,000, each insurer will apply the principle of contribution.</p>
+                <div class="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg text-center">
+                  <p class="text-indigo-700 dark:text-indigo-400 font-medium">Each insurer will contribute RM30,000 (in the proportion of 1:3)</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Conditions for the Application of Contribution</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white dark:bg-gray-700 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-gray-600">
+              <div class="p-3 bg-indigo-50 dark:bg-indigo-900/30 flex items-center">
+                <div class="bg-white dark:bg-gray-800 h-8 w-8 rounded-full flex items-center justify-center mr-3 shadow-sm">
+                  <span class="text-indigo-600 dark:text-indigo-400 font-medium">1</span>
+                </div>
+                <h4 class="font-medium text-indigo-700 dark:text-indigo-400">Multiple Policies</h4>
+              </div>
+              <div class="p-4">
+                <p class="text-sm text-gray-700 dark:text-gray-300">Two or more policies of indemnity must exist.</p>
+              </div>
+            </div>
+            
+            <div class="bg-white dark:bg-gray-700 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-gray-600">
+              <div class="p-3 bg-indigo-50 dark:bg-indigo-900/30 flex items-center">
+                <div class="bg-white dark:bg-gray-800 h-8 w-8 rounded-full flex items-center justify-center mr-3 shadow-sm">
+                  <span class="text-indigo-600 dark:text-indigo-400 font-medium">2</span>
+                </div>
+                <h4 class="font-medium text-indigo-700 dark:text-indigo-400">Common Interest</h4>
+              </div>
+              <div class="p-4">
+                <p class="text-sm text-gray-700 dark:text-gray-300">The policies must cover a common interest.</p>
+              </div>
+            </div>
+            
+            <div class="bg-white dark:bg-gray-700 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-gray-600">
+              <div class="p-3 bg-indigo-50 dark:bg-indigo-900/30 flex items-center">
+                <div class="bg-white dark:bg-gray-800 h-8 w-8 rounded-full flex items-center justify-center mr-3 shadow-sm">
+                  <span class="text-indigo-600 dark:text-indigo-400 font-medium">3</span>
+                </div>
+                <h4 class="font-medium text-indigo-700 dark:text-indigo-400">Common Peril</h4>
+              </div>
+              <div class="p-4">
+                <p class="text-sm text-gray-700 dark:text-gray-300">The policies must cover a common peril which gives rise to the loss.</p>
+              </div>
+            </div>
+            
+            <div class="bg-white dark:bg-gray-700 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-gray-600">
+              <div class="p-3 bg-indigo-50 dark:bg-indigo-900/30 flex items-center">
+                <div class="bg-white dark:bg-gray-800 h-8 w-8 rounded-full flex items-center justify-center mr-3 shadow-sm">
+                  <span class="text-indigo-600 dark:text-indigo-400 font-medium">4</span>
+                </div>
+                <h4 class="font-medium text-indigo-700 dark:text-indigo-400">Common Subject Matter</h4>
+              </div>
+              <div class="p-4">
+                <p class="text-sm text-gray-700 dark:text-gray-300">The policies must cover a common subject matter.</p>
+              </div>
+            </div>
+            
+            <div class="bg-white dark:bg-gray-700 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-gray-600">
+              <div class="p-3 bg-indigo-50 dark:bg-indigo-900/30 flex items-center">
+                <div class="bg-white dark:bg-gray-800 h-8 w-8 rounded-full flex items-center justify-center mr-3 shadow-sm">
+                  <span class="text-indigo-600 dark:text-indigo-400 font-medium">5</span>
+                </div>
+                <h4 class="font-medium text-indigo-700 dark:text-indigo-400">Each Policy Liable</h4>
+              </div>
+              <div class="p-4">
+                <p class="text-sm text-gray-700 dark:text-gray-300">Each policy must be liable for the loss.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-indigo-50 dark:bg-indigo-900/30 p-6 rounded-lg mb-8">
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Interactive Case Study</h3>
+            <div class="bg-white dark:bg-gray-700 p-5 rounded-lg">
+              <h4 class="font-medium text-gray-900 dark:text-white mb-3">Multiple Insurance Scenario</h4>
+              <p class="text-gray-700 dark:text-gray-300 text-sm mb-4">A business owner has insured their commercial property worth RM600,000 with three different insurance companies:</p>
+              
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-indigo-50 dark:bg-indigo-900/30 p-3 rounded-lg text-center">
+                  <p class="font-medium text-indigo-700 dark:text-indigo-400">Insurer A</p>
+                  <p class="text-gray-700 dark:text-gray-300 text-sm">Sum Insured: RM300,000</p>
+                </div>
+                <div class="bg-indigo-50 dark:bg-indigo-900/30 p-3 rounded-lg text-center">
+                  <p class="font-medium text-indigo-700 dark:text-indigo-400">Insurer B</p>
+                  <p class="text-gray-700 dark:text-gray-300 text-sm">Sum Insured: RM200,000</p>
+                </div>
+                <div class="bg-indigo-50 dark:bg-indigo-900/30 p-3 rounded-lg text-center">
+                  <p class="font-medium text-indigo-700 dark:text-indigo-400">Insurer C</p>
+                  <p class="text-gray-700 dark:text-gray-300 text-sm">Sum Insured: RM400,000</p>
+                </div>
+              </div>
+              
+              <p class="text-gray-700 dark:text-gray-300 text-sm mb-4">If a fire causes damage worth RM150,000, how much would each insurer contribute?</p>
+              
+              <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg mb-4">
+                <h5 class="font-medium text-gray-900 dark:text-white mb-2">Method: Proportionate to Sum Insured</h5>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div class="bg-white dark:bg-gray-700 p-3 rounded-lg">
+                    <p class="font-medium text-gray-900 dark:text-white mb-1">Insurer A</p>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">RM300,000 / RM900,000 × RM150,000</div>
+                    <p class="text-indigo-600 dark:text-indigo-400 font-medium">= RM50,000</p>
+                  </div>
+                  <div class="bg-white dark:bg-gray-700 p-3 rounded-lg">
+                    <p class="font-medium text-gray-900 dark:text-white mb-1">Insurer B</p>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">RM200,000 / RM900,000 × RM150,000</div>
+                    <p class="text-indigo-600 dark:text-indigo-400 font-medium">= RM33,333.33</p>
+                  </div>
+                  <div class="bg-white dark:bg-gray-700 p-3 rounded-lg">
+                    <p class="font-medium text-gray-900 dark:text-white mb-1">Insurer C</p>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">RM400,000 / RM900,000 × RM150,000</div>
+                    <p class="text-indigo-600 dark:text-indigo-400 font-medium">= RM66,666.67</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="text-center">
+                <p class="text-gray-700 dark:text-gray-300 text-sm">Total contribution: RM50,000 + RM33,333.33 + RM66,666.67 = RM150,000</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-4 rounded-r-md">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <i class="fas fa-lightbulb text-yellow-500 text-xl"></i>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Key Point</h3>
+                <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                  <p>Many insurance policies contain a "contribution clause" that specifies how the contribution will be calculated if multiple policies cover the same loss. Common methods include:</p>
+                  <ul class="list-disc list-inside mt-2">
+                    <li>Proportionate to sum insured (as shown in the example)</li>
+                    <li>Proportionate to independent liability</li>
+                    <li>Equal contribution where all policies contribute equally</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex justify-between">
+          <button class="prev-module-btn bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-medium py-2 px-6 rounded-md shadow-sm transition duration-150 ease-in-out" data-prev="subrogation">
+            <i class="fas fa-arrow-left mr-2"></i> Previous
+          </button>
+          <button class="next-module-btn bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-md shadow-sm transition duration-150 ease-in-out" data-next="proximate-cause">
+            Next <i class="fas fa-arrow-right ml-2"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- Proximate Cause Module -->
+      <section id="proximate-cause" class="module-section hidden py-8 px-4 sm:px-6 lg:px-8 container mx-auto">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+            <i class="fas fa-link text-indigo-600 dark:text-indigo-400 mr-3"></i>
+            Proximate Cause
+          </h2>
+          
+          <div class="flex flex-col md:flex-row mb-8">
+            <div class="md:w-1/2 pr-0 md:pr-8">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Definition</h3>
+              <div class="bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 mb-4">
+                <p class="text-gray-700 dark:text-gray-300 text-sm italic">"Proximate cause means the active, efficient cause that sets in motion a train of events which brings about a result, without the intervention of any force started and working from a new and independent source."</p>
+                <p class="text-gray-500 dark:text-gray-400 text-xs mt-2 text-right">— Pawsey v Scottish Union & National (1907)</p>
+              </div>
+              
+              <p class="text-gray-700 dark:text-gray-300 mb-4">In simpler terms, proximate cause is the primary or most important cause of a loss. It's the event that started the chain of events leading to the loss, without any new independent cause intervening.</p>
+              
+              <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-lg">
+                <h4 class="font-medium text-indigo-700 dark:text-indigo-400 mb-2">Need for the Doctrine of Proximate Cause</h4>
+                <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-2">
+                  <li class="flex items-start">
+                    <i class="fas fa-circle text-xs text-indigo-600 dark:text-indigo-400 mt-1 mr-2"></i>
+                    <span>When a loss occurs, the insured must prove it was caused by an insured peril</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-circle text-xs text-indigo-600 dark:text-indigo-400 mt-1 mr-2"></i>
+                    <span>If a loss is the result of one cause, determining liability is straightforward</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-circle text-xs text-indigo-600 dark:text-indigo-400 mt-1 mr-2"></i>
+                    <span>However, complex losses often involve multiple causes in a chain of events</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="md:w-1/2 mt-6 md:mt-0">
+              <img src="https://i.imgur.com/V5CUnXe.png" alt="Proximate Cause Concept" class="w-full h-auto rounded-lg shadow-sm">
+              
+              <div class="mt-6 bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+                <h4 class="font-medium text-gray-900 dark:text-white mb-3">Basic Rules of Proximate Cause</h4>
+                <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-3">
+                  <li class="flex items-start">
+                    <div class="flex-shrink-0 mt-0.5">
+                      <i class="fas fa-check-circle text-green-500"></i>
+                    </div>
+                    <div class="ml-3">
+                      <span class="font-medium">Insured Peril:</span> An insurer is liable for a loss caused by an insured peril.
+                    </div>
+                  </li>
+                  <li class="flex items-start">
+                    <div class="flex-shrink-0 mt-0.5">
+                      <i class="fas fa-times-circle text-red-500"></i>
+                    </div>
+                    <div class="ml-3">
+                      <span class="font-medium">Uninsured/Excepted Peril:</span> The insurer will not be liable for losses caused by either uninsured or excepted perils.
+                    </div>
+                  </li>
+                  <li class="flex items-start">
+                    <div class="flex-shrink-0 mt-0.5">
+                      <i class="fas fa-question-circle text-yellow-500"></i>
+                    </div>
+                    <div class="ml-3">
+                      <span class="font-medium">Multiple Causes:</span> When multiple causes are involved, the court must determine which is the proximate cause.
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mb-8">
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Differences Between Proximate Cause and Remote Cause</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+                <h4 class="font-medium text-gray-900 dark:text-white mb-3 flex items-center">
+                  <div class="bg-indigo-100 dark:bg-indigo-900/50 p-2 rounded-full mr-3">
+                    <i class="fas fa-bullseye text-indigo-600 dark:text-indigo-400"></i>
+                  </div>
+                  Proximate Cause
+                </h4>
+                <p class="text-gray-700 dark:text-gray-300 text-sm">The real, dominant, or most important cause of a loss. It's the cause that is most directly responsible for the loss.</p>
+                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                  <p class="text-gray-700 dark:text-gray-300 text-sm font-medium">Example:</p>
+                  <p class="text-gray-700 dark:text-gray-300 text-sm mt-1">A person fractured his leg in a road accident. While hospitalized, he contracted a strange disease and died. The proximate cause of his death was the strange disease.</p>
+                </div>
+              </div>
+              
+              <div class="bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+                <h4 class="font-medium text-gray-900 dark:text-white mb-3 flex items-center">
+                  <div class="bg-indigo-100 dark:bg-indigo-900/50 p-2 rounded-full mr-3">
+                    <i class="fas fa-map-marker-alt text-indigo-600 dark:text-indigo-400"></i>
+                  </div>
+                  Remote Cause
+                </h4>
+                <p class="text-gray-700 dark:text-gray-300 text-sm">A cause that is far removed from the result and overshadowed by the real cause. It may set up conditions that allow the proximate cause to operate.</p>
+                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                  <p class="text-gray-700 dark:text-gray-300 text-sm font-medium">Example:</p>
+                  <p class="text-gray-700 dark:text-gray-300 text-sm mt-1">In the same scenario, the road accident and leg injury would be considered remote causes of death, as they were overshadowed by the strange disease.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-indigo-50 dark:bg-indigo-900/30 p-6 rounded-lg mb-8">
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Case Studies on Proximate Cause</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm">
+                <h4 class="font-medium text-gray-900 dark:text-white mb-3">Case 1: Fire Following Earthquake</h4>
+                <p class="text-gray-700 dark:text-gray-300 text-sm mb-3">A house is damaged by an earthquake, which ruptures gas lines causing a fire that burns down the house. The insurance policy covers fire but excludes earthquake damage.</p>
+                <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                  <p class="text-sm font-medium text-gray-900 dark:text-white mb-1">Analysis:</p>
+                  <p class="text-gray-700 dark:text-gray-300 text-sm">Although the earthquake was the initial event, the fire was a separate and distinct peril that directly caused the destruction of the house. The fire would be considered the proximate cause, and the insurer would likely be liable for the fire damage.</p>
+                </div>
+              </div>
+              
+              <div class="bg-white dark:bg-gray-700 p-5 rounded-lg shadow-sm">
+                <h4 class="font-medium text-gray-900 dark:text-white mb-3">Case 2: Storm Damage with Multiple Effects</h4>
+                <p class="text-gray-700 dark:text-gray-300 text-sm mb-3">A severe storm causes a tree to fall on a house, damaging the roof. Rain enters through the damaged roof, causing water damage to the interior. The policy covers storm damage but excludes flood and water damage.</p>
+                <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                  <p class="text-sm font-medium text-gray-900 dark:text-white mb-1">Analysis:</p>
+                  <p class="text-gray-700 dark:text-gray-300 text-sm">The storm would be considered the proximate cause of both the roof damage and the subsequent water damage. The water damage is a direct consequence of the storm, without any new independent cause intervening. The insurer would likely be liable for both the roof and water damage.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-4 rounded-r-md">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <i class="fas fa-lightbulb text-yellow-500 text-xl"></i>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Key Point</h3>
+                <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                  <p>The doctrine of proximate cause is important in insurance claims because:</p>
+                  <ul class="list-disc list-inside mt-2">
+                    <li>It helps determine whether a particular loss is covered under the policy</li>
+                    <li>It establishes a fair method for resolving complex claims involving multiple causes</li>
+                    <li>It provides a consistent framework for both insurers and policyholders to understand coverage</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex justify-between">
+          <button class="prev-module-btn bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-medium py-2 px-6 rounded-md shadow-sm transition duration-150 ease-in-out" data-prev="contribution">
+            <i class="fas fa-arrow-left mr-2"></i> Previous
+          </button>
+          <button class="next-module-btn bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-md shadow-sm transition duration-150 ease-in-out" data-next="quiz">
+            Take Quiz <i class="fas fa-arrow-right ml-2"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- Quiz Module -->
+      <section id="quiz" class="module-section hidden py-8 px-4 sm:px-6 lg:px-8 container mx-auto">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+            <i class="fas fa-question-circle text-indigo-600 dark:text-indigo-400 mr-3"></i>
+            Test Your Knowledge
+          </h2>
+          
+          <div id="quiz-container">
+            <!-- Question 1 -->
+            <div class="quiz-question" data-question="1">
+              <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-lg mb-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Question 1 of 6</h3>
+                <p class="text-gray-700 dark:text-gray-300 mt-1">What is the principle that requires a legally recognized financial interest in the subject matter of insurance?</p>
+              </div>
+              
+              <div class="space-y-3">
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer" data-correct="true">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Insurable Interest</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Proximate Cause</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Indemnity</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Subrogation</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mt-4 hidden" id="explanation-1">
+                <div class="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-400 p-4 rounded-r-md">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                    </div>
+                    <div class="ml-3">
+                      <h3 class="text-sm font-medium text-green-800 dark:text-green-200">Correct!</h3>
+                      <div class="mt-2 text-sm text-green-700 dark:text-green-300">
+                        <p>Insurable Interest is the right to insure arising out of a legally recognized financial interest which a person has in the subject matter of insurance. Without insurable interest, an insurance contract is invalid.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Question 2 -->
+            <div class="quiz-question hidden" data-question="2">
+              <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-lg mb-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Question 2 of 6</h3>
+                <p class="text-gray-700 dark:text-gray-300 mt-1">Which principle requires the insured to disclose all material facts whether asked or not?</p>
+              </div>
+              
+              <div class="space-y-3">
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Contribution</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer" data-correct="true">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Utmost Good Faith</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Indemnity</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Proximate Cause</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mt-4 hidden" id="explanation-2">
+                <div class="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-400 p-4 rounded-r-md">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                    </div>
+                    <div class="ml-3">
+                      <h3 class="text-sm font-medium text-green-800 dark:text-green-200">Correct!</h3>
+                      <div class="mt-2 text-sm text-green-700 dark:text-green-300">
+                        <p>Utmost Good Faith (Uberrima Fides) requires the insured to disclose fully and accurately all material facts that they know, whether asked for or not by the insurer.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Question 3 -->
+            <div class="quiz-question hidden" data-question="3">
+              <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-lg mb-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Question 3 of 6</h3>
+                <p class="text-gray-700 dark:text-gray-300 mt-1">Which principle ensures that the insured is restored to the same financial position after a loss as they enjoyed immediately before it?</p>
+              </div>
+              
+              <div class="space-y-3">
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Subrogation</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Utmost Good Faith</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer" data-correct="true">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Indemnity</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Insurable Interest</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mt-4 hidden" id="explanation-3">
+                <div class="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-400 p-4 rounded-r-md">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                    </div>
+                    <div class="ml-3">
+                      <h3 class="text-sm font-medium text-green-800 dark:text-green-200">Correct!</h3>
+                      <div class="mt-2 text-sm text-green-700 dark:text-green-300">
+                        <p>The principle of Indemnity requires that when a loss arises under an insurance policy, the insured shall be restored to the same financial position after the loss as they enjoyed immediately before it. This prevents the insured from making a profit from a loss.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Question 4 -->
+            <div class="quiz-question hidden" data-question="4">
+              <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-lg mb-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Question 4 of 6</h3>
+                <p class="text-gray-700 dark:text-gray-300 mt-1">Which principle allows the insurer to take over the insured's rights against third parties after paying a claim?</p>
+              </div>
+              
+              <div class="space-y-3">
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer" data-correct="true">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Subrogation</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Contribution</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Indemnity</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Proximate Cause</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mt-4 hidden" id="explanation-4">
+                <div class="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-400 p-4 rounded-r-md">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                    </div>
+                    <div class="ml-3">
+                      <h3 class="text-sm font-medium text-green-800 dark:text-green-200">Correct!</h3>
+                      <div class="mt-2 text-sm text-green-700 dark:text-green-300">
+                        <p>Subrogation is the principle that allows an insurer to take over the insured's rights against third parties after indemnifying the insured. This prevents the insured from recovering twice for the same loss and helps place the burden of loss on the responsible party.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Question 5 -->
+            <div class="quiz-question hidden" data-question="5">
+              <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-lg mb-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Question 5 of 6</h3>
+                <p class="text-gray-700 dark:text-gray-300 mt-1">When multiple insurance policies cover the same loss, which principle determines how each insurer shares the cost?</p>
+              </div>
+              
+              <div class="space-y-3">
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Subrogation</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer" data-correct="true">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Contribution</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Indemnity</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Insurable Interest</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mt-4 hidden" id="explanation-5">
+                <div class="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-400 p-4 rounded-r-md">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                    </div>
+                    <div class="ml-3">
+                      <h3 class="text-sm font-medium text-green-800 dark:text-green-200">Correct!</h3>
+                      <div class="mt-2 text-sm text-green-700 dark:text-green-300">
+                        <p>Contribution is the principle that determines how multiple insurers share the cost when they all cover the same loss. It prevents the insured from recovering more than their actual loss by making multiple claims.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Question 6 -->
+            <div class="quiz-question hidden" data-question="6">
+              <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-lg mb-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Question 6 of 6</h3>
+                <p class="text-gray-700 dark:text-gray-300 mt-1">Which principle determines the primary cause of a loss when multiple events are involved in a chain of events?</p>
+              </div>
+              
+              <div class="space-y-3">
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Insurable Interest</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Indemnity</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer" data-correct="true">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Proximate Cause</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="quiz-option bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 mr-3">
+                      <div class="h-6 w-6 border-2 border-gray-300 dark:border-gray-500 rounded-full flex items-center justify-center quiz-radio">
+                        <div class="h-3 w-3 bg-indigo-600 dark:bg-indigo-400 rounded-full hidden quiz-radio-selected"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-gray-700 dark:text-gray-300">Contribution</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mt-4 hidden" id="explanation-6">
+                <div class="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-400 p-4 rounded-r-md">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                    </div>
+                    <div class="ml-3">
+                      <h3 class="text-sm font-medium text-green-800 dark:text-green-200">Correct!</h3>
+                      <div class="mt-2 text-sm text-green-700 dark:text-green-300">
+                        <p>Proximate Cause is the principle that determines the primary or most important cause of a loss when multiple events are involved in a chain of events. It helps establish whether a particular loss is covered under the insurance policy.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Quiz Result -->
+            <div id="quiz-result" class="hidden">
+              <div class="bg-indigo-50 dark:bg-indigo-900/30 p-6 rounded-lg text-center">
+                <div class="inline-block p-3 bg-white dark:bg-gray-700 rounded-full mb-4 shadow-sm">
+                  <i id="result-icon" class="fas fa-trophy text-4xl text-indigo-600 dark:text-indigo-400"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Quiz Completed!</h3>
+                <p class="text-gray-700 dark:text-gray-300 mb-4">You got <span id="correct-count" class="font-semibold text-indigo-600 dark:text-indigo-400">0</span> out of 6 questions correct.</p>
+                <div id="result-message" class="text-gray-700 dark:text-gray-300 mb-6"></div>
+                <div class="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+                  <button id="retake-quiz" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-md shadow-sm transition duration-150 ease-in-out">
+                    Retake Quiz
+                  </button>
+                  <button id="back-to-intro" class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-medium py-2 px-6 rounded-md shadow-sm transition duration-150 ease-in-out">
+                    Back to Introduction
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Quiz Navigation -->
+            <div id="quiz-nav" class="mt-8 flex justify-between">
+              <button id="prev-question" class="prev-question-btn bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-medium py-2 px-6 rounded-md shadow-sm transition duration-150 ease-in-out hidden">
+                <i class="fas fa-arrow-left mr-2"></i> Previous
+              </button>
+              <div></div>
+              <button id="next-question" class="next-question-btn bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-md shadow-sm transition duration-150 ease-in-out" disabled>
+                Next <i class="fas fa-arrow-right ml-2"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-gray-800 py-6 shadow-inner">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="mb-4 md:mb-0">
+            <p class="text-sm text-gray-600 dark:text-gray-400">© 2023 INS200: Risk and Insurance</p>
+          </div>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">
+              <i class="fas fa-book-open"></i>
+            </a>
+            <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">
+              <i class="fas fa-question-circle"></i>
+            </a>
+            <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">
+              <i class="fas fa-user-graduate"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Theme Toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    const htmlElement = document.documentElement;
+    
+    // Check user preference
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      htmlElement.classList.add('dark');
+      themeToggle.querySelector('i').classList.remove('fa-moon');
+      themeToggle.querySelector('i').classList.add('fa-sun');
+    }
+    
+    // Listen for changes in user preference
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+      if (event.matches) {
+        htmlElement.classList.add('dark');
+        themeToggle.querySelector('i').classList.remove('fa-moon');
+        themeToggle.querySelector('i').classList.add('fa-sun');
+      } else {
+        htmlElement.classList.remove('dark');
+        themeToggle.querySelector('i').classList.remove('fa-sun');
+        themeToggle.querySelector('i').classList.add('fa-moon');
+      }
+    });
+    
+    themeToggle.addEventListener('click', () => {
+      htmlElement.classList.toggle('dark');
+      
+      const icon = themeToggle.querySelector('i');
+      if (htmlElement.classList.contains('dark')) {
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+      } else {
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
+      }
+    });
+    
+    // Module Navigation
+    const navButtons = document.querySelectorAll('.module-nav-item');
+    const modules = document.querySelectorAll('.module-section');
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+    let currentModuleIndex = 0;
+    const totalModules = modules.length;
+    
+    // Update progress
+    function updateProgress() {
+      const progress = Math.round((currentModuleIndex / (totalModules - 1)) * 100);
+      progressBar.style.width = `${progress}%`;
+      progressText.textContent = `Progress: ${progress}%`;
+    }
+    
+    // Show module
+    function showModule(moduleId) {
+      modules.forEach(module => {
+        module.classList.add('hidden');
+      });
+      
+      const targetModule = document.getElementById(moduleId);
+      targetModule.classList.remove('hidden');
+      targetModule.classList.add('fade-in');
+      
+      navButtons.forEach(button => {
+        button.classList.remove('text-indigo-600', 'dark:text-indigo-400', 'bg-indigo-50', 'dark:bg-indigo-900/30');
+        button.classList.add('text-gray-700', 'dark:text-gray-300');
+      });
+      
+      const activeNavButton = document.querySelector(`.module-nav-item[data-target="${moduleId}"]`);
+      activeNavButton.classList.remove('text-gray-700', 'dark:text-gray-300');
+      activeNavButton.classList.add('text-indigo-600', 'dark:text-indigo-400', 'bg-indigo-50', 'dark:bg-indigo-900/30');
+      
+      // Set current module index
+      const moduleArray = Array.from(modules);
+      currentModuleIndex = moduleArray.findIndex(m => m.id === moduleId);
+      
+      // Update progress
+      updateProgress();
+      
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    // Navigation button click
+    navButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const targetId = button.getAttribute('data-target');
+        showModule(targetId);
+      });
+    });
+    
+    // Next module buttons
+    const nextButtons = document.querySelectorAll('.next-module-btn');
+    nextButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const nextModuleId = button.getAttribute('data-next');
+        showModule(nextModuleId);
+      });
+    });
+    
+    // Previous module buttons
+    const prevButtons = document.querySelectorAll('.prev-module-btn');
+    prevButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const prevModuleId = button.getAttribute('data-prev');
+        showModule(prevModuleId);
+      });
+    });
+    
+    // Quiz functionality
+    const quizContainer = document.getElementById('quiz-container');
+    const quizQuestions = document.querySelectorAll('.quiz-question');
+    const nextQuestionBtn = document.getElementById('next-question');
+    const prevQuestionBtn = document.getElementById('prev-question');
+    const quizResult = document.getElementById('quiz-result');
+    const correctCount = document.getElementById('correct-count');
+    const resultMessage = document.getElementById('result-message');
+    const resultIcon = document.getElementById('result-icon');
+    const retakeQuizBtn = document.getElementById('retake-quiz');
+    const backToIntroBtn = document.getElementById('back-to-intro');
+    
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let userAnswers = [];
+    
+    // Show question
+    function showQuestion(index) {
+      quizQuestions.forEach(question => {
+        question.classList.add('hidden');
+      });
+      
+      quizQuestions[index].classList.remove('hidden');
+      
+      // Update navigation buttons
+      prevQuestionBtn.classList.toggle('hidden', index === 0);
+      
+      if (index === quizQuestions.length - 1) {
+        nextQuestionBtn.textContent = 'Submit Quiz';
+        nextQuestionBtn.innerHTML = 'Submit Quiz';
+      } else {
+        nextQuestionBtn.textContent = 'Next';
+        nextQuestionBtn.innerHTML = 'Next <i class="fas fa-arrow-right ml-2"></i>';
+      }
+      
+      // Check if question is already answered
+      const questionNum = index + 1;
+      const userAnswer = userAnswers.find(a => a.question === questionNum);
+      
+      if (userAnswer) {
+        const options = quizQuestions[index].querySelectorAll('.quiz-option');
+        options.forEach((option, optionIndex) => {
+          if (optionIndex === userAnswer.optionIndex) {
+            selectOption(option);
+          }
+        });
+      } else {
+        // Reset options
+        const options = quizQuestions[index].querySelectorAll('.quiz-option');
+        options.forEach(option => {
+          option.classList.remove('bg-indigo-50', 'dark:bg-indigo-900/30', 'border-indigo-300', 'dark:border-indigo-600');
+          option.querySelector('.quiz-radio-selected').classList.add('hidden');
+        });
+        
+        // Disable next button if no option selected
+        nextQuestionBtn.disabled = true;
+      }
+    }
+    
+    // Handle option click
+    function handleOptionClick(option) {
+      const questionContainer = option.closest('.quiz-question');
+      const options = questionContainer.querySelectorAll('.quiz-option');
+      
+      // Deselect all options
+      options.forEach(opt => {
+        opt.classList.remove('bg-indigo-50', 'dark:bg-indigo-900/30', 'border-indigo-300', 'dark:border-indigo-600');
+        opt.querySelector('.quiz-radio-selected').classList.add('hidden');
+      });
+      
+      // Select clicked option
+      selectOption(option);
+      
+      // Enable next button
+      nextQuestionBtn.disabled = false;
+      
+      // Save answer
+      const questionNum = parseInt(questionContainer.getAttribute('data-question'));
+      const optionIndex = Array.from(options).indexOf(option);
+      const isCorrect = option.hasAttribute('data-correct');
+      
+      // Update or add user answer
+      const existingAnswerIndex = userAnswers.findIndex(a => a.question === questionNum);
+      if (existingAnswerIndex >= 0) {
+        userAnswers[existingAnswerIndex] = { question: questionNum, optionIndex, isCorrect };
+      } else {
+        userAnswers.push({ question: questionNum, optionIndex, isCorrect });
+      }
+    }
+    
+    // Select option
+    function selectOption(option) {
+      option.classList.add('bg-indigo-50', 'dark:bg-indigo-900/30', 'border-indigo-300', 'dark:border-indigo-600');
+      option.querySelector('.quiz-radio-selected').classList.remove('hidden');
+    }
+    
+    // Add click event to quiz options
+    document.querySelectorAll('.quiz-option').forEach(option => {
+      option.addEventListener('click', () => {
+        handleOptionClick(option);
+      });
+    });
+    
+    // Next question button
+    nextQuestionBtn.addEventListener('click', () => {
+      // Show explanation
+      const explanationId = `explanation-${currentQuestionIndex + 1}`;
+      const explanation = document.getElementById(explanationId);
+      if (explanation) {
+        explanation.classList.remove('hidden');
+      }
+      
+      // Wait a moment to show explanation
+      setTimeout(() => {
+        if (currentQuestionIndex < quizQuestions.length - 1) {
+          currentQuestionIndex++;
+          showQuestion(currentQuestionIndex);
+        } else {
+          // Calculate score
+          score = userAnswers.filter(a => a.isCorrect).length;
+          
+          // Show result
+          quizQuestions.forEach(q => q.classList.add('hidden'));
+          quizResult.classList.remove('hidden');
+          document.getElementById('quiz-nav').classList.add('hidden');
+          
+          correctCount.textContent = score;
+          
+          // Set result message
+          if (score === quizQuestions.length) {
+            resultMessage.textContent = "Excellent! You have a perfect understanding of the principles of insurance.";
+            resultIcon.classList.add('text-yellow-500');
+            resultIcon.classList.remove('text-indigo-600', 'dark:text-indigo-400');
+          } else if (score >= quizQuestions.length * 0.7) {
+            resultMessage.textContent = "Good job! You have a solid grasp of most insurance principles. Review the ones you missed.";
+          } else if (score >= quizQuestions.length * 0.5) {
+            resultMessage.textContent = "Not bad. You understand some key principles, but should review the material to strengthen your knowledge.";
+          } else {
+            resultMessage.textContent = "You might want to go through the material again to better understand the insurance principles.";
+            resultIcon.classList.remove('fa-trophy');
+            resultIcon.classList.add('fa-book');
+          }
+        }
+      }, 1500);
+    });
+    
+    // Previous question button
+    prevQuestionBtn.addEventListener('click', () => {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        showQuestion(currentQuestionIndex);
+      }
+    });
+    
+    // Retake quiz button
+    retakeQuizBtn.addEventListener('click', () => {
+      // Reset quiz
+      currentQuestionIndex = 0;
+      score = 0;
+      userAnswers = [];
+      
+      // Hide result
+      quizResult.classList.add('hidden');
+      document.getElementById('quiz-nav').classList.remove('hidden');
+      
+      // Reset explanations
+      document.querySelectorAll('[id^="explanation-"]').forEach(exp => {
+        exp.classList.add('hidden');
+      });
+      
+      // Show first question
+      showQuestion(currentQuestionIndex);
+    });
+    
+    // Back to intro button
+    backToIntroBtn.addEventListener('click', () => {
+      showModule('intro');
+    });
+    
+    // Initialize first question
+    if (quizQuestions.length > 0) {
+      showQuestion(0);
+    }
+    
+    // Initialize with intro module
+    updateProgress();
+  </script>
+</body>
+</html>
