@@ -1,0 +1,2014 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Management & Assessment - Chapter 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        secondary: '#4B5563',
+                        accent: '#8B5CF6',
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .flip-card {
+            perspective: 1000px;
+            height: 200px;
+        }
+        
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+        
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+        
+        @keyframes progress {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+        
+        .progress-animate {
+            animation: progress 0.5s ease;
+        }
+        
+        .quiz-option {
+            transition: all 0.3s ease;
+        }
+        
+        .quiz-option:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .dark .quiz-option:hover {
+            background-color: #374151;
+        }
+        
+        .quiz-option.correct {
+            background-color: #10B981;
+            color: white;
+        }
+        
+        .quiz-option.incorrect {
+            background-color: #EF4444;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .accordion-content.active {
+            max-height: 1000px;
+        }
+
+        .process-step {
+            transition: all 0.3s ease;
+        }
+        
+        .process-step:hover {
+            transform: translateY(-3px);
+        }
+
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            border-color: #5D5CDE;
+            color: #5D5CDE;
+            background-color: rgba(93, 92, 222, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+    <!-- Navigation bar -->
+    <nav class="bg-white dark:bg-gray-800 shadow-md fixed w-full z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#" class="flex items-center space-x-2">
+                        <i class="fas fa-shield-alt text-primary text-2xl"></i>
+                        <span class="font-bold text-xl">INS200</span>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="progress-text" class="hidden md:block">Progress: 0%</span>
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <i class="fas fa-moon text-gray-600 dark:text-gray-300 dark:hidden"></i>
+                        <i class="fas fa-sun text-yellow-400 hidden dark:block"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Progress bar -->
+    <div class="fixed top-16 w-full h-1 bg-gray-200 dark:bg-gray-700 z-10">
+        <div id="progress-bar" class="h-full bg-primary" style="width: 0%"></div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="fixed left-0 top-16 h-full bg-gray-100 dark:bg-gray-800 w-64 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-10" id="sidebar">
+        <div class="p-4">
+            <h2 class="text-lg font-semibold mb-4">Chapter 2: Risk Management & Assessment</h2>
+            <ul class="space-y-2">
+                <li><a href="#intro" class="block p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Introduction</a></li>
+                <li>
+                    <div class="p-2 flex justify-between items-center cursor-pointer rounded hover:bg-gray-200 dark:hover:bg-gray-700" onclick="toggleSubmenu('risk-management-submenu')">
+                        <span>2.1 Risk Management</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <ul id="risk-management-submenu" class="ml-4 mt-1 space-y-1 hidden">
+                        <li><a href="#definition" class="block p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Definition & Objectives</a></li>
+                        <li><a href="#islamic" class="block p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Islamic Perspective</a></li>
+                        <li><a href="#objectives" class="block p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Objectives</a></li>
+                        <li><a href="#process" class="block p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Risk Management Process</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <div class="p-2 flex justify-between items-center cursor-pointer rounded hover:bg-gray-200 dark:hover:bg-gray-700" onclick="toggleSubmenu('risk-assessment-submenu')">
+                        <span>2.2 Risk Assessment</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <ul id="risk-assessment-submenu" class="ml-4 mt-1 space-y-1 hidden">
+                        <li><a href="#human-assessment" class="block p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Human Assessment</a></li>
+                        <li><a href="#sources" class="block p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Sources of Risk</a></li>
+                        <li><a href="#exposures" class="block p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Risk Exposures</a></li>
+                        <li><a href="#techniques" class="block p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Identification Techniques</a></li>
+                    </ul>
+                </li>
+                <li><a href="#quiz" class="block p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Knowledge Check</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="md:ml-64 pt-20 pb-16 min-h-screen">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Mobile menu button -->
+            <button id="mobile-menu-button" class="md:hidden fixed bottom-4 right-4 bg-primary text-white rounded-full p-3 shadow-lg z-20">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Introduction Section -->
+            <section id="intro" class="mb-12 pt-8">
+                <h1 class="text-3xl font-bold text-primary mb-6">Chapter 2: Risk Management & Assessment</h1>
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">Chapter Outcomes</h2>
+                    <p class="mb-4">Upon completion of this chapter, you should be able to:</p>
+                    <ul class="space-y-2 ml-6 list-disc">
+                        <li>Define common terminology related to risk management</li>
+                        <li>Explain the importance of risk management to individuals and organizations</li>
+                        <li>Define risk management from an Islamic perspective</li>
+                        <li>Describe the objectives of risk management</li>
+                        <li>Explain the risk management process</li>
+                        <li>Identify the best risk management techniques for different risk categories</li>
+                        <li>Describe risk identification techniques available to industry</li>
+                        <li>Outline human assessment of risk and sources of risk</li>
+                        <li>Discuss risk data and sources of risk data</li>
+                    </ul>
+                </div>
+
+                <!-- Shopping Mall Scenario -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Case Scenario: H&N Shopping Mall</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="relative">
+                            <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mb-4">
+                                <div class="flex items-start">
+                                    <div class="bg-white dark:bg-gray-600 rounded-full p-2 mr-3">
+                                        <i class="fas fa-user-secret text-red-500"></i>
+                                    </div>
+                                    <div class="speech-bubble relative">
+                                        <p>"Yes! I got away. I'll steal things again soon."</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <img src="https://i.imgur.com/cM8PiQV.png" alt="Shoplifter" class="w-full h-auto rounded-lg">
+                        </div>
+                        <div class="relative">
+                            <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mb-4">
+                                <div class="flex items-start">
+                                    <div class="bg-white dark:bg-gray-600 rounded-full p-2 mr-3">
+                                        <i class="fas fa-user-tie text-blue-500"></i>
+                                    </div>
+                                    <div class="speech-bubble relative">
+                                        <p>"Oh no! This shoplifting problem is getting worse. What to do?"</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <img src="https://i.imgur.com/UmiEGqA.png" alt="Manager" class="w-full h-auto rounded-lg">
+                        </div>
+                    </div>
+
+                    <div class="mt-6 grid md:grid-cols-3 gap-4">
+                        <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                            <h4 class="font-semibold mb-2">What risk is causing losses?</h4>
+                            <p class="text-blue-700 dark:text-blue-300 font-bold">SHOPLIFTING</p>
+                        </div>
+                        <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                            <h4 class="font-semibold mb-2">How to manage this risk?</h4>
+                            <p class="text-green-700 dark:text-green-300 font-bold">INSTALL CCTV</p>
+                        </div>
+                        <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+                            <h4 class="font-semibold mb-2">How to finance the losses?</h4>
+                            <p class="text-purple-700 dark:text-purple-300 font-bold">COMPANY FUNDS</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end">
+                    <a href="#definition" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md flex items-center">
+                        Next: Definition of Risk Management <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </section>
+
+            <!-- 2.1 Risk Management Section -->
+            <!-- Definition and Objectives Section -->
+            <section id="definition" class="mb-12 pt-8">
+                <h2 class="text-2xl font-bold text-primary mb-6">2.1.1 Definition and Objectives of Risk Management</h2>
+                
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <div class="flex flex-col md:flex-row md:items-center gap-6">
+                        <div class="md:w-1/3">
+                            <img src="https://i.imgur.com/xGtISz3.png" alt="Risk Management" class="w-full h-auto rounded-lg">
+                        </div>
+                        <div class="md:w-2/3">
+                            <p class="mb-4"><strong>Definition:</strong> Risk management is a systematic approach to identifying, measuring, and controlling risks that can threaten assets and earnings of oneself, a business, or an organization.</p>
+                            <ul class="space-y-2 ml-6 list-disc">
+                                <li>The purpose is to enable an organization to progress toward its goals in the most direct, efficient, and effective path</li>
+                                <li>Risk management is crucial for survival of a person, company, or organization</li>
+                                <li>Climate changes, political uncertainties, and economic forces are among external factors that necessitate risk management</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+                    <blockquote class="border-l-4 border-primary pl-4 italic text-gray-600 dark:text-gray-300">
+                        <p class="mb-2">"Risk management is a scientific approach to dealing with risks by anticipating possible losses and designing and implementing procedures that minimize the occurrence of loss or the financial impact of the losses that do occur."</p>
+                        <footer class="text-right">— Vaughan & Vaughan (2008)</footer>
+                    </blockquote>
+                </div>
+
+                <div class="flex justify-between">
+                    <a href="#intro" class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 px-4 py-2 rounded-md flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i> Previous
+                    </a>
+                    <a href="#islamic" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md flex items-center">
+                        Next: Islamic Perspective <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Islamic Perspective Section -->
+            <section id="islamic" class="mb-12 pt-8">
+                <h2 class="text-2xl font-bold text-primary mb-6">2.1.2 Risk Management in Islamic Perspective</h2>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <p class="mb-4">Every human being who is the caliph (vicegerent) of Allah SWT must accept all His divine stipulations and give way to His qada' and qadar (actions and reactions).</p>
+                            <p class="mb-4">In fact, efforts and prayers should precede this kind of belief. Muslims are asked to work hard in order to be able to change their conditions as God says:</p>
+                            <blockquote class="border-l-4 border-primary pl-4 italic mb-4">
+                                <p>"... verily never will God change the condition of a people until they change it themselves (with their own souls)..."</p>
+                                <footer>— Qur'an 13:11</footer>
+                            </blockquote>
+                        </div>
+                        <div class="flex items-center justify-center">
+                            <img src="https://i.imgur.com/vRXjMg5.png" alt="Islamic Perspective" class="max-h-64 w-auto">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Key Principles</h3>
+                    <ul class="space-y-3 ml-6 list-disc">
+                        <li>The Ummah should anticipate risks that will hinder the ultimate goal of attaining success in this world and the hereafter</li>
+                        <li>Risk management in Islamic perspective should aim to reduce the utilization of resources (financial and non-financial)</li>
+                        <li>It should minimize the negative effects of risks or maximize opportunities and goals</li>
+                        <li>These goals must be aligned with the Shariah</li>
+                    </ul>
+                </div>
+
+                <div class="flex justify-between">
+                    <a href="#definition" class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 px-4 py-2 rounded-md flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i> Previous
+                    </a>
+                    <a href="#objectives" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md flex items-center">
+                        Next: Objectives of Risk Management <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Objectives of Risk Management Section -->
+            <section id="objectives" class="mb-12 pt-8">
+                <h2 class="text-2xl font-bold text-primary mb-6">2.1.3 Objectives of Risk Management</h2>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <p class="mb-4">The objectives of risk management can be examined from two different perspectives:</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mt-6">
+                        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-5">
+                            <div class="flex items-center mb-4">
+                                <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-800 mr-3">
+                                    <i class="fas fa-shield-alt text-blue-500 dark:text-blue-300 text-xl"></i>
+                                </div>
+                                <h3 class="text-xl font-bold">Before Loss</h3>
+                            </div>
+                            <ul class="space-y-3">
+                                <li class="flex items-start">
+                                    <span class="font-bold mr-2">R</span>
+                                    <span>Reduce impact of loss</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="font-bold mr-2">R</span>
+                                    <span>Reduce fear & worry</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="font-bold mr-2">R</span>
+                                    <span>Required by law</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="bg-green-50 dark:bg-green-900/20 rounded-xl p-5">
+                            <div class="flex items-center mb-4">
+                                <div class="p-3 rounded-full bg-green-100 dark:bg-green-800 mr-3">
+                                    <i class="fas fa-life-ring text-green-500 dark:text-green-300 text-xl"></i>
+                                </div>
+                                <h3 class="text-xl font-bold">After Loss</h3>
+                            </div>
+                            <ul class="space-y-3">
+                                <li class="flex items-start">
+                                    <span class="font-bold mr-2">S</span>
+                                    <span>Survival of the organization</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="font-bold mr-2">S</span>
+                                    <span>Stability of earnings</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="font-bold mr-2">S</span>
+                                    <span>Social responsibility</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Detailed Objectives</h3>
+                    
+                    <!-- Tabs -->
+                    <div class="border-b border-gray-200 dark:border-gray-700 mb-6">
+                        <ul class="flex flex-wrap -mb-px">
+                            <li class="mr-2">
+                                <button class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-gray-300 active" onclick="openTab(event, 'before-loss')">Before Loss</button>
+                            </li>
+                            <li class="mr-2">
+                                <button class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-gray-300" onclick="openTab(event, 'after-loss')">After Loss</button>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Tab content -->
+                    <div id="before-loss" class="tab-content active">
+                        <div class="space-y-6">
+                            <div class="accordion">
+                                <div class="accordion-header bg-white dark:bg-gray-700 p-4 rounded-t-lg cursor-pointer flex justify-between items-center" onclick="toggleAccordion(this)">
+                                    <h4 class="font-semibold">1. Reduce impact of loss / Economic reasons</h4>
+                                    <i class="fas fa-chevron-down text-gray-500 dark:text-gray-400 transition-transform"></i>
+                                </div>
+                                <div class="accordion-content bg-white dark:bg-gray-700 p-4 rounded-b-lg">
+                                    <ul class="space-y-2 ml-6 list-disc">
+                                        <li>To anticipate and minimize losses in the most economical way</li>
+                                        <li>To ensure optimal utilization of company resources</li>
+                                        <li>A cost-benefit analysis is normally conducted to ensure the risk management program is beneficial</li>
+                                        <li><strong>Example:</strong> The cost & benefits of safety training programs, insurance costs, and costs associated with risk treatment</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion">
+                                <div class="accordion-header bg-white dark:bg-gray-700 p-4 rounded-t-lg cursor-pointer flex justify-between items-center" onclick="toggleAccordion(this)">
+                                    <h4 class="font-semibold">2. Reduce fear & worry</h4>
+                                    <i class="fas fa-chevron-down text-gray-500 dark:text-gray-400 transition-transform"></i>
+                                </div>
+                                <div class="accordion-content bg-white dark:bg-gray-700 p-4 rounded-b-lg">
+                                    <ul class="space-y-2 ml-6 list-disc">
+                                        <li>To reduce fear & worry among staff, managers & clients</li>
+                                        <li>The program can reduce stress & anxiety and create peace of mind</li>
+                                        <li>An organization able to handle risks will experience less financial distress</li>
+                                        <li><strong>Example:</strong> A well-designed risk management program offers mental security, reduces stress & creates peace of mind. Management can then channel energy & resources toward growth & profitability</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion">
+                                <div class="accordion-header bg-white dark:bg-gray-700 p-4 rounded-t-lg cursor-pointer flex justify-between items-center" onclick="toggleAccordion(this)">
+                                    <h4 class="font-semibold">3. Required by law</h4>
+                                    <i class="fas fa-chevron-down text-gray-500 dark:text-gray-400 transition-transform"></i>
+                                </div>
+                                <div class="accordion-content bg-white dark:bg-gray-700 p-4 rounded-b-lg">
+                                    <ul class="space-y-2 ml-6 list-disc">
+                                        <li>In certain cases, organizations need to have a risk management program to comply with government requirements</li>
+                                        <li>The Occupational Safety and Health Act 1994 (OSHA) is an example of a statutory requirement organizations must comply with</li>
+                                        <li>This act requires all workplaces to have health & safety procedures</li>
+                                        <li><strong>Example:</strong> The government sets regulations requiring companies to install fire extinguishers in their premises</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="after-loss" class="tab-content">
+                        <div class="space-y-6">
+                            <div class="accordion">
+                                <div class="accordion-header bg-white dark:bg-gray-700 p-4 rounded-t-lg cursor-pointer flex justify-between items-center" onclick="toggleAccordion(this)">
+                                    <h4 class="font-semibold">1. Survival of organization</h4>
+                                    <i class="fas fa-chevron-down text-gray-500 dark:text-gray-400 transition-transform"></i>
+                                </div>
+                                <div class="accordion-content bg-white dark:bg-gray-700 p-4 rounded-b-lg">
+                                    <ul class="space-y-2 ml-6 list-disc">
+                                        <li>Ensures a company can continue its business despite incurring losses</li>
+                                        <li><strong>Example:</strong> A company that experiences capital asset damage due to fire may still survive by having a back-up capital asset</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion">
+                                <div class="accordion-header bg-white dark:bg-gray-700 p-4 rounded-t-lg cursor-pointer flex justify-between items-center" onclick="toggleAccordion(this)">
+                                    <h4 class="font-semibold">2. Stability of earnings</h4>
+                                    <i class="fas fa-chevron-down text-gray-500 dark:text-gray-400 transition-transform"></i>
+                                </div>
+                                <div class="accordion-content bg-white dark:bg-gray-700 p-4 rounded-b-lg">
+                                    <ul class="space-y-2 ml-6 list-disc">
+                                        <li>Proper risk management after any loss ensures a company can continue operations so earnings can be maintained</li>
+                                        <li><strong>Example:</strong> A company experiencing capital asset damage due to fire can continue operating and making profits because of back-up capital assets</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion">
+                                <div class="accordion-header bg-white dark:bg-gray-700 p-4 rounded-t-lg cursor-pointer flex justify-between items-center" onclick="toggleAccordion(this)">
+                                    <h4 class="font-semibold">3. Social responsibility</h4>
+                                    <i class="fas fa-chevron-down text-gray-500 dark:text-gray-400 transition-transform"></i>
+                                </div>
+                                <div class="accordion-content bg-white dark:bg-gray-700 p-4 rounded-b-lg">
+                                    <ul class="space-y-2 ml-6 list-disc">
+                                        <li>The risk management program can be considered an obligation of the organization toward the community & society</li>
+                                        <li>When an organization is exposed to losses, many parties are affected</li>
+                                        <li>Among the goals is to reduce the impact of losses to the organization & society</li>
+                                        <li><strong>Example:</strong> A disrupted factory operation due to fire affects not only management but also employees, creditors, suppliers, retailers & consumers</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between">
+                    <a href="#islamic" class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 px-4 py-2 rounded-md flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i> Previous
+                    </a>
+                    <a href="#process" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md flex items-center">
+                        Next: Risk Management Process <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Risk Management Process Section -->
+            <section id="process" class="mb-12 pt-8">
+                <h2 class="text-2xl font-bold text-primary mb-6">2.1.4 Risk Management Process</h2>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <div class="flex flex-col items-center mb-8">
+                        <div class="w-full max-w-3xl relative">
+                            <div class="absolute left-0 top-1/2 w-full h-1 bg-gray-200 dark:bg-gray-600 -z-10 transform -translate-y-1/2"></div>
+                            <div class="flex justify-between">
+                                <div class="process-step flex flex-col items-center">
+                                    <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center mb-2">
+                                        <span class="font-bold">I</span>
+                                    </div>
+                                    <div class="text-center w-24">Identifying existing and potential risk</div>
+                                </div>
+                                <div class="process-step flex flex-col items-center">
+                                    <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center mb-2">
+                                        <span class="font-bold">E</span>
+                                    </div>
+                                    <div class="text-center w-24">Evaluating potential risk</div>
+                                </div>
+                                <div class="process-step flex flex-col items-center">
+                                    <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center mb-2">
+                                        <span class="font-bold">E</span>
+                                    </div>
+                                    <div class="text-center w-24">Examining alternative risk management techniques</div>
+                                </div>
+                                <div class="process-step flex flex-col items-center">
+                                    <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center mb-2">
+                                        <span class="font-bold">S</span>
+                                    </div>
+                                    <div class="text-center w-24">Selecting and implementing risk management program</div>
+                                </div>
+                                <div class="process-step flex flex-col items-center">
+                                    <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center mb-2">
+                                        <span class="font-bold">E</span>
+                                    </div>
+                                    <div class="text-center w-24">Evaluating, reviewing and controlling the program</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Process steps tabs -->
+                    <div class="my-8">
+                        <div class="grid grid-cols-5 gap-1">
+                            <button class="process-tab-btn active py-2 px-1 text-xs md:text-sm rounded-t-lg bg-gray-100 dark:bg-gray-700" onclick="openProcessTab(event, 'process-1')">
+                                1. Identifying Risks
+                            </button>
+                            <button class="process-tab-btn py-2 px-1 text-xs md:text-sm rounded-t-lg bg-gray-100 dark:bg-gray-700" onclick="openProcessTab(event, 'process-2')">
+                                2. Evaluating Risks
+                            </button>
+                            <button class="process-tab-btn py-2 px-1 text-xs md:text-sm rounded-t-lg bg-gray-100 dark:bg-gray-700" onclick="openProcessTab(event, 'process-3')">
+                                3. Examining Techniques
+                            </button>
+                            <button class="process-tab-btn py-2 px-1 text-xs md:text-sm rounded-t-lg bg-gray-100 dark:bg-gray-700" onclick="openProcessTab(event, 'process-4')">
+                                4. Selection & Implementation
+                            </button>
+                            <button class="process-tab-btn py-2 px-1 text-xs md:text-sm rounded-t-lg bg-gray-100 dark:bg-gray-700" onclick="openProcessTab(event, 'process-5')">
+                                5. Evaluation & Review
+                            </button>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-700 rounded-b-lg p-4">
+                            <!-- Step 1 content -->
+                            <div id="process-1" class="process-tab-content active">
+                                <h4 class="font-semibold text-lg mb-3">1. Identifying existing and potential risk</h4>
+                                <p class="mb-4">Risk identification is the process by which an organization learns of areas where it is exposed to risk, what can be insured, and what can be controlled.</p>
+                                <div class="grid md:grid-cols-3 gap-4 mb-4">
+                                    <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                                        <h5 class="font-semibold mb-2">Types of exposure</h5>
+                                        <ul class="list-disc ml-5 space-y-1">
+                                            <li>Property – buildings, office equipment, machinery, etc.</li>
+                                            <li>Liability – public, product, employer, etc.</li>
+                                            <li>Human – personal risk covering death, injuries, retirement, etc.</li>
+                                            <li>Others – financial risks, fraud risks, natural disaster risks, etc.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                                        <h5 class="font-semibold mb-2">Loss classification</h5>
+                                        <ul class="list-disc ml-5 space-y-1">
+                                            <li>Direct damage – i.e., damage to building</li>
+                                            <li>Indirect damage – i.e., loss of profit due to business interruption</li>
+                                            <li>Liability – i.e., court award to third party</li>
+                                            <li>Loss of key person – i.e., employees die/become disabled as a result of fire</li>
+                                        </ul>
+                                    </div>
+                                    <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                                        <h5 class="font-semibold mb-2">Risk identification tools</h5>
+                                        <ul class="list-disc ml-5 space-y-1">
+                                            <li>Orientation</li>
+                                            <li>Risk analysis questionnaire</li>
+                                            <li>Exposure checklists</li>
+                                            <li>Insurance policy checklist</li>
+                                            <li>Flowchart</li>
+                                            <li>Financial statements</li>
+                                            <li>Inspections</li>
+                                            <li>Interview</li>
+                                            <li>Combination approach</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 2 content -->
+                            <div id="process-2" class="process-tab-content">
+                                <h4 class="font-semibold text-lg mb-3">2. Evaluating potential losses</h4>
+                                <p class="mb-4">Risk measurement evaluates the likelihood of loss and the value of loss in terms of frequency and severity. This step involves two important aspects of loss exposures:</p>
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg flex">
+                                        <div class="mr-4 flex-shrink-0">
+                                            <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                                                <i class="fas fa-chart-line text-blue-500 dark:text-blue-300"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h5 class="font-semibold mb-2">Frequency</h5>
+                                            <p class="text-sm">Refers to the number of times the loss occurs. Priority is given to those with high frequency of occurrence.</p>
+                                            <p class="mt-2 text-sm italic">How many times does the risk happen? Rarely? Always? Seldom?</p>
+                                        </div>
+                                    </div>
+                                    <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg flex">
+                                        <div class="mr-4 flex-shrink-0">
+                                            <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center">
+                                                <i class="fas fa-exclamation-triangle text-red-500 dark:text-red-300"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h5 class="font-semibold mb-2">Severity (Size)</h5>
+                                            <p class="text-sm">Refers to the maximum size of loss exposure. Risks expected to cause huge losses will be given priority.</p>
+                                            <p class="mt-2 text-sm italic">How much does the risk cost? Low? High? RM100,000?</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <p>Note: Identifying and determining loss exposures alone is not sufficient. The frequency and severity for each type must be estimated and ranked according to relative importance. High loss exposures will be given priority.</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 3 content -->
+                            <div id="process-3" class="process-tab-content">
+                                <h4 class="font-semibold text-lg mb-3">3. Examining alternative risk management techniques</h4>
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <h5 class="font-semibold mb-3 text-primary">A. Risk Control</h5>
+                                        <p class="mb-2">Methods that seek to alter an organization's exposure to risk.</p>
+                                        <div class="space-y-3 mt-4">
+                                            <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded">
+                                                <h6 class="font-semibold">1. Risk Avoidance</h6>
+                                                <p class="text-sm">Not exposing the organization/individual to events that create risk.</p>
+                                                <p class="text-sm italic mt-1">Example: A pharmaceutical manufacturer stops producing certain types of medical drugs due to potential harmful side effects.</p>
+                                            </div>
+                                            <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded">
+                                                <h6 class="font-semibold">2. Loss Control</h6>
+                                                <ul class="list-disc ml-5 text-sm">
+                                                    <li><strong>Loss prevention</strong> - Reduces the probability or frequency of a particular loss. Example: Factories install fences around dangerous machinery.</li>
+                                                    <li><strong>Loss reduction</strong> - Reduces/lowers the severity of losses. Example: Installing fire alarms (before loss) or salvage efforts (after loss).</li>
+                                                </ul>
+                                            </div>
+                                            <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded">
+                                                <h6 class="font-semibold">3. Separation</h6>
+                                                <p class="text-sm">Dispersing firm's assets in several locations. Example: Separating headquarters and assembly plants in the automobile industry.</p>
+                                            </div>
+                                            <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded">
+                                                <h6 class="font-semibold">4. Contractual Transfer</h6>
+                                                <p class="text-sm">Non-insurance transfer that shifts legal responsibility for loss to another party. Examples: Incorporation, leasing contracts, hedging, hold-harmless agreements.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h5 class="font-semibold mb-3 text-primary">B. Risk Financing</h5>
+                                        <p class="mb-2">Methods involving generating funds to pay for losses.</p>
+                                        <div class="space-y-3 mt-4">
+                                            <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded">
+                                                <h6 class="font-semibold">1. Retention</h6>
+                                                <p class="text-sm">The company bears the consequences of the loss. Used when impact and consequences are not too great or when other methods aren't feasible.</p>
+                                                <p class="text-sm italic mt-1">Example: Risk manager arranges funds to replace damaged property, meet obligations, and continue operations in the event of loss.</p>
+                                            </div>
+                                            <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded">
+                                                <h6 class="font-semibold">2. Captive Insurer</h6>
+                                                <p class="text-sm">Self-insurance implies the organization sets up a fund pool to retain loss exposures. A captive insurance company is an entity that provides risk-mitigation services for its parent company.</p>
+                                                <p class="text-sm italic mt-1">Example: Sime Darby Group is the parent company of Sime AXA Assurance Sdn Bhd.</p>
+                                            </div>
+                                            <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded">
+                                                <h6 class="font-semibold">3. Insurance</h6>
+                                                <p class="text-sm">Transfers losses to an insurer through a contractual agreement. The insured pays premiums, and the insurer agrees to pay a stated sum when specified risks occur.</p>
+                                                <p class="text-sm italic mt-1">Example: A company purchases an insurance policy for particular risk coverage and continually pays the pre-determined premium.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 4 content -->
+                            <div id="process-4" class="process-tab-content">
+                                <h4 class="font-semibold text-lg mb-3">4. Selection and implementation of risk management process</h4>
+                                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                                    <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                                        <h5 class="font-semibold mb-3">Financial criteria</h5>
+                                        <p>Whether it will affect the organization's profitability or rate of return</p>
+                                    </div>
+                                    <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                                        <h5 class="font-semibold mb-3">Non-financial criteria</h5>
+                                        <p>Whether it affects the growth of the organization, humanitarian aspects, and legal requirements</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden mt-6">
+                                    <div class="px-4 py-3 bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                                        <h5 class="font-semibold">Risk Matrix Table</h5>
+                                    </div>
+                                    <div class="overflow-x-auto">
+                                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                            <thead>
+                                                <tr>
+                                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Type of Risk</th>
+                                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">High Frequency</th>
+                                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Low Frequency</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                                <tr>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">High Severity</td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm">Risk avoidance and reduction</td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm">Risk transfer (e.g., insurance, etc.)</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">Low Severity</td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm">Risk retention & reduction</td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm">Risk retention</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 5 content -->
+                            <div id="process-5" class="process-tab-content">
+                                <h4 class="font-semibold text-lg mb-3">5. Evaluation, review and control</h4>
+                                <div class="bg-gray-50 dark:bg-gray-800 p-5 rounded-lg">
+                                    <div class="flex items-start mb-4">
+                                        <div class="mr-4 flex-shrink-0">
+                                            <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                                                <i class="fas fa-sync-alt text-green-500 dark:text-green-300"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p class="mb-3">The risk management program must be monitored and controlled systematically. It must be periodically reviewed.</p>
+                                            <p class="mb-3">This ensures effectiveness and that the techniques employed are still suitable.</p>
+                                        </div>
+                                    </div>
+                                    <div class="bg-white dark:bg-gray-700 p-4 rounded-lg mb-4">
+                                        <p class="italic text-gray-600 dark:text-gray-300">"The techniques that were appropriate last year may not be the most advisable this year, and constant attention is required."</p>
+                                    </div>
+                                    <p>Evaluation and review of the risk management program permits the manager to review decisions and discover mistakes before they become costly.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between">
+                    <a href="#objectives" class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 px-4 py-2 rounded-md flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i> Previous
+                    </a>
+                    <a href="#human-assessment" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md flex items-center">
+                        Next: Human Assessment of Risk <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </section>
+
+            <!-- 2.2 Risk Assessment Section -->
+            <!-- Human Assessment of Risk Section -->
+            <section id="human-assessment" class="mb-12 pt-8">
+                <h2 class="text-2xl font-bold text-primary mb-6">2.2.1 Human Assessment of Risk</h2>
+                
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <p class="mb-4"><strong>Definition:</strong> Risk assessment is the qualitative and quantitative evaluation performed to define the risk cause to human health or the environment by an action or by the presence of a specific substance.</p>
+                    <p>It is a continuous and never-ending process.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md">
+                        <h3 class="text-xl font-semibold mb-4">Areas of Human Risk Assessment</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <div class="mr-3 mt-1">
+                                    <div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                                        <i class="fas fa-user text-blue-500 dark:text-blue-300"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold mb-1">Personal</h4>
+                                    <p class="text-sm">Making choices in life such as career choice, marriage partner, selecting a course to study</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="mr-3 mt-1">
+                                    <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                                        <i class="fas fa-heartbeat text-green-500 dark:text-green-300"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold mb-1">Medical</h4>
+                                    <p class="text-sm">Difficult decisions when facing uncertainty, such as whether to operate or donate blood</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="mr-3 mt-1">
+                                    <div class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center">
+                                        <i class="fas fa-landmark text-red-500 dark:text-red-300"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold mb-1">Political</h4>
+                                    <p class="text-sm">Risk during elections, such as riots or demonstrations</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="mr-3 mt-1">
+                                    <div class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
+                                        <i class="fas fa-chart-line text-purple-500 dark:text-purple-300"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold mb-1">Business</h4>
+                                    <p class="text-sm">Potential investors in speculative risk hope for gain but may incur losses due to recession</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md">
+                        <h3 class="text-xl font-semibold mb-4">Actual vs. Perceived Risk</h3>
+                        <div class="grid grid-cols-1 gap-4">
+                            <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                                <h4 class="font-semibold mb-2 text-blue-700 dark:text-blue-300">Actual Risk</h4>
+                                <ul class="list-disc ml-5 space-y-1">
+                                    <li>Also called real/known risk</li>
+                                    <li>The amount of risk which actually exists at a given moment in time</li>
+                                    <li>Refers to the combination of chance and negative consequence that exists in the real world</li>
+                                </ul>
+                            </div>
+                            <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+                                <h4 class="font-semibold mb-2 text-purple-700 dark:text-purple-300">Perceived Risk</h4>
+                                <ul class="list-disc ml-5 space-y-1">
+                                    <li>Also called perception risk</li>
+                                    <li>An individual's judgment that people make</li>
+                                    <li>Our perception of risk level is often different from the actual level</li>
+                                    <li>Elements affecting risk perception include past experience, culture, education level, and individual beliefs</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                            <h4 class="font-semibold mb-2">Example:</h4>
+                            <p class="mb-2">A man died from a car crash accident. People assume the accident caused his death. After a post-mortem, the hospital determines he died from a heart attack.</p>
+                            <div class="grid grid-cols-2 gap-3 mt-3">
+                                <div class="p-2 bg-white dark:bg-gray-800 rounded">
+                                    <p class="text-center text-sm font-semibold mb-1">Actual Risk:</p>
+                                    <p class="text-center text-xs">Death due to heart attack led to car accident</p>
+                                </div>
+                                <div class="p-2 bg-white dark:bg-gray-800 rounded">
+                                    <p class="text-center text-sm font-semibold mb-1">Perceived Risk:</p>
+                                    <p class="text-center text-xs">Assuming the car crash killed the man</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Categories of Risk Behavior</h3>
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
+                            <div class="flex items-center mb-3">
+                                <div class="mr-3">
+                                    <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-800 flex items-center justify-center">
+                                        <i class="fas fa-skiing text-red-500 dark:text-red-300"></i>
+                                    </div>
+                                </div>
+                                <h4 class="font-bold text-red-700 dark:text-red-300">Risk Seekers</h4>
+                            </div>
+                            <ul class="list-disc ml-5 space-y-1">
+                                <li>People who see risk as an opportunity, not a threat</li>
+                                <li>Have preference for uncertainty</li>
+                                <li>Voluntarily take part in dangerous sports, hazardous occupations, and gamble regularly</li>
+                                <li>Will not respond to safety devices like seat belts, hard hats, etc.</li>
+                            </ul>
+                            <p class="mt-3 text-center font-bold text-red-500 dark:text-red-300">Like risk</p>
+                        </div>
+                        
+                        <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                            <div class="flex items-center mb-3">
+                                <div class="mr-3">
+                                    <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-800 flex items-center justify-center">
+                                        <i class="fas fa-user-shield text-blue-500 dark:text-blue-300"></i>
+                                    </div>
+                                </div>
+                                <h4 class="font-bold text-blue-700 dark:text-blue-300">Risk Adverse</h4>
+                            </div>
+                            <ul class="list-disc ml-5 space-y-1">
+                                <li>Unadventurous people who see risk as a threat, not an opportunity</li>
+                                <li>Have preference for certainty</li>
+                                <li>Tend to insure fully</li>
+                            </ul>
+                            <p class="mt-3 text-center font-bold text-blue-500 dark:text-blue-300">Hate risk</p>
+                        </div>
+                        
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <div class="flex items-center mb-3">
+                                <div class="mr-3">
+                                    <div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
+                                        <i class="fas fa-meh text-gray-500 dark:text-gray-300"></i>
+                                    </div>
+                                </div>
+                                <h4 class="font-bold text-gray-700 dark:text-gray-300">Risk Indifferent</h4>
+                            </div>
+                            <ul class="list-disc ml-5 space-y-1">
+                                <li>People neither influenced by danger nor opportunity in risky situations</li>
+                                <li>Neither attracted nor repelled by risk</li>
+                            </ul>
+                            <p class="mt-3 text-center font-bold text-gray-500 dark:text-gray-300">Ignorant about risk</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Factors Influencing Risk Perception</h3>
+                    <p class="mb-4">Four main factors influence individual perceptions between actual and perceived risk:</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg">
+                            <h4 class="font-semibold mb-2 text-primary">Familiarity</h4>
+                            <p>People's perceptions are influenced by their level of familiarity with the risky event.</p>
+                            <p class="mt-2 italic text-sm">Example: Personal experience with similar risks</p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg">
+                            <h4 class="font-semibold mb-2 text-primary">Control</h4>
+                            <p>People normally minimize the level of risk where they feel in control of events.</p>
+                            <p class="mt-2 italic text-sm">Example: People feel safer driving slowly than being a passenger</p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg">
+                            <h4 class="font-semibold mb-2 text-primary">Personal/Societal Effect</h4>
+                            <p>An individual's perception of the risk's effect on themselves versus society.</p>
+                            <p class="mt-2 italic text-sm">Example: Individuals may understate risk to society while overestimating their personal risk</p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg">
+                            <h4 class="font-semibold mb-2 text-primary">Frequency and Severity</h4>
+                            <p>People distinguish between how often an event will occur and the size of the area once affected.</p>
+                            <p class="mt-2 italic text-sm">Example: Nuclear plant – Low probability but high impact</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between">
+                    <a href="#process" class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 px-4 py-2 rounded-md flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i> Previous
+                    </a>
+                    <a href="#sources" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md flex items-center">
+                        Next: Sources of Risk <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Sources of Risk Section -->
+            <section id="sources" class="mb-12 pt-8">
+                <h2 class="text-2xl font-bold text-primary mb-6">2.2.2 Sources of Risk</h2>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <div class="flex flex-col md:flex-row items-center justify-center mb-8">
+                        <div class="w-full md:w-2/3 max-w-md">
+                            <div class="relative">
+                                <div class="bg-gray-200 dark:bg-gray-700 rounded-full w-64 h-64 mx-auto flex items-center justify-center">
+                                    <div class="text-center">
+                                        <span class="text-primary font-bold text-lg">Sources of Risk</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Physical environment -->
+                                <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                                    <div class="bg-blue-100 dark:bg-blue-900 rounded-full w-12 h-12 flex items-center justify-center source-of-risk" data-source="physical">
+                                        <i class="fas fa-mountain text-blue-500 dark:text-blue-300"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Social -->
+                                <div class="absolute top-1/4 right-0 transform translate-x-1/2">
+                                    <div class="bg-green-100 dark:bg-green-900 rounded-full w-12 h-12 flex items-center justify-center source-of-risk" data-source="social">
+                                        <i class="fas fa-users text-green-500 dark:text-green-300"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Political -->
+                                <div class="absolute top-2/4 right-0 transform translate-x-1/2">
+                                    <div class="bg-red-100 dark:bg-red-900 rounded-full w-12 h-12 flex items-center justify-center source-of-risk" data-source="political">
+                                        <i class="fas fa-landmark text-red-500 dark:text-red-300"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Legal -->
+                                <div class="absolute bottom-0 right-1/4 transform translate-y-1/2">
+                                    <div class="bg-yellow-100 dark:bg-yellow-900 rounded-full w-12 h-12 flex items-center justify-center source-of-risk" data-source="legal">
+                                        <i class="fas fa-gavel text-yellow-500 dark:text-yellow-300"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Operational -->
+                                <div class="absolute bottom-0 left-1/4 transform translate-y-1/2">
+                                    <div class="bg-purple-100 dark:bg-purple-900 rounded-full w-12 h-12 flex items-center justify-center source-of-risk" data-source="operational">
+                                        <i class="fas fa-cogs text-purple-500 dark:text-purple-300"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Economic -->
+                                <div class="absolute top-2/4 left-0 transform -translate-x-1/2">
+                                    <div class="bg-indigo-100 dark:bg-indigo-900 rounded-full w-12 h-12 flex items-center justify-center source-of-risk" data-source="economic">
+                                        <i class="fas fa-chart-line text-indigo-500 dark:text-indigo-300"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Cognitive -->
+                                <div class="absolute top-1/4 left-0 transform -translate-x-1/2">
+                                    <div class="bg-pink-100 dark:bg-pink-900 rounded-full w-12 h-12 flex items-center justify-center source-of-risk" data-source="cognitive">
+                                        <i class="fas fa-brain text-pink-500 dark:text-pink-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="source-details" class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-3" id="source-title">Click on any source of risk to learn more</h3>
+                        <p id="source-description" class="mb-4">Explore the different sources of risk by clicking on the icons above.</p>
+                        <div id="source-example" class="text-sm italic"></div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Sources of Risk: Detailed View</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead class="bg-gray-100 dark:bg-gray-700">
+                                <tr>
+                                    <th class="px-4 py-2 text-left">Source</th>
+                                    <th class="px-4 py-2 text-left">Explanation</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                <tr>
+                                    <td class="px-4 py-3 font-semibold">Physical environment</td>
+                                    <td class="px-4 py-3">
+                                        <p class="mb-1">Comprises all the different factors of nature that create risk. Natural disasters can severely impact an entire country.</p>
+                                        <p class="text-sm italic">Examples: earthquake, flood, volcano, etc.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 font-semibold">Social environment</td>
+                                    <td class="px-4 py-3">
+                                        <p class="mb-1">Human behavior, social structures, and institutions that create risk.</p>
+                                        <p class="text-sm italic">Examples: drug addiction, sexual harassment, etc.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 font-semibold">Political environment</td>
+                                    <td class="px-4 py-3">
+                                        <p class="mb-1">National & international political factors that can create risk.</p>
+                                        <p class="text-sm italic">Examples: riot, demonstration, etc.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 font-semibold">Legal environment</td>
+                                    <td class="px-4 py-3">
+                                        <p class="mb-1">Uncertainty & risk arising from legal systems, which vary from country to country.</p>
+                                        <p class="text-sm italic">Examples: bribery, bias, marijuana laws, liquor laws, etc.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 font-semibold">Operational environment</td>
+                                    <td class="px-4 py-3">
+                                        <p class="mb-1">Processes & procedures of an organization that can generate risk & uncertainty.</p>
+                                        <p class="text-sm italic">Examples: defective products, injuries during manufacturing, hiring & firing, etc.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 font-semibold">Economic environment</td>
+                                    <td class="px-4 py-3">
+                                        <p class="mb-1">The global marketplace expansion has created uncertainty. Includes economic systems, policies, trade cycles, resources, income levels, and wealth distribution.</p>
+                                        <p class="text-sm italic">Examples: inflation, recession, etc.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 font-semibold">Cognitive (Perception) environment</td>
+                                    <td class="px-4 py-3">
+                                        <p class="mb-1">Risk manager's ability/judgment to understand, see, measure, and assess is imperfect, thus creating risk.</p>
+                                        <p class="text-sm italic">Example: risk manager may overstate/understate certain types of risk depending on personal perception.</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="flex justify-between">
+                    <a href="#human-assessment" class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 px-4 py-2 rounded-md flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i> Previous
+                    </a>
+                    <a href="#exposures" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md flex items-center">
+                        Next: Risk Exposures <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Risk Exposures Section -->
+            <section id="exposures" class="mb-12 pt-8">
+                <h2 class="text-2xl font-bold text-primary mb-6">2.2.3 Categories of Risk Exposures</h2>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <div class="flex justify-center mb-8">
+                        <div class="relative w-64 h-64">
+                            <div class="absolute inset-0 bg-gradient-to-b from-primary/20 to-primary/5 dark:from-primary/30 dark:to-primary/10 rounded-full flex items-center justify-center">
+                                <p class="font-bold text-primary text-lg">Risk Exposures</p>
+                            </div>
+                            
+                            <!-- Physical asset exposures -->
+                            <div class="absolute top-4 left-1/2 transform -translate-x-1/2 exposure-item cursor-pointer" data-exposure="physical">
+                                <div class="bg-blue-100 dark:bg-blue-900 rounded-full p-3 flex items-center justify-center">
+                                    <i class="fas fa-building text-blue-500 dark:text-blue-300"></i>
+                                </div>
+                                <p class="text-center text-xs mt-1">Physical asset</p>
+                            </div>
+                            
+                            <!-- Financial asset exposures -->
+                            <div class="absolute top-1/2 right-4 transform -translate-y-1/2 exposure-item cursor-pointer" data-exposure="financial">
+                                <div class="bg-green-100 dark:bg-green-900 rounded-full p-3 flex items-center justify-center">
+                                    <i class="fas fa-dollar-sign text-green-500 dark:text-green-300"></i>
+                                </div>
+                                <p class="text-center text-xs mt-1">Financial asset</p>
+                            </div>
+                            
+                            <!-- Liability asset exposures -->
+                            <div class="absolute bottom-4 right-1/3 transform translate-x-1/2 exposure-item cursor-pointer" data-exposure="liability">
+                                <div class="bg-red-100 dark:bg-red-900 rounded-full p-3 flex items-center justify-center">
+                                    <i class="fas fa-gavel text-red-500 dark:text-red-300"></i>
+                                </div>
+                                <p class="text-center text-xs mt-1">Liability asset</p>
+                            </div>
+                            
+                            <!-- Human asset exposures -->
+                            <div class="absolute bottom-4 left-1/3 transform -translate-x-1/2 exposure-item cursor-pointer" data-exposure="human">
+                                <div class="bg-purple-100 dark:bg-purple-900 rounded-full p-3 flex items-center justify-center">
+                                    <i class="fas fa-user text-purple-500 dark:text-purple-300"></i>
+                                </div>
+                                <p class="text-center text-xs mt-1">Human asset</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="exposure-details" class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-3" id="exposure-title">Click on any exposure category to learn more</h3>
+                        <p id="exposure-description" class="mb-4">Explore the different categories of risk exposure by clicking on the icons above.</p>
+                        <div id="exposure-example" class="text-sm italic"></div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Detailed Risk Exposures</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg">
+                            <div class="flex items-center mb-3">
+                                <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900 mr-3">
+                                    <i class="fas fa-building text-blue-500 dark:text-blue-300"></i>
+                                </div>
+                                <h4 class="font-semibold">1. Physical Asset Exposures</h4>
+                            </div>
+                            <p>Ownership of property such as houses or cars gives rise to possible gains/losses to physical assets.</p>
+                            <p class="mt-2 italic text-sm">Example: Property may be damaged, destroyed, lost, or diminished in value.</p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg">
+                            <div class="flex items-center mb-3">
+                                <div class="p-3 rounded-full bg-green-100 dark:bg-green-900 mr-3">
+                                    <i class="fas fa-dollar-sign text-green-500 dark:text-green-300"></i>
+                                </div>
+                                <h4 class="font-semibold">2. Financial Asset Exposures</h4>
+                            </div>
+                            <p>Ownership of securities such as common stocks, bonds, and mortgages creates the possibility of financial asset gains/losses.</p>
+                            <p class="mt-2 italic text-sm">Example: Share price drops due to unfavorable market conditions.</p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg">
+                            <div class="flex items-center mb-3">
+                                <div class="p-3 rounded-full bg-red-100 dark:bg-red-900 mr-3">
+                                    <i class="fas fa-gavel text-red-500 dark:text-red-300"></i>
+                                </div>
+                                <h4 class="font-semibold">3. Liability Exposures</h4>
+                            </div>
+                            <p>Obligations imposed by the legal system create liability risk.</p>
+                            <p class="mt-2 italic text-sm">Example: A company selling skincare products with negative side effects will receive a summons.</p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg">
+                            <div class="flex items-center mb-3">
+                                <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900 mr-3">
+                                    <i class="fas fa-user text-purple-500 dark:text-purple-300"></i>
+                                </div>
+                                <h4 class="font-semibold">4. Human Asset Exposures</h4>
+                            </div>
+                            <p>An organization's human resources may create human asset risk.</p>
+                            <p class="mt-2 italic text-sm">Examples: Possible injury or death of managers, employees, or significant shareholders.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between">
+                    <a href="#sources" class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 px-4 py-2 rounded-md flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i> Previous
+                    </a>
+                    <a href="#techniques" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md flex items-center">
+                        Next: Risk Identification Techniques <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Risk Identification Techniques Section -->
+            <section id="techniques" class="mb-12 pt-8">
+                <h2 class="text-2xl font-bold text-primary mb-6">2.2.4 Risk Identification Techniques</h2>
+                
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <p class="mb-6">Risk identification was originally the observation of losses that had already occurred. Today, various techniques are available:</p>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                        <button class="technique-tab flex flex-col items-center p-3 rounded-lg bg-white dark:bg-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors border-2 border-transparent focus:border-primary focus:outline-none active" data-technique="physical">
+                            <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-2">
+                                <i class="fas fa-search text-blue-500 dark:text-blue-300"></i>
+                            </div>
+                            <p class="text-center text-xs">Physical inspection</p>
+                        </button>
+                        
+                        <button class="technique-tab flex flex-col items-center p-3 rounded-lg bg-white dark:bg-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors border-2 border-transparent focus:border-primary focus:outline-none" data-technique="checklist">
+                            <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mb-2">
+                                <i class="fas fa-tasks text-green-500 dark:text-green-300"></i>
+                            </div>
+                            <p class="text-center text-xs">Checklist</p>
+                        </button>
+                        
+                        <button class="technique-tab flex flex-col items-center p-3 rounded-lg bg-white dark:bg-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors border-2 border-transparent focus:border-primary focus:outline-none" data-technique="flowchart">
+                            <div class="w-12 h-12 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center mb-2">
+                                <i class="fas fa-project-diagram text-yellow-500 dark:text-yellow-300"></i>
+                            </div>
+                            <p class="text-center text-xs">Flow charts</p>
+                        </button>
+                        
+                        <button class="technique-tab flex flex-col items-center p-3 rounded-lg bg-white dark:bg-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors border-2 border-transparent focus:border-primary focus:outline-none" data-technique="fault">
+                            <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center mb-2">
+                                <i class="fas fa-sitemap text-red-500 dark:text-red-300"></i>
+                            </div>
+                            <p class="text-center text-xs">Fault tree</p>
+                        </button>
+                        
+                        <button class="technique-tab flex flex-col items-center p-3 rounded-lg bg-white dark:bg-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors border-2 border-transparent focus:border-primary focus:outline-none" data-technique="hazop">
+                            <div class="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center mb-2">
+                                <i class="fas fa-cogs text-purple-500 dark:text-purple-300"></i>
+                            </div>
+                            <p class="text-center text-xs">HAZOP</p>
+                        </button>
+                    </div>
+                    
+                    <div class="mt-6 bg-white dark:bg-gray-700 p-4 rounded-lg">
+                        <!-- Physical inspection content -->
+                        <div id="physical-content" class="technique-content active">
+                            <h3 class="font-semibold text-lg mb-3">1. Physical Inspection</h3>
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <p class="mb-4">Direct observation of the thing/life insured. This is the most commonly used method.</p>
+                                    <div class="mt-4 space-y-3">
+                                        <div class="flex items-start">
+                                            <i class="fas fa-plus-circle text-green-500 dark:text-green-300 mt-1 mr-2"></i>
+                                            <div>
+                                                <p class="font-semibold">Advantages:</p>
+                                                <p>Establishes good contacts, no need to rely on others' reports</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-start">
+                                            <i class="fas fa-minus-circle text-red-500 dark:text-red-300 mt-1 mr-2"></i>
+                                            <div>
+                                                <p class="font-semibold">Disadvantages:</p>
+                                                <p>Time-consuming & requires preparatory work (visits and focused inspection)</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="mt-4">Updates from previous inspections are crucial for effectiveness.</p>
+                                </div>
+                                <div class="flex items-center justify-center">
+                                    <img src="https://i.imgur.com/PCQC0jF.png" alt="Physical Inspection" class="max-h-48 rounded-lg">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Checklist content -->
+                        <div id="checklist-content" class="technique-content hidden">
+                            <h3 class="font-semibold text-lg mb-3">2. Checklists</h3>
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <p class="mb-4">A form containing a list of items for different areas and aspects of risk (e.g., security checklist, fire checklist, liability checklist).</p>
+                                    <div class="mt-4 space-y-3">
+                                        <div class="flex items-start">
+                                            <i class="fas fa-plus-circle text-green-500 dark:text-green-300 mt-1 mr-2"></i>
+                                            <div>
+                                                <p class="font-semibold">Advantages:</p>
+                                                <p>Functions as an early warning system & is less expensive</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-start">
+                                            <i class="fas fa-minus-circle text-red-500 dark:text-red-300 mt-1 mr-2"></i>
+                                            <div>
+                                                <p class="font-semibold">Disadvantages:</p>
+                                                <p>Tendency to hide deficiencies & inaccuracies during completion</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 bg-gray-50 dark:bg-gray-800 p-3 rounded">
+                                        <p class="font-semibold mb-2">Types of checklists:</p>
+                                        <ul class="list-disc ml-5 space-y-1">
+                                            <li>Risk analysis questionnaires</li>
+                                            <li>Exposure checklists</li>
+                                            <li>Insurance policy checklists</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-center">
+                                    <img src="https://i.imgur.com/3rQU8Za.png" alt="Checklist" class="max-h-48 rounded-lg">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Flow charts content -->
+                        <div id="flowchart-content" class="technique-content hidden">
+                            <h3 class="font-semibold text-lg mb-3">3. Flow Charts</h3>
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <p class="mb-4">Refers to the organizational structure of the group, production, service, accounting, marketing & distribution flows.</p>
+                                    <div class="mt-4 space-y-3">
+                                        <div class="flex items-start">
+                                            <i class="fas fa-plus-circle text-green-500 dark:text-green-300 mt-1 mr-2"></i>
+                                            <div>
+                                                <p class="font-semibold">Advantages:</p>
+                                                <p>Detailed analysis, manageable units & easy to understand</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-start">
+                                            <i class="fas fa-minus-circle text-red-500 dark:text-red-300 mt-1 mr-2"></i>
+                                            <div>
+                                                <p class="font-semibold">Disadvantages:</p>
+                                                <p>Time-consuming & over-simplification</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="mt-4">Example: Production flow shows where raw materials come from, how they're processed, various production stages, parts and product flows, destinations, etc.</p>
+                                </div>
+                                <div class="flex items-center justify-center">
+                                    <img src="https://i.imgur.com/tJ9gFtx.png" alt="Flow Chart" class="max-h-48 rounded-lg">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Fault tree content -->
+                        <div id="fault-content" class="technique-content hidden">
+                            <h3 class="font-semibold text-lg mb-3">4. Fault Tree Analysis (FTA)</h3>
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <p class="mb-4">A structured approach to risk identification developed from logical thought. Shows the main risk event at the top with branches showing alternative causes. The chance of occurrence is calculated using simple probability formulas.</p>
+                                    <div class="mt-4 space-y-3">
+                                        <div class="flex items-start">
+                                            <i class="fas fa-plus-circle text-green-500 dark:text-green-300 mt-1 mr-2"></i>
+                                            <div>
+                                                <p class="font-semibold">Advantages:</p>
+                                                <p>Simpler component parts, logical structure & allows calculation of probabilities</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-start">
+                                            <i class="fas fa-minus-circle text-red-500 dark:text-red-300 mt-1 mr-2"></i>
+                                            <div>
+                                                <p class="font-semibold">Disadvantages:</p>
+                                                <p>Requires skill & accuracy of probabilities is questionable</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-center">
+                                    <img src="https://i.imgur.com/GDJnS1y.png" alt="Fault Tree" class="max-h-48 rounded-lg">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- HAZOP content -->
+                        <div id="hazop-content" class="technique-content hidden">
+                            <h3 class="font-semibold text-lg mb-3">5. Hazard and Operability Studies (HAZOP)</h3>
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <p class="mb-4">A simple, structured methodology for identifying hazards. An investigation technique designed to inspire imaginative thinking by a team of experts to identify hazards & operational problems while systematically examining a process or system.</p>
+                                    <p class="mb-3">Extensively used in the chemical industry.</p>
+                                    <div class="mt-4 space-y-3">
+                                        <div class="flex items-start">
+                                            <i class="fas fa-plus-circle text-green-500 dark:text-green-300 mt-1 mr-2"></i>
+                                            <div>
+                                                <p class="font-semibold">Advantages:</p>
+                                                <p>Comprehensive, teamwork creates a wide range of abilities</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-start">
+                                            <i class="fas fa-minus-circle text-red-500 dark:text-red-300 mt-1 mr-2"></i>
+                                            <div>
+                                                <p class="font-semibold">Disadvantages:</p>
+                                                <p>Time-consuming & very expensive</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-center">
+                                    <img src="https://i.imgur.com/mOqmK2c.png" alt="HAZOP" class="max-h-48 rounded-lg">
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 bg-gray-50 dark:bg-gray-800 p-3 rounded">
+                                <h4 class="font-semibold mb-2">Four Main Questions in HAZOP Studies:</h4>
+                                <ol class="list-decimal ml-5 space-y-2">
+                                    <li>
+                                        <p class="font-semibold">The intention of the part examined</p>
+                                        <p class="text-sm">A particular section is selected and its intention is defined</p>
+                                        <p class="text-sm italic">Example: Pump to inject petrol</p>
+                                    </li>
+                                    <li>
+                                        <p class="font-semibold">The deviations from the declared intentions</p>
+                                        <p class="text-sm">Deviations from the intention should be listed</p>
+                                        <p class="text-sm italic">Example: No flow from the pump, more flow, less flow, etc.</p>
+                                    </li>
+                                    <li>
+                                        <p class="font-semibold">The causes of the deviation</p>
+                                        <p class="text-sm">List all possible causes for each deviation</p>
+                                        <p class="text-sm italic">Example: Tank empty, pump not working, etc.</p>
+                                    </li>
+                                    <li>
+                                        <p class="font-semibold">The consequences of the deviation</p>
+                                        <p class="text-sm">List various deviations and related consequences to implement possible solutions</p>
+                                        <p class="text-sm italic">Example: Consequences include no petrol gets to vehicles, petrol seeps out of pipes; actions include regular tank checking, pump maintenance, etc.</p>
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Common Features of Risk Identification</h3>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <ul class="space-y-2 ml-6 list-disc">
+                            <li>Must give top priority in the organization</li>
+                            <li>Multiple risk identification techniques are available</li>
+                            <li>Continuous effort is required</li>
+                            <li>Efficient record management is essential</li>
+                        </ul>
+                        <ul class="space-y-2 ml-6 list-disc">
+                            <li>Requires cooperation from various departments</li>
+                            <li>Consumes monetary cost</li>
+                            <li>Demands common sense and imagination plus detailed assessment</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="flex justify-between">
+                    <a href="#exposures" class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 px-4 py-2 rounded-md flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i> Previous
+                    </a>
+                    <a href="#quiz" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md flex items-center">
+                        Next: Knowledge Check <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Knowledge Check Section -->
+            <section id="quiz" class="mb-12 pt-8">
+                <h2 class="text-2xl font-bold text-primary mb-6">Knowledge Check</h2>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+                    <div id="quiz-container">
+                        <div class="quiz-question" data-question="1">
+                            <h3 class="text-xl font-semibold mb-4">Question 1: What are the two perspectives from which risk management objectives can be viewed?</h3>
+                            <div class="space-y-3">
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="true">
+                                    <span>Before loss and after loss</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Financial and non-financial</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Pure risk and speculative risk</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Risk control and risk financing</span>
+                                </div>
+                            </div>
+                            <div class="mt-4 hidden" id="feedback-1"></div>
+                        </div>
+                        
+                        <div class="quiz-question hidden" data-question="2">
+                            <h3 class="text-xl font-semibold mb-4">Question 2: Which of the following is NOT one of the steps in the risk management process?</h3>
+                            <div class="space-y-3">
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Identifying existing and potential risk</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Examining alternative risk management techniques</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="true">
+                                    <span>Calculating insurance premiums</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Evaluating, reviewing and controlling the program</span>
+                                </div>
+                            </div>
+                            <div class="mt-4 hidden" id="feedback-2"></div>
+                        </div>
+                        
+                        <div class="quiz-question hidden" data-question="3">
+                            <h3 class="text-xl font-semibold mb-4">Question 3: Which risk management technique involves dispersing a firm's assets in several locations?</h3>
+                            <div class="space-y-3">
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Risk avoidance</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Loss prevention</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="true">
+                                    <span>Separation</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Contractual transfer</span>
+                                </div>
+                            </div>
+                            <div class="mt-4 hidden" id="feedback-3"></div>
+                        </div>
+                        
+                        <div class="quiz-question hidden" data-question="4">
+                            <h3 class="text-xl font-semibold mb-4">Question 4: What type of risk behavior is characterized by people who see risk as an opportunity rather than a threat?</h3>
+                            <div class="space-y-3">
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Risk adverse</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="true">
+                                    <span>Risk seekers</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Risk indifferent</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Risk conscious</span>
+                                </div>
+                            </div>
+                            <div class="mt-4 hidden" id="feedback-4"></div>
+                        </div>
+                        
+                        <div class="quiz-question hidden" data-question="5">
+                            <h3 class="text-xl font-semibold mb-4">Question 5: Which of the following risk identification techniques is extensively used in the chemical industry?</h3>
+                            <div class="space-y-3">
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Physical inspection</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Checklist</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="false">
+                                    <span>Fault tree analysis</span>
+                                </div>
+                                <div class="quiz-option p-3 rounded-md border border-gray-300 dark:border-gray-600 cursor-pointer" data-correct="true">
+                                    <span>HAZOP (Hazard and Operability Studies)</span>
+                                </div>
+                            </div>
+                            <div class="mt-4 hidden" id="feedback-5"></div>
+                        </div>
+                        
+                        <div id="quiz-results" class="hidden">
+                            <h3 class="text-xl font-semibold mb-4">Quiz Results</h3>
+                            <p class="mb-3">You scored: <span id="quiz-score">0</span>/5</p>
+                            <div id="quiz-message" class="mb-4"></div>
+                            <button id="retry-quiz" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md">Try Again</button>
+                        </div>
+                        
+                        <div class="flex justify-center mt-6">
+                            <button id="next-question" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md hidden">Next Question</button>
+                            <button id="submit-quiz" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md hidden">Submit Quiz</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between">
+                    <a href="#techniques" class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 px-4 py-2 rounded-md flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i> Previous
+                    </a>
+                    <a href="#intro" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-md flex items-center">
+                        Back to Top <i class="fas fa-arrow-up ml-2"></i>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Check for dark mode preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        
+        // Listen for changes in color scheme preference
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+        
+        // Theme toggle
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+        });
+        
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', () => {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-translate-x-full');
+        });
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            const sidebar = document.getElementById('sidebar');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            
+            if (window.innerWidth < 768 && 
+                !sidebar.contains(e.target) && 
+                e.target !== mobileMenuButton && 
+                !mobileMenuButton.contains(e.target) && 
+                !sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.add('-translate-x-full');
+            }
+        });
+        
+        // Toggle submenu function
+        function toggleSubmenu(id) {
+            const submenu = document.getElementById(id);
+            submenu.classList.toggle('hidden');
+        }
+        
+        // Open tab function
+        function openTab(event, tabId) {
+            // Hide all tab content
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            
+            // Remove 'active' class from all tab buttons
+            const tabButtons = document.getElementsByClassName('tab-button');
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove('active');
+            }
+            
+            // Show the selected tab content and add 'active' class to the button
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+        
+        // Toggle accordion function
+        function toggleAccordion(element) {
+            const content = element.nextElementSibling;
+            const icon = element.querySelector('i');
+            
+            content.classList.toggle('active');
+            icon.style.transform = content.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0)';
+        }
+        
+        // Open process tab function
+        function openProcessTab(event, tabId) {
+            // Hide all tab content
+            const tabContents = document.getElementsByClassName('process-tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            
+            // Remove 'active' class from all tab buttons
+            const tabButtons = document.getElementsByClassName('process-tab-btn');
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove('active');
+            }
+            
+            // Show the selected tab content and add 'active' class to the button
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+        
+        // Calculate scroll progress
+        function updateScrollProgress() {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            
+            document.getElementById('progress-bar').style.width = scrolled + '%';
+            document.getElementById('progress-text').innerText = 'Progress: ' + Math.round(scrolled) + '%';
+            
+            // Add animation to progress bar
+            document.getElementById('progress-bar').classList.add('progress-animate');
+            setTimeout(() => {
+                document.getElementById('progress-bar').classList.remove('progress-animate');
+            }, 500);
+        }
+        
+        window.addEventListener('scroll', updateScrollProgress);
+        
+        // Source of risk interactive function
+        document.querySelectorAll('.source-of-risk').forEach(element => {
+            element.addEventListener('click', function() {
+                const source = this.getAttribute('data-source');
+                const titleElement = document.getElementById('source-title');
+                const descriptionElement = document.getElementById('source-description');
+                const exampleElement = document.getElementById('source-example');
+                
+                // Reset all icons to normal state
+                document.querySelectorAll('.source-of-risk').forEach(el => {
+                    el.classList.remove('ring-2', 'ring-primary', 'scale-110');
+                });
+                
+                // Highlight selected icon
+                this.classList.add('ring-2', 'ring-primary', 'scale-110');
+                
+                // Update content based on selected source
+                switch(source) {
+                    case 'physical':
+                        titleElement.textContent = 'Physical Environment';
+                        descriptionElement.textContent = 'Comprises all the different factors of nature that create risk. Natural disasters can give bad impact to the entire country.';
+                        exampleElement.textContent = 'Examples: Earthquakes, floods, volcanoes, etc.';
+                        break;
+                    case 'social':
+                        titleElement.textContent = 'Social Environment';
+                        descriptionElement.textContent = 'Human behavior, social structures, and institutions that create risk.';
+                        exampleElement.textContent = 'Examples: Drug addiction, sexual harassment, etc.';
+                        break;
+                    case 'political':
+                        titleElement.textContent = 'Political Environment';
+                        descriptionElement.textContent = 'National & international political factors can create risk.';
+                        exampleElement.textContent = 'Examples: Riots, demonstrations, etc.';
+                        break;
+                    case 'legal':
+                        titleElement.textContent = 'Legal Environment';
+                        descriptionElement.textContent = 'Uncertainty & risk arise from the legal system. These vary from country to country.';
+                        exampleElement.textContent = 'Examples: Bribery, bias, marijuana laws, liquor laws, etc.';
+                        break;
+                    case 'operational':
+                        titleElement.textContent = 'Operational Environment';
+                        descriptionElement.textContent = 'Processes & procedures of an organization can generate risk & uncertainty.';
+                        exampleElement.textContent = 'Examples: Defective products, injury during manufacturing process, hiring & firing, etc.';
+                        break;
+                    case 'economic':
+                        titleElement.textContent = 'Economic Environment';
+                        descriptionElement.textContent = 'The global marketplace expansion has created uncertainty. Includes economic systems, policies, trade cycles, resources, income levels, and wealth distribution.';
+                        exampleElement.textContent = 'Examples: Inflation, recession, etc.';
+                        break;
+                    case 'cognitive':
+                        titleElement.textContent = 'Cognitive (Perception) Environment';
+                        descriptionElement.textContent = 'Risk manager\'s ability/judgment to understand, see, measure, and assess is imperfect, thus creating risk.';
+                        exampleElement.textContent = 'Example: Risk manager may overstate/understate certain types of risk depending on personal perception.';
+                        break;
+                }
+            });
+        });
+        
+        // Risk exposure interactive function
+        document.querySelectorAll('.exposure-item').forEach(element => {
+            element.addEventListener('click', function() {
+                const exposure = this.getAttribute('data-exposure');
+                const titleElement = document.getElementById('exposure-title');
+                const descriptionElement = document.getElementById('exposure-description');
+                const exampleElement = document.getElementById('exposure-example');
+                
+                // Reset all icons to normal state
+                document.querySelectorAll('.exposure-item').forEach(el => {
+                    el.classList.remove('scale-110');
+                    el.querySelector('div').classList.remove('ring-2', 'ring-primary');
+                });
+                
+                // Highlight selected icon
+                this.classList.add('scale-110');
+                this.querySelector('div').classList.add('ring-2', 'ring-primary');
+                
+                // Update content based on selected exposure
+                switch(exposure) {
+                    case 'physical':
+                        titleElement.textContent = 'Physical Asset Exposures';
+                        descriptionElement.textContent = 'Ownership of property such as houses or cars gives rise to possible gains/losses to physical assets.';
+                        exampleElement.textContent = 'Example: Property may be damaged, destroyed, lost, or diminished in value.';
+                        break;
+                    case 'financial':
+                        titleElement.textContent = 'Financial Asset Exposures';
+                        descriptionElement.textContent = 'Ownership of securities such as common stocks, bonds, and mortgages creates the possibility of financial asset gains/losses.';
+                        exampleElement.textContent = 'Example: Share price drops due to unfavorable market conditions.';
+                        break;
+                    case 'liability':
+                        titleElement.textContent = 'Liability Exposures';
+                        descriptionElement.textContent = 'Obligations imposed by the legal system create liability risk.';
+                        exampleElement.textContent = 'Example: A company selling skincare products with negative side effects will receive a summons.';
+                        break;
+                    case 'human':
+                        titleElement.textContent = 'Human Asset Exposures';
+                        descriptionElement.textContent = 'An organization\'s human resources may create human asset risk.';
+                        exampleElement.textContent = 'Examples: Possible injury or death of managers, employees, or significant shareholders.';
+                        break;
+                }
+            });
+        });
+        
+        // Risk identification techniques tabs
+        document.querySelectorAll('.technique-tab').forEach(button => {
+            button.addEventListener('click', function() {
+                const technique = this.getAttribute('data-technique');
+                
+                // Hide all content
+                document.querySelectorAll('.technique-content').forEach(content => {
+                    content.classList.remove('active');
+                    content.classList.add('hidden');
+                });
+                
+                // Remove active class from all buttons
+                document.querySelectorAll('.technique-tab').forEach(btn => {
+                    btn.classList.remove('bg-primary/10', 'dark:bg-primary/20', 'border-primary');
+                });
+                
+                // Show selected content
+                document.getElementById(`${technique}-content`).classList.remove('hidden');
+                document.getElementById(`${technique}-content`).classList.add('active');
+                
+                // Activate selected button
+                this.classList.add('bg-primary/10', 'dark:bg-primary/20', 'border-primary');
+            });
+        });
+        
+        // Quiz functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizOptions = document.querySelectorAll('.quiz-option');
+            const nextButton = document.getElementById('next-question');
+            const submitButton = document.getElementById('submit-quiz');
+            const retryButton = document.getElementById('retry-quiz');
+            let currentQuestion = 1;
+            let score = 0;
+            let answered = false;
+            
+            // Show first question's next button
+            nextButton.classList.remove('hidden');
+            
+            // Add click event to all quiz options
+            quizOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    if (answered) return;
+                    
+                    // Mark as answered
+                    answered = true;
+                    
+                    // Check if answer is correct
+                    const isCorrect = this.getAttribute('data-correct') === 'true';
+                    const questionNumber = this.closest('.quiz-question').getAttribute('data-question');
+                    
+                    // Update score
+                    if (isCorrect) {
+                        score++;
+                        this.classList.add('correct');
+                        document.getElementById(`feedback-${questionNumber}`).innerHTML = '<div class="bg-green-100 dark:bg-green-900 p-3 rounded-md">Correct! Well done.</div>';
+                    } else {
+                        this.classList.add('incorrect');
+                        
+                        // Find the correct answer and highlight it
+                        const correctOption = Array.from(this.closest('.quiz-question').querySelectorAll('.quiz-option'))
+                            .find(opt => opt.getAttribute('data-correct') === 'true');
+                        correctOption.classList.add('correct');
+                        
+                        document.getElementById(`feedback-${questionNumber}`).innerHTML = '<div class="bg-red-100 dark:bg-red-900 p-3 rounded-md">Incorrect! The highlighted answer is correct.</div>';
+                    }
+                    
+                    // Show feedback
+                    document.getElementById(`feedback-${questionNumber}`).classList.remove('hidden');
+                    
+                    // Disable all options for this question
+                    const allOptions = this.closest('.quiz-question').querySelectorAll('.quiz-option');
+                    allOptions.forEach(opt => {
+                        opt.style.pointerEvents = 'none';
+                    });
+                    
+                    // Show appropriate button
+                    if (currentQuestion < 5) {
+                        nextButton.classList.remove('hidden');
+                    } else {
+                        submitButton.classList.remove('hidden');
+                    }
+                });
+            });
+            
+            // Next question button
+            nextButton.addEventListener('click', function() {
+                // Hide current question
+                document.querySelector(`.quiz-question[data-question="${currentQuestion}"]`).classList.add('hidden');
+                
+                // Show next question
+                currentQuestion++;
+                document.querySelector(`.quiz-question[data-question="${currentQuestion}"]`).classList.remove('hidden');
+                
+                // Reset answered state
+                answered = false;
+                
+                // Hide next button until answer is selected
+                nextButton.classList.add('hidden');
+                
+                // If last question, show submit button instead of next
+                if (currentQuestion === 5) {
+                    nextButton.classList.add('hidden');
+                }
+            });
+            
+            // Submit quiz button
+            submitButton.addEventListener('click', function() {
+                // Hide the last question
+                document.querySelector(`.quiz-question[data-question="${currentQuestion}"]`).classList.add('hidden');
+                
+                // Hide submit button
+                submitButton.classList.add('hidden');
+                
+                // Show results
+                document.getElementById('quiz-results').classList.remove('hidden');
+                document.getElementById('quiz-score').textContent = score;
+                
+                // Display message based on score
+                const message = document.getElementById('quiz-message');
+                if (score === 5) {
+                    message.innerHTML = 'Perfect score! You have an excellent understanding of risk management concepts.';
+                } else if (score >= 3) {
+                    message.innerHTML = 'Good job! You have a good grasp of risk management principles.';
+                } else {
+                    message.innerHTML = 'Consider reviewing the material again to strengthen your understanding of risk management.';
+                }
+            });
+            
+            // Retry quiz button
+            retryButton.addEventListener('click', function() {
+                // Reset all quiz state
+                score = 0;
+                currentQuestion = 1;
+                answered = false;
+                
+                // Hide results
+                document.getElementById('quiz-results').classList.add('hidden');
+                
+                // Show first question
+                document.querySelectorAll('.quiz-question').forEach(q => q.classList.add('hidden'));
+                document.querySelector('.quiz-question[data-question="1"]').classList.remove('hidden');
+                
+                // Reset options
+                quizOptions.forEach(option => {
+                    option.classList.remove('correct', 'incorrect');
+                    option.style.pointerEvents = 'auto';
+                });
+                
+                // Hide feedback
+                for (let i = 1; i <= 5; i++) {
+                    const feedback = document.getElementById(`feedback-${i}`);
+                    if (feedback) {
+                        feedback.classList.add('hidden');
+                        feedback.innerHTML = '';
+                    }
+                }
+                
+                // Show next button for first question
+                nextButton.classList.remove('hidden');
+                submitButton.classList.add('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
