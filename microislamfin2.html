@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Microlearning: Shari’ah Contracts</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Marked.js for Markdown parsing -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Microlearning: Shari’ah Contracts</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Marked.js for Markdown parsing -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
     :root {
       --primary-color: #5D5CDE;
       --primary-dark: #4A49B8;
@@ -99,12 +99,11 @@
     .dark .lesson-content code, .dark .lesson-content pre {
       background-color: rgba(255,255,255,0.1);
     }
-  </style>
+</style>
 </head>
 <body class="font-sans antialiased">
-  <div id="app" class="course-app min-h-screen"></div>
-
-  <script>
+<div class="course-app min-h-screen" id="app"></div>
+<script>
     document.addEventListener('DOMContentLoaded', () => {
       const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
       initApp(prefersDarkMode);
@@ -136,7 +135,7 @@
 **Overview:**
 During the Prophet’s time, examples from his life served as guidance in formulating contracts. Islamic contracts emphasize transparency, mutual consent, and avoiding prohibited elements such as riba and gharar.
 
-![Contract Illustration](https://api.storyset.com/v1/illustration/contract/outline?color=5D5CDE)
+![Contract Illustration](https://i.imgur.com/h1E4aoW.png)
 
 Explore the essential elements and conditions needed for a valid Shari’ah contract.
               `
@@ -179,7 +178,7 @@ Explore the essential elements and conditions needed for a valid Shari’ah cont
 - **Participating Contracts:** Include profit sharing (e.g., Musharakah, Mudharabah).
 - **Supporting Contracts:** Include security and custody contracts (e.g., Rahn, Kafalah).
 
-![Classification Illustration](https://api.storyset.com/v1/illustration/classification/outline?color=5D5CDE)
+![Classification Illustration](https://i.imgur.com/egTC7lQ.png)
               `
             }
           ],
@@ -221,7 +220,7 @@ Explore the essential elements and conditions needed for a valid Shari’ah cont
 **Process Flow:**
 Diagrams illustrate the steps for both contracts.
 
-![Exchange Contract Illustration](https://api.storyset.com/v1/illustration/exchange/outline?color=5D5CDE)
+![Exchange Contract Illustration](https://i.imgur.com/Gdxmjud.png)
               `
             }
           ],
@@ -259,7 +258,7 @@ Diagrams illustrate the steps for both contracts.
 **Example Process:**
 For Mudharabah, one party supplies the funds while the other manages the venture. Profits are shared as pre-agreed.
 
-![Partnership Illustration](https://api.storyset.com/v1/illustration/partnership/outline?color=5D5CDE)
+![Partnership Illustration](https://i.imgur.com/VsAVkRV.png)
               `
             }
           ],
@@ -295,7 +294,7 @@ For Mudharabah, one party supplies the funds while the other manages the venture
 - **Wadiah (Safekeeping):** Deposits held safely by banks.
 - **Wakalah (Agency):** Agent carries out tasks on behalf of a principal.
 
-![Agency Illustration](https://api.storyset.com/v1/illustration/agency/outline?color=5D5CDE)
+![Agency Illustration](https://i.imgur.com/JjTsxzH.png)
 
 These contracts are vital for ensuring trust and efficiency in Islamic financial operations.
               `
@@ -333,7 +332,7 @@ These contracts are vital for ensuring trust and efficiency in Islamic financial
 - **Rahn (Pledge):** Assets are pledged as security for loans.
 - **Additional Supporting Contracts:** Such as Ibraa’ and Wa’d.
 
-![Security Illustration](https://api.storyset.com/v1/illustration/security/outline?color=5D5CDE)
+![Security Illustration](https://i.imgur.com/3Zp9Md9.png)
               `
             }
           ],
@@ -500,13 +499,13 @@ These contracts are vital for ensuring trust and efficiency in Islamic financial
           ${lesson.videoId ? `
             <div class="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
               <iframe 
-                class="w-full h-full"
-                src="https://www.youtube.com/embed/${lesson.videoId}" 
-                title="${lesson.title}"
-                frameborder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowfullscreen>
-              </iframe>
+                  class="w-full h-full"
+                  src="https://www.youtube.com/embed/${lesson.videoId}" 
+                  title="${lesson.title}"
+                  frameborder="0" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                  allowfullscreen>
+                </iframe>
             </div>
           ` : ''}
           <!-- Lesson Content -->
@@ -521,76 +520,6 @@ These contracts are vital for ensuring trust and efficiency in Islamic financial
             <button id="next-lesson" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors">
               Next Lesson
             </button>
-          </div>
-        </div>
-      `;
-    }
-
-    // Render quiz content
-    function renderQuizContent(module, userProgress) {
-      const quiz = module.quiz;
-      const quizScore = userProgress.quizScores[module.id];
-      const hasCompletedQuiz = quizScore !== undefined;
-      
-      if (hasCompletedQuiz) {
-        return `
-          <div class="space-y-6">
-            <div>
-              <h2 class="text-2xl font-bold">${quiz.title}</h2>
-              <p class="text-gray-600 dark:text-gray-400">${module.title}</p>
-            </div>
-            <div class="bg-indigo-50 dark:bg-indigo-900/30 p-6 rounded-lg">
-              <div class="text-center">
-                <div class="text-4xl font-bold text-indigo-600 dark:text-indigo-400">${quizScore}%</div>
-                <p class="text-lg mt-2 mb-4">
-                  ${quizScore >= 70 ? 'Congratulations! You passed the quiz.' : 'You need to score at least 70% to pass.'}
-                </p>
-                <button id="retake-quiz" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors">
-                  Retake Quiz
-                </button>
-              </div>
-            </div>
-            <div class="flex justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
-              <button id="prev-lesson" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-md transition-colors">
-                Back to Lessons
-              </button>
-              <button id="next-module" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors">
-                Next Module
-              </button>
-            </div>
-          </div>
-        `;
-      }
-      return `
-        <div class="space-y-6">
-          <div>
-            <h2 class="text-2xl font-bold">${quiz.title}</h2>
-            <p class="text-gray-600 dark:text-gray-400">${module.title}</p>
-          </div>
-          <div class="bg-indigo-50 dark:bg-indigo-900/30 p-6 rounded-lg">
-            <p class="mb-4">Complete this quiz to test your understanding of ${module.title}. You need to score at least 70% to pass.</p>
-            <form id="quiz-form" class="space-y-6">
-              ${quiz.questions.map((q, qIndex) => `
-                <div class="quiz-question p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                  <h3 class="font-medium text-lg mb-3">Question ${qIndex + 1}: ${q.question}</h3>
-                  <div class="space-y-2">
-                    ${q.options.map((option, oIndex) => `
-                      <div class="quiz-option flex items-center p-3 rounded-md cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700" data-question="${qIndex}" data-option="${oIndex}">
-                        <div class="h-5 w-5 rounded-full border-2 border-indigo-500 dark:border-indigo-400 mr-3 flex-shrink-0 flex items-center justify-center">
-                          <div class="selected-indicator h-3 w-3 rounded-full bg-indigo-500 dark:bg-indigo-400 hidden"></div>
-                        </div>
-                        <div>${option}</div>
-                      </div>
-                    `).join('')}
-                  </div>
-                </div>
-              `).join('')}
-              <div class="text-center">
-                <button type="submit" id="submit-quiz" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-medium rounded-md transition-colors">
-                  Submit Quiz
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       `;
@@ -671,90 +600,6 @@ These contracts are vital for ensuring trust and efficiency in Islamic financial
       }
     }
 
-    // Setup quiz-specific event listeners
-    function setupQuizEventListeners(appElement, module, userProgress, courseData) {
-      const contentArea = appElement.querySelector('#content-area');
-      const quizForm = appElement.querySelector('#quiz-form');
-      const retakeQuizBtn = appElement.querySelector('#retake-quiz');
-      const nextModuleBtn = appElement.querySelector('#next-module');
-      const prevLessonBtn = appElement.querySelector('#prev-lesson');
-
-      const quizOptions = appElement.querySelectorAll('.quiz-option');
-      quizOptions.forEach(option => {
-        option.addEventListener('click', () => {
-          const questionIndex = parseInt(option.dataset.question);
-          appElement.querySelectorAll(`.quiz-option[data-question="${questionIndex}"]`).forEach(opt => {
-            opt.classList.remove('bg-indigo-100', 'dark:bg-indigo-900/50');
-            opt.querySelector('.selected-indicator').classList.add('hidden');
-          });
-          option.classList.add('bg-indigo-100', 'dark:bg-indigo-900/50');
-          option.querySelector('.selected-indicator').classList.remove('hidden');
-        });
-      });
-
-      if (quizForm) {
-        quizForm.addEventListener('submit', (e) => {
-          e.preventDefault();
-          const selectedAnswers = [];
-          for (let i = 0; i < module.quiz.questions.length; i++) {
-            const selectedOption = appElement.querySelector(`.quiz-option[data-question="${i}"].bg-indigo-100`);
-            selectedAnswers[i] = selectedOption ? parseInt(selectedOption.dataset.option) : null;
-          }
-          if (selectedAnswers.includes(null)) {
-            alert('Please answer all questions before submitting.');
-            return;
-          }
-          let correctCount = 0;
-          for (let i = 0; i < module.quiz.questions.length; i++) {
-            if (selectedAnswers[i] === module.quiz.questions[i].correctAnswer) {
-              correctCount++;
-            }
-          }
-          const score = Math.round((correctCount / module.quiz.questions.length) * 100);
-          userProgress.quizScores[module.id] = score;
-          saveUserProgress(userProgress);
-          contentArea.style.opacity = '0';
-          setTimeout(() => {
-            contentArea.innerHTML = renderQuizContent(module, userProgress);
-            setupQuizEventListeners(appElement, module, userProgress, courseData);
-            contentArea.style.opacity = '1';
-          }, 300);
-        });
-      }
-
-      if (retakeQuizBtn) {
-        retakeQuizBtn.addEventListener('click', () => {
-          delete userProgress.quizScores[module.id];
-          saveUserProgress(userProgress);
-          contentArea.style.opacity = '0';
-          setTimeout(() => {
-            contentArea.innerHTML = renderQuizContent(module, userProgress);
-            setupQuizEventListeners(appElement, module, userProgress, courseData);
-            contentArea.style.opacity = '1';
-          }, 300);
-        });
-      }
-      if (nextModuleBtn) {
-        nextModuleBtn.addEventListener('click', () => {
-          const currentModuleIndex = courseData.modules.findIndex(m => m.id === module.id);
-          if (currentModuleIndex < courseData.modules.length - 1) {
-            const nextModule = courseData.modules[currentModuleIndex + 1];
-            userProgress.currentModule = nextModule.id;
-            if (nextModule.lessons.length > 0) {
-              userProgress.currentLesson = nextModule.lessons[0].id;
-            }
-            saveUserProgress(userProgress);
-            renderApp(appElement, courseData, userProgress);
-          }
-        });
-      }
-      if (prevLessonBtn) {
-        prevLessonBtn.addEventListener('click', () => {
-          renderApp(appElement, courseData, userProgress);
-        });
-      }
-    }
-
     // Navigate between lessons
     function navigateLesson(appElement, courseData, userProgress, direction) {
       const currentModule = courseData.modules.find(m => m.id === userProgress.currentModule);
@@ -803,6 +648,6 @@ These contracts are vital for ensuring trust and efficiency in Islamic financial
         console.log('Unable to save progress');
       }
     }
-  </script>
+</script>
 </body>
 </html>
