@@ -1,0 +1,2091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Analysis - Chapter 1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        secondary: '#6C63FF',
+                        darkBg: '#181818',
+                        lightBg: '#FFFFFF',
+                        darkText: '#333333',
+                        lightText: '#F3F4F6'
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 3s linear infinite',
+                    }
+                }
+            }
+        }
+
+        // Check for dark mode preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+        
+        .section-content {
+            display: none;
+        }
+        
+        .section-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity:.5 1; transform: translateY(0); }
+        }
+        
+        .card {
+            transform: translateY(0);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(93, 92, 222, 0.1), 0 10px 10px -5px rgba(93, 92, 222, 0.04);
+        }
+
+        .dark .quiz-option {
+            background-color: #2D2D2D;
+            border-color: #3D3D3D;
+        }
+        
+        .dark .quiz-option:hover {
+            background-color: #3D3D3D;
+        }
+        
+        .quiz-option.selected {
+            border-color: #5D5CDE;
+            background-color: rgba(93, 92, 222, 0.1);
+        }
+        
+        .dark .quiz-option.selected {
+            background-color: rgba(93, 92, 222, 0.2);
+        }
+        
+        .quiz-option.correct {
+            border-color: #10B981;
+            background-color: rgba(16, 185, 129, 0.1);
+        }
+        
+        .quiz-option.incorrect {
+            border-color: #EF4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-lightBg dark:bg-darkBg text-darkText dark:text-lightText transition-all duration-200">
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="sticky top-0 z-50 bg-white dark:bg-darkBg shadow-sm border-b border-gray-200 dark:border-gray-800">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <svg class="w-8 h-8 text-primary" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
+                    </svg>
+                    <h1 class="text-lg font-bold">Technical Analysis</h1>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <!-- Progress -->
+                    <div class="hidden md:flex items-center space-x-2">
+                        <span class="text-sm font-medium progress-text">0%</span>
+                        <div class="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                            <div class="progress-bar h-full bg-primary rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Dark Mode Toggle -->
+                    <button id="darkModeToggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
+                        <svg id="lightIcon" class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path>
+                        </svg>
+                        <svg id="darkIcon" class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Progress Bar -->
+            <div class="md:hidden w-full h-1 bg-gray-200 dark:bg-gray-700">
+                <div class="progress-bar h-full bg-primary" style="width: 0%"></div>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="flex-grow container mx-auto px-4 py-8">
+            <!-- Hero Section -->
+            <section class="mb-16">
+                <div class="bg-gradient-to-br from-primary/10 to-secondary/10 dark:from-primary/20 dark:to-secondary/20 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center">
+                    <div class="md:w-1/2 mb-6 md:mb-0 md:pr-8">
+                        <h1 class="text-3xl md:text-4xl font-bold mb-4">Introduction to Technical Analysis</h1>
+                        <p class="text-lg mb-6 text-gray-700 dark:text-gray-300">
+                            Begin your journey into the world of technical analysis and learn how to analyze market trends, patterns, and signals.
+                        </p>
+                        <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
+                            <button id="startLearningBtn" class="bg-primary hover:bg-primary/90 text-white font-medium py-2.5 px-5 rounded-lg transition-colors flex items-center justify-center">
+                                <span>Start Learning</span>
+                                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                </svg>
+                            </button>
+                            <button id="showObjectivesBtn" class="border border-primary text-primary hover:bg-primary/10 font-medium py-2.5 px-5 rounded-lg transition-colors">
+                                Learning Objectives
+                            </button>
+                        </div>
+                    </div>
+                    <div class="md:w-1/2 flex justify-center">
+                        <lottie-player src="https://assets2.lottiefiles.com/packages/lf20_l3qxn9jy.json" background="transparent" speed="1" style="width: 300px; height: 300px;" loop autoplay></lottie-player>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Learning Objectives Section -->
+            <section id="objectives" class="hidden mb-16 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6">
+                <h2 class="text-2xl font-bold mb-6 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"></path>
+                    </svg>
+                    Learning Objectives
+                </h2>
+                <p class="text-gray-600 dark:text-gray-400 mb-6">
+                    At the end of this chapter, you will be able to:
+                </p>
+                
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 mt-1">
+                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-base font-medium">Define technical analysis</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 mt-1">
+                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-base font-medium">Distinguish between Technical and Fundamental Analysis</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 mt-1">
+                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-base font-medium">Explain the basic assumptions based on investing theories</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 mt-1">
+                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-base font-medium">Illustrate the basics of the stock market and how it works</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Sections Navigation -->
+            <div class="mb-8 flex overflow-x-auto pb-2 scrollbar-hide space-x-4" id="sectionsNav">
+                <button class="section-btn active whitespace-nowrap px-4 py-2 bg-primary text-white rounded-lg font-medium" data-section="1">
+                    What is Technical Analysis?
+                </button>
+                <button class="section-btn whitespace-nowrap px-4 py-2 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg font-medium transition-colors" data-section="2">
+                    Stock Market Basics
+                </button>
+                <button class="section-btn whitespace-nowrap px-4 py-2 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg font-medium transition-colors" data-section="3">
+                    Dow Theory
+                </button>
+                <button class="section-btn whitespace-nowrap px-4 py-2 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg font-medium transition-colors" data-section="4">
+                    Types of Analysis
+                </button>
+                <button class="section-btn whitespace-nowrap px-4 py-2 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg font-medium transition-colors" data-section="5">
+                    Chart Types
+                </button>
+                <button class="section-btn whitespace-nowrap px-4 py-2 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg font-medium transition-colors" data-section="6">
+                    Misconceptions
+                </button>
+                <button class="section-btn whitespace-nowrap px-4 py-2 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg font-medium transition-colors" data-section="7">
+                    Pros & Cons
+                </button>
+            </div>
+            
+            <!-- Content Sections -->
+            <div id="contentSections">
+                <!-- Section 1: What is Technical Analysis -->
+                <section id="section1" class="section-content active bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 mb-8">
+                    <h2 class="text-2xl font-bold mb-6">What is Technical Analysis?</h2>
+                    
+                    <div class="flex flex-col md:flex-row mb-8">
+                        <div class="md:w-1/2 md:pr-6 mb-6 md:mb-0">
+                            <p class="mb-4 text-gray-700 dark:text-gray-300">
+                                Technical analysis is a powerful tool used by traders and investors to analyze and predict market movements. It involves studying historical price and volume data to identify patterns, trends, and potential future price movements.
+                            </p>
+                            <p class="mb-4 text-gray-700 dark:text-gray-300">
+                                Unlike fundamental analysis, which focuses on analyzing the financial health and intrinsic value of a company, technical analysis is primarily concerned with the study of price and volume data based on the belief that historical price patterns tend to repeat.
+                            </p>
+                            <p class="text-gray-700 dark:text-gray-300">
+                                At the core of technical analysis is the idea that markets are not completely random or chaotic. They provide visual representations of various aspects of market behavior such as momentum, trend strength, and overbought or oversold conditions.
+                            </p>
+                        </div>
+                        <div class="md:w-1/2 flex justify-center items-center">
+                            <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80" alt="Technical Analysis Chart" class="rounded-lg shadow-md max-h-80 object-cover">
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-8">
+                        <h3 class="font-semibold text-lg mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                            </svg>
+                            Key Components of Technical Analysis
+                        </h3>
+                        <ul class="space-y-2">
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-primary mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span><strong>Price Charts:</strong> Visual representation of historical price data over a specific period.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-primary mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span><strong>Technical Indicators:</strong> Mathematical calculations based on price and volume data that provide insights into market behavior.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-primary mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span><strong>Chart Patterns:</strong> Recognizable formations on price charts that can indicate potential market movements.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-primary mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span><strong>Support and Resistance:</strong> Price levels where a stock or other asset tends to find buying support or selling resistance.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Video Section -->
+                    <div class="mb-8">
+                        <h3 class="font-semibold text-lg mb-3">Video: Introduction to Technical Analysis</h3>
+                        <div class="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                            <div class="text-center p-6">
+                                <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                                </svg>
+                                <p class="text-gray-500 dark:text-gray-400 mb-2">Video placeholder</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    (YouTube embedding will appear here)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Check -->
+                    <div class="bg-primary/10 dark:bg-primary/20 rounded-lg p-4">
+                        <h3 class="font-semibold text-lg mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+                            </svg>
+                            Quick Check
+                        </h3>
+                        <p class="mb-3">What does technical analysis primarily focus on?</p>
+                        <div class="space-y-2">
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="true">
+                                Historical price and volume data
+                            </div>
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="false">
+                                Company financial statements
+                            </div>
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="false">
+                                Economic indicators
+                            </div>
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="false">
+                                Company management quality
+                            </div>
+                        </div>
+                        <div class="mt-4 hidden" id="quiz-result-1">
+                            <div class="correct-answer hidden text-green-600 dark:text-green-400 font-medium">
+                                Correct! Technical analysis primarily focuses on studying historical price and volume data.
+                            </div>
+                            <div class="incorrect-answer hidden text-red-600 dark:text-red-400 font-medium">
+                                Not quite. Technical analysis primarily focuses on studying historical price and volume data, not fundamental factors.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation -->
+                    <div class="mt-8 flex justify-between">
+                        <div></div>
+                        <button class="next-section-btn bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center">
+                            Next: Stock Market Basics
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Section 2: Stock Market Basics -->
+                <section id="section2" class="section-content bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 mb-8">
+                    <h2 class="text-2xl font-bold mb-6">Stock Market Basics</h2>
+                    
+                    <div class="mb-8">
+                        <h3 class="font-semibold text-lg mb-3">What is a Stock?</h3>
+                        <div class="flex flex-col md:flex-row mb-6">
+                            <div class="md:w-1/2 md:pr-6 mb-6 md:mb-0">
+                                <p class="mb-4 text-gray-700 dark:text-gray-300">
+                                    A stock represents ownership in a company. When you buy a share of a company like Apple, you become a part owner of that company. While your ownership stake might be very small compared to the company's total market capitalization, you still have a claim on a portion of the company's assets and earnings.
+                                </p>
+                                <p class="text-gray-700 dark:text-gray-300">
+                                    For example, Apple has a market capitalization of approximately $2.85 trillion. If you buy one share at around $174.61, you would own a very small percentage of the company, but you would still be a shareholder with certain rights.
+                                </p>
+                            </div>
+                            <div class="md:w-1/2 flex justify-center items-center">
+                                <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80" alt="Stock Market" class="rounded-lg shadow-md max-h-72 object-cover">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
+                            <h3 class="font-semibold text-lg mb-3 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path>
+                                </svg>
+                                Stock Exchanges
+                            </h3>
+                            <p class="mb-3 text-gray-700 dark:text-gray-300">
+                                Stocks are traded on various exchanges around the world. Some of the major stock exchanges include:
+                            </p>
+                            <ul class="space-y-2 text-gray-700 dark:text-gray-300">
+                                <li class="flex items-start">
+                                    <svg class="w-5 h-5 text-primary mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span>New York Stock Exchange (NYSE)</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="w-5 h-5 text-primary mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span>NASDAQ Stock Exchange</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="w-5 h-5 text-primary mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span>Bursa Malaysia (KLSE)</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="w-5 h-5 text-primary mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span>And many more worldwide</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
+                            <h3 class="font-semibold text-lg mb-3 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                                </svg>
+                                Stock Market Sectors
+                            </h3>
+                            <p class="mb-3 text-gray-700 dark:text-gray-300">
+                                The stock market is divided into different sectors, each representing a specific industry or area of the economy:
+                            </p>
+                            <div class="grid grid-cols-2 gap-2 text-gray-700 dark:text-gray-300">
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 text-primary mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span>Technology</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 text-primary mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span>Healthcare</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 text-primary mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span>Finance</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 text-primary mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span>Energy</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 text-primary mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span>Consumer Goods</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 text-primary mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span>Real Estate</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Video Section -->
+                    <div class="mb-8">
+                        <h3 class="font-semibold text-lg mb-3">Video: Understanding Stock Market Basics</h3>
+                        <div class="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                            <div class="text-center p-6">
+                                <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                                </svg>
+                                <p class="text-gray-500 dark:text-gray-400 mb-2">Video placeholder</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    (YouTube embedding will appear here)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bursa Malaysia Info Box -->
+                    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-8">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mt-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h4 class="font-medium text-blue-700 dark:text-blue-300">Bursa Malaysia Stats</h4>
+                                <div class="mt-2 text-sm text-blue-600 dark:text-blue-400">
+                                    <div class="flex justify-between mb-1">
+                                        <span>Market Capitalization:</span>
+                                        <span class="font-semibold">1,747 Billion</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Listed Companies:</span>
+                                        <span class="font-semibold">759</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Check -->
+                    <div class="bg-primary/10 dark:bg-primary/20 rounded-lg p-4">
+                        <h3 class="font-semibold text-lg mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+                            </svg>
+                            Quick Check
+                        </h3>
+                        <p class="mb-3">What does buying a share of a company represent?</p>
+                        <div class="space-y-2">
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="true">
+                                Ownership in the company
+                            </div>
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="false">
+                                A loan to the company
+                            </div>
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="false">
+                                A promise of employment
+                            </div>
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="false">
+                                A fixed income investment
+                            </div>
+                        </div>
+                        <div class="mt-4 hidden" id="quiz-result-2">
+                            <div class="correct-answer hidden text-green-600 dark:text-green-400 font-medium">
+                                Correct! When you buy a share of stock, you are buying partial ownership in a company.
+                            </div>
+                            <div class="incorrect-answer hidden text-red-600 dark:text-red-400 font-medium">
+                                Not quite. Buying a share of stock represents ownership in the company, making you a shareholder with certain rights.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation -->
+                    <div class="mt-8 flex justify-between">
+                        <button class="prev-section-btn bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 font-medium py-2 px-4 rounded-lg transition-colors flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                            Previous: What is Technical Analysis
+                        </button>
+                        <button class="next-section-btn bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center">
+                            Next: Dow Theory
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Section 3: Dow Theory -->
+                <section id="section3" class="section-content bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 mb-8">
+                    <h2 class="text-2xl font-bold mb-6">Dow Theory and Basic Assumptions</h2>
+                    
+                    <div class="flex flex-col md:flex-row mb-8">
+                        <div class="md:w-1/2 md:pr-6 mb-6 md:mb-0">
+                            <p class="mb-4 text-gray-700 dark:text-gray-300">
+                                The Dow Theory is one of the foundational theories of technical analysis, developed by Charles Dow in the late 19th century. Though it was created before modern technical analysis tools, many of its principles still form the core of technical analysis today.
+                            </p>
+                            <p class="text-gray-700 dark:text-gray-300">
+                                The theory provides a framework for analyzing market trends and making investment decisions based on price movements rather than fundamental factors. Let's explore the six basic assumptions of Dow Theory.
+                            </p>
+                        </div>
+                        <div class="md:w-1/2 flex justify-center items-center">
+                            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80" alt="Market Trends" class="rounded-lg shadow-md max-h-80 object-cover">
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
+                            <h3 class="font-semibold text-lg mb-3 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+                                </svg>
+                                Assumptions #1-3
+                            </h3>
+                            <ul class="space-y-4 text-gray-700 dark:text-gray-300">
+                                <li>
+                                    <div class="font-medium">#1: Markets move in three ways</div>
+                                    <p class="text-sm mt-1">Primary trends (major movements lasting months to years), secondary trends (corrections lasting weeks to months), and minor fluctuations (daily movements).</p>
+                                </li>
+                                <li>
+                                    <div class="font-medium">#2: Primary trends have three phases</div>
+                                    <p class="text-sm mt-1">Accumulation phase (informed buying), public participation phase (wider recognition), and distribution phase (informed selling to the public).</p>
+                                </li>
+                                <li>
+                                    <div class="font-medium">#3: Markets quickly price in news</div>
+                                    <p class="text-sm mt-1">Stock prices quickly reflect available information, adjusting to news and events rapidly.</p>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
+                            <h3 class="font-semibold text-lg mb-3 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+                                </svg>
+                                Assumptions #4-6
+                            </h3>
+                            <ul class="space-y-4 text-gray-700 dark:text-gray-300">
+                                <li>
+                                    <div class="font-medium">#4: Indices must confirm trends</div>
+                                    <p class="text-sm mt-1">A market trend is confirmed when related indices show similar movement. For example, the Dow Jones Industrial and Transport indices should move in the same direction to confirm a trend.</p>
+                                </li>
+                                <li>
+                                    <div class="font-medium">#5: Volume must confirm trends</div>
+                                    <p class="text-sm mt-1">Trading volume should increase in the direction of the primary trend. High volume in the direction of the trend confirms its strength.</p>
+                                </li>
+                                <li>
+                                    <div class="font-medium">#6: Trends persist until definitive reversal signals</div>
+                                    <p class="text-sm mt-1">A trend is assumed to continue until there are clear signals of a reversal. This is similar to Newton's first law of motion applied to markets.</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Interactive Chart -->
+                    <div class="mb-8 bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
+                        <h3 class="font-semibold text-lg mb-4 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            Interactive: Market Trend Phases
+                        </h3>
+                        <div class="relative h-48 border border-gray-300 dark:border-gray-700 rounded-lg overflow-hidden">
+                            <div class="absolute inset-0 flex items-center">
+                                <div class="w-full h-0.5 bg-gray-300 dark:bg-gray-700"></div>
+                            </div>
+                            <div class="relative h-full flex">
+                                <div class="flex-1 px-2 flex flex-col justify-center items-center transition-all hover:bg-primary/10" id="phase1">
+                                    <div class="text-green-600 dark:text-green-400 mb-1">Accumulation</div>
+                                    <div class="w-full h-24 relative">
+                                        <svg class="w-full h-full" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M0,50 Q20,48 40,40 T80,30 T100,20" fill="none" stroke="currentColor" stroke-width="2" class="text-green-500"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Smart money buying</div>
+                                </div>
+                                <div class="flex-1 px-2 flex flex-col justify-center items-center transition-all hover:bg-primary/10" id="phase2">
+                                    <div class="text-blue-600 dark:text-blue-400 mb-1">Public Participation</div>
+                                    <div class="w-full h-24 relative">
+                                        <svg class="w-full h-full" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M0,40 Q20,35 40,25 T80,15 T100,5" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-500"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Trend followers join</div>
+                                </div>
+                                <div class="flex-1 px-2 flex flex-col justify-center items-center transition-all hover:bg-primary/10" id="phase3">
+                                    <div class="text-red-600 dark:text-red-400 mb-1">Distribution</div>
+                                    <div class="w-full h-24 relative">
+                                        <svg class="w-full h-full" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M0,5 Q20,5 40,10 T80,25 T100,40" fill="none" stroke="currentColor" stroke-width="2" class="text-red-500"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Smart money selling</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="trendExplanation" class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                            <p class="text-center">Hover over each phase to learn more</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Video Section -->
+                    <div class="mb-8">
+                        <h3 class="font-semibold text-lg mb-3">Video: Understanding Dow Theory</h3>
+                        <div class="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                            <div class="text-center p-6">
+                                <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                                </svg>
+                                <p class="text-gray-500 dark:text-gray-400 mb-2">Video placeholder</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    (YouTube embedding will appear here)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Check -->
+                    <div class="bg-primary/10 dark:bg-primary/20 rounded-lg p-4">
+                        <h3 class="font-semibold text-lg mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+                            </svg>
+                            Quick Check
+                        </h3>
+                        <p class="mb-3">According to Dow Theory, what should happen when a primary trend is confirmed?</p>
+                        <div class="space-y-2">
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="true">
+                                Both related indices should confirm the trend direction
+                            </div>
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="false">
+                                Only the Dow Jones Industrial index matters
+                            </div>
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="false">
+                                Volume should decrease in the direction of the trend
+                            </div>
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="false">
+                                News should not affect the market prices
+                            </div>
+                        </div>
+                        <div class="mt-4 hidden" id="quiz-result-3">
+                            <div class="correct-answer hidden text-green-600 dark:text-green-400 font-medium">
+                                Correct! According to Dow Theory, related indices (like Industrials and Transports) should confirm each other to validate a trend.
+                            </div>
+                            <div class="incorrect-answer hidden text-red-600 dark:text-red-400 font-medium">
+                                Not quite. Dow Theory states that related indices (like Industrials and Transports) should confirm each other for a trend to be valid.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation -->
+                    <div class="mt-8 flex justify-between">
+                        <button class="prev-section-btn bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 font-medium py-2 px-4 rounded-lg transition-colors flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                            Previous: Stock Market Basics
+                        </button>
+                        <button class="next-section-btn bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center">
+                            Next: Types of Analysis
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Section 4: Types of Analysis -->
+                <section id="section4" class="section-content bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 mb-8">
+                    <h2 class="text-2xl font-bold mb-6">Types of Market Analysis</h2>
+                    
+                    <p class="mb-6 text-gray-700 dark:text-gray-300">
+                        There are three primary approaches to analyzing financial markets, each offering unique perspectives and insights. Understanding these different approaches can help traders and investors develop a more comprehensive view of the markets.
+                    </p>
+                    
+                    <div class="grid md:grid-cols-3 gap-6 mb-8">
+                        <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm">
+                            <div class="bg-primary/10 dark:bg-primary/20 p-4">
+                                <h3 class="font-bold text-xl text-primary">Technical Analysis</h3>
+                            </div>
+                            <div class="p-5">
+                                <div class="flex justify-center mb-4">
+                                    <svg class="w-12 h-12 text-primary" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
+                                    </svg>
+                                </div>
+                                <ul class="space-y-2 text-gray-700 dark:text-gray-300">
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-primary mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Focuses on price and volume data</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-primary mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Studies patterns and trends</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-primary mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Uses chart patterns and indicators</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-primary mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Best for timing entry and exit points</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm">
+                            <div class="bg-green-100 dark:bg-green-900/20 p-4">
+                                <h3 class="font-bold text-xl text-green-600 dark:text-green-400">Fundamental Analysis</h3>
+                            </div>
+                            <div class="p-5">
+                                <div class="flex justify-center mb-4">
+                                    <svg class="w-12 h-12 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <ul class="space-y-2 text-gray-700 dark:text-gray-300">
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Examines financial statements</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Analyzes economic indicators</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Focuses on intrinsic value</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Best for long-term investment decisions</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm">
+                            <div class="bg-blue-100 dark:bg-blue-900/20 p-4">
+                                <h3 class="font-bold text-xl text-blue-600 dark:text-blue-400">Sentiment Analysis</h3>
+                            </div>
+                            <div class="p-5">
+                                <div class="flex justify-center mb-4">
+                                    <svg class="w-12 h-12 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <ul class="space-y-2 text-gray-700 dark:text-gray-300">
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Gauges market mood and emotions</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Considers bullish vs. bearish outlook</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Analyzes news, social media trends</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Identifies potential market extremes</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Comparing Approaches -->
+                    <div class="mb-8 overflow-x-auto">
+                        <h3 class="font-semibold text-lg mb-4">Comparing Analysis Approaches</h3>
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-800">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Aspect</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Technical Analysis</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Fundamental Analysis</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sentiment Analysis</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">Focus</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">Price and volume patterns</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">Financial data and economic factors</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">Market psychology and emotions</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">Timeframe</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">Short to medium term</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">Medium to long term</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">Short term (often contrarian)</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">Tools</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">Charts, indicators, patterns</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">Financial statements, ratios, economic data</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">Surveys, social media, news analysis</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">Best Used For</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">Entry/exit timing, trend following</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">Value investing, long-term growth</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">Contrarian signals, market extremes</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Video Section -->
+                    <div class="mb-8">
+                        <h3 class="font-semibold text-lg mb-3">Video: Different Types of Market Analysis</h3>
+                        <div class="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                            <div class="text-center p-6">
+                                <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                                </svg>
+                                <p class="text-gray-500 dark:text-gray-400 mb-2">Video placeholder</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    (YouTube embedding will appear here)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Key Takeaway -->
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-8">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-300">Key Takeaway</h3>
+                                <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-200">
+                                    <p>
+                                        While this course focuses on technical analysis, successful traders often combine elements of all three approaches for a more comprehensive market view. Technical analysis helps with timing, fundamental analysis helps with selection, and sentiment analysis helps identify potential extremes.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Check -->
+                    <div class="bg-primary/10 dark:bg-primary/20 rounded-lg p-4">
+                        <h3 class="font-semibold text-lg mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+                            </svg>
+                            Quick Check
+                        </h3>
+                        <p class="mb-3">Which type of analysis would be most useful for identifying a potential market bubble?</p>
+                        <div class="space-y-2">
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="false">
+                                Technical Analysis only
+                            </div>
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="false">
+                                Fundamental Analysis only
+                            </div>
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="false">
+                                Sentiment Analysis only
+                            </div>
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="true">
+                                A combination of all three approaches
+                            </div>
+                        </div>
+                        <div class="mt-4 hidden" id="quiz-result-4">
+                            <div class="correct-answer hidden text-green-600 dark:text-green-400 font-medium">
+                                Correct! Market bubbles typically show technical overextension, fundamental overvaluation, and extreme bullish sentiment. Using all three approaches provides the most complete picture.
+                            </div>
+                            <div class="incorrect-answer hidden text-red-600 dark:text-red-400 font-medium">
+                                Not quite. While each approach has value, market bubbles typically show technical overextension, fundamental overvaluation, and extreme bullish sentiment. A combination of all three provides the most complete picture.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation -->
+                    <div class="mt-8 flex justify-between">
+                        <button class="prev-section-btn bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 font-medium py-2 px-4 rounded-lg transition-colors flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                            Previous: Dow Theory
+                        </button>
+                        <button class="next-section-btn bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center">
+                            Next: Chart Types
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Section 5: Chart Types -->
+                <section id="section5" class="section-content bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 mb-8">
+                    <h2 class="text-2xl font-bold mb-6">Types of Charts</h2>
+                    
+                    <p class="mb-6 text-gray-700 dark:text-gray-300">
+                        Price charts are essential tools in technical analysis, providing visual representations of historical price data. Different types of charts offer varying levels of detail and insights into market behavior. Let's explore the most common types of price charts used in technical analysis.
+                    </p>
+                    
+                    <div class="grid md:grid-cols-3 gap-6 mb-8">
+                        <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm">
+                            <div class="p-4 bg-blue-100 dark:bg-blue-900/20">
+                                <h3 class="font-bold text-xl text-blue-600 dark:text-blue-400">Line Charts</h3>
+                            </div>
+                            <div class="p-5">
+                                <div class="mb-4 bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+                                    <svg class="w-full h-32" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0,70 C20,60 40,80 60,40 C80,10 100,50 120,30 C140,20 160,40 180,20 C190,10 200,30 200,20" fill="none" stroke="#3B82F6" stroke-width="2"></path>
+                                        <line x1="0" y1="90" x2="200" y2="90" stroke="#9CA3AF" stroke-width="1"></line>
+                                        <!-- X-axis labels -->
+                                        <text x="0" y="100" fill="currentColor" class="text-xs text-gray-500">Mon</text>
+                                        <text x="50" y="100" fill="currentColor" class="text-xs text-gray-500">Tue</text>
+                                        <text x="100" y="100" fill="currentColor" class="text-xs text-gray-500">Wed</text>
+                                        <text x="150" y="100" fill="currentColor" class="text-xs text-gray-500">Thu</text>
+                                        <text x="190" y="100" fill="currentColor" class="text-xs text-gray-500">Fri</text>
+                                    </svg>
+                                </div>
+                                <ul class="space-y-2 text-gray-700 dark:text-gray-300">
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Simplest chart type</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Shows only closing prices</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Good for overall trend analysis</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Less detail than other chart types</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm">
+                            <div class="p-4 bg-green-100 dark:bg-green-900/20">
+                                <h3 class="font-bold text-xl text-green-600 dark:text-green-400">Bar Charts (OHLC)</h3>
+                            </div>
+                            <div class="p-5">
+                                <div class="mb-4 bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+                                    <svg class="w-full h-32" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+                                        <!-- Bar 1 -->
+                                        <line x1="20" y1="30" x2="20" y2="70" stroke="#10B981" stroke-width="1"></line>
+                                        <line x1="10" y1="40" x2="20" y2="40" stroke="#10B981" stroke-width="1"></line>
+                                        <line x1="20" y1="60" x2="30" y2="60" stroke="#10B981" stroke-width="1"></line>
+                                        
+                                        <!-- Bar 2 -->
+                                        <line x1="60" y1="20" x2="60" y2="65" stroke="#10B981" stroke-width="1"></line>
+                                        <line x1="50" y1="25" x2="60" y2="25" stroke="#10B981" stroke-width="1"></line>
+                                        <line x1="60" y1="60" x2="70" y2="60" stroke="#10B981" stroke-width="1"></line>
+                                        
+                                        <!-- Bar 3 -->
+                                        <line x1="100" y1="40" x2="100" y2="80" stroke="#EF4444" stroke-width="1"></line>
+                                        <line x1="90" y1="45" x2="100" y2="45" stroke="#EF4444" stroke-width="1"></line>
+                                        <line x1="100" y1="75" x2="110" y2="75" stroke="#EF4444" stroke-width="1"></line>
+                                        
+                                        <!-- Bar 4 -->
+                                        <line x1="140" y1="50" x2="140" y2="75" stroke="#EF4444" stroke-width="1"></line>
+                                        <line x1="130" y1="55" x2="140" y2="55" stroke="#EF4444" stroke-width="1"></line>
+                                        <line x1="140" y1="70" x2="150" y2="70" stroke="#EF4444" stroke-width="1"></line>
+                                        
+                                        <!-- Bar 5 -->
+                                        <line x1="180" y1="30" x2="180" y2="60" stroke="#10B981" stroke-width="1"></line>
+                                        <line x1="170" y1="50" x2="180" y2="50" stroke="#10B981" stroke-width="1"></line>
+                                        <line x1="180" y1="35" x2="190" y2="35" stroke="#10B981" stroke-width="1"></line>
+                                        
+                                        <line x1="0" y1="90" x2="200" y2="90" stroke="#9CA3AF" stroke-width="1"></line>
+                                    </svg>
+                                </div>
+                                <ul class="space-y-2 text-gray-700 dark:text-gray-300">
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Shows OHLC (Open, High, Low, Close)</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Vertical line shows high/low range</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Left tick marks opening price</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Right tick marks closing price</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm">
+                            <div class="p-4 bg-primary/10 dark:bg-primary/20">
+                                <h3 class="font-bold text-xl text-primary">Candlestick Charts</h3>
+                            </div>
+                            <div class="p-5">
+                                <div class="mb-4 bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+                                    <svg class="w-full h-32" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+                                        <!-- Candlestick 1 (bullish) -->
+                                        <line x1="20" y1="20" x2="20" y2="40" stroke="#9CA3AF" stroke-width="1"></line>
+                                        <line x1="20" y1="60" x2="20" y2="75" stroke="#9CA3AF" stroke-width="1"></line>
+                                        <rect x="10" y="40" width="20" height="20" fill="#10B981"></rect>
+                                        
+                                        <!-- Candlestick 2 (bullish) -->
+                                        <line x1="60" y1="15" x2="60" y2="30" stroke="#9CA3AF" stroke-width="1"></line>
+                                        <line x1="60" y1="50" x2="60" y2="65" stroke="#9CA3AF" stroke-width="1"></line>
+                                        <rect x="50" y="30" width="20" height="20" fill="#10B981"></rect>
+                                        
+                                        <!-- Candlestick 3 (bearish) -->
+                                        <line x1="100" y1="35" x2="100" y2="50" stroke="#9CA3AF" stroke-width="1"></line>
+                                        <line x1="100" y1="70" x2="100" y2="80" stroke="#9CA3AF" stroke-width="1"></line>
+                                        <rect x="90" y="50" width="20" height="20" fill="#EF4444"></rect>
+                                        
+                                        <!-- Candlestick 4 (bearish) -->
+                                        <line x1="140" y1="40" x2="140" y2="55" stroke="#9CA3AF" stroke-width="1"></line>
+                                        <line x1="140" y1="75" x2="140" y2="85" stroke="#9CA3AF" stroke-width="1"></line>
+                                        <rect x="130" y="55" width="20" height="20" fill="#EF4444"></rect>
+                                        
+                                        <!-- Candlestick 5 (bullish) -->
+                                        <line x1="180" y1="25" x2="180" y2="40" stroke="#9CA3AF" stroke-width="1"></line>
+                                        <line x1="180" y1="60" x2="180" y2="70" stroke="#9CA3AF" stroke-width="1"></line>
+                                        <rect x="170" y="40" width="20" height="20" fill="#10B981"></rect>
+                                        
+                                        <line x1="0" y1="90" x2="200" y2="90" stroke="#9CA3AF" stroke-width="1"></line>
+                                    </svg>
+                                </div>
+                                <ul class="space-y-2 text-gray-700 dark:text-gray-300">
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-primary mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Shows OHLC with color-coded bodies</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-primary mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Green/white body: Close > Open</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-primary mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Red/black body: Close < Open</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-primary mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"></path>
+                                        </svg>
+                                        <span>Wicks (shadows) show high/low</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Candlestick Components -->
+                    <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+                        <h3 class="font-semibold text-lg mb-4">Anatomy of a Candlestick</h3>
+                        
+                        <div class="flex flex-col md:flex-row items-center">
+                            <div class="md:w-1/2 flex justify-center mb-6 md:mb-0">
+                                <div class="relative w-80 h-80">
+                                    <!-- Bullish Candlestick -->
+                                    <div class="absolute left-10 top-10 w-60 flex flex-col items-center">
+                                        <div class="w-2 h-24 bg-gray-400"></div>
+                                        <div class="w-24 h-32 bg-green-500"></div>
+                                        <div class="w-2 h-36 bg-gray-400"></div>
+                                        
+                                        <!-- Labels -->
+                                        <div class="absolute top-0 left-full ml-4 flex items-center">
+                                            <div class="h-0.5 w-8 bg-gray-400"></div>
+                                            <span class="ml-2 text-sm">High</span>
+                                        </div>
+                                        
+                                        <div class="absolute top-24 left-full ml-4 flex items-center">
+                                            <div class="h-0.5 w-8 bg-gray-400"></div>
+                                            <span class="ml-2 text-sm">Open</span>
+                                        </div>
+                                        
+                                        <div class="absolute top-56 left-full ml-4 flex items-center">
+                                            <div class="h-0.5 w-8 bg-gray-400"></div>
+                                            <span class="ml-2 text-sm">Close</span>
+                                        </div>
+                                        
+                                        <div class="absolute top-92 left-full ml-4 flex items-center">
+                                            <div class="h-0.5 w-8 bg-gray-400"></div>
+                                            <span class="ml-2 text-sm">Low</span>
+                                        </div>
+                                        
+                                        <div class="absolute top-36 right-full mr-4 flex items-center">
+                                            <span class="mr-2 text-sm">Body</span>
+                                            <div class="h-0.5 w-8 bg-gray-400"></div>
+                                        </div>
+                                        
+                                        <div class="absolute top-10 right-full mr-4 flex items-center">
+                                            <span class="mr-2 text-sm">Upper Shadow<br>(Wick)</span>
+                                            <div class="h-0.5 w-8 bg-gray-400"></div>
+                                        </div>
+                                        
+                                        <div class="absolute top-72 right-full mr-4 flex items-center">
+                                            <span class="mr-2 text-sm">Lower Shadow<br>(Wick)</span>
+                                            <div class="h-0.5 w-8 bg-gray-400"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="md:w-1/2">
+                                <h4 class="font-medium text-lg mb-3">Candlestick Components</h4>
+                                <ul class="space-y-3 text-gray-700 dark:text-gray-300">
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-primary mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        <div>
+                                            <strong>Body</strong>: Represents the range between opening and closing prices
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-primary mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        <div>
+                                            <strong>Shadows (Wicks)</strong>: The thin lines extending from the body showing the high and low prices
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-primary mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        <div>
+                                            <strong>Bullish Candle</strong>: Close higher than open (green/white body)
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-primary mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        <div>
+                                            <strong>Bearish Candle</strong>: Close lower than open (red/black body)
+                                        </div>
+                                    </li>
+                                </ul>
+                                
+                                <div class="mt-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
+                                    <div class="flex">
+                                        <div class="flex-shrink-0">
+                                            <svg class="h-5 w-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                            </svg>
+                                        </div>
+                                        <div class="ml-3 text-sm text-yellow-700 dark:text-yellow-200">
+                                            <p>
+                                                Candlestick charts are the most popular chart type among technical analysts because they provide the most visual information about price action and sentiment in a single glance.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Video Section -->
+                    <div class="mb-8">
+                        <h3 class="font-semibold text-lg mb-3">Video: Understanding Chart Types</h3>
+                        <div class="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                            <div class="text-center p-6">
+                                <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                                </svg>
+                                <p class="text-gray-500 dark:text-gray-400 mb-2">Video placeholder</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    (YouTube embedding will appear here)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Check -->
+                    <div class="bg-primary/10 dark:bg-primary/20 rounded-lg p-4">
+                        <h3 class="font-semibold text-lg mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+                            </svg>
+                            Quick Check
+                        </h3>
+                        <p class="mb-3">Which component of a candlestick represents the range between opening and closing prices?</p>
+                        <div class="space-y-2">
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="false">
+                                Shadow
+                            </div>
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="true">
+                                Body
+                            </div>
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="false">
+                                Wick
+                            </div>
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="false">
+                                Tail
+                            </div>
+                        </div>
+                        <div class="mt-4 hidden" id="quiz-result-5">
+                            <div class="correct-answer hidden text-green-600 dark:text-green-400 font-medium">
+                                Correct! The body of a candlestick represents the range between the opening and closing prices.
+                            </div>
+                            <div class="incorrect-answer hidden text-red-600 dark:text-red-400 font-medium">
+                                Not quite. The body of a candlestick represents the range between the opening and closing prices. The shadows (wicks) show the high and low prices.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation -->
+                    <div class="mt-8 flex justify-between">
+                        <button class="prev-section-btn bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 font-medium py-2 px-4 rounded-lg transition-colors flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                            Previous: Types of Analysis
+                        </button>
+                        <button class="next-section-btn bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center">
+                            Next: Misconceptions
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Section 6: Misconceptions -->
+                <section id="section6" class="section-content bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 mb-8">
+                    <h2 class="text-2xl font-bold mb-6">Common Misconceptions about Technical Analysis</h2>
+                    
+                    <p class="mb-6 text-gray-700 dark:text-gray-300">
+                        Despite its widespread use, technical analysis is often misunderstood. Let's address some of the common misconceptions to develop a more realistic understanding of what technical analysis can and cannot do.
+                    </p>
+                    
+                    <div class="grid md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-lg p-5">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 mt-1">
+                                    <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-medium text-red-800 dark:text-red-300">Misconception #1: Technical Analysis Can Predict the Future with Certainty</h3>
+                                    <div class="mt-2 text-red-700 dark:text-red-200">
+                                        <p class="mb-2">One of the most common misconceptions is that technical analysis provides definitive predictions of future price movements.</p>
+                                        <div class="bg-white dark:bg-gray-800 rounded p-3 mt-3">
+                                            <h4 class="font-medium text-gray-900 dark:text-gray-100">Reality</h4>
+                                            <p class="text-gray-700 dark:text-gray-300">
+                                                Technical analysis deals with probabilities, not certainties. It helps assess the likelihood of various outcomes based on historical patterns and market behavior, but the future is influenced by many unpredictable factors.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-lg p-5">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 mt-1">
+                                    <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-medium text-red-800 dark:text-red-300">Misconception #2: Technical Analysis Ignores Fundamental Factors</h3>
+                                    <div class="mt-2 text-red-700 dark:text-red-200">
+                                        <p class="mb-2">Some believe that technical analysis completely disregards fundamental factors like financial data, industry trends, or economic indicators.</p>
+                                        <div class="bg-white dark:bg-gray-800 rounded p-3 mt-3">
+                                            <h4 class="font-medium text-gray-900 dark:text-gray-100">Reality</h4>
+                                            <p class="text-gray-700 dark:text-gray-300">
+                                                While technical analysis focuses primarily on price and volume data, it doesn't completely ignore fundamental factors. Many technical analysts understand that fundamentals influence market behavior and incorporate this awareness into their analysis.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-lg p-5">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 mt-1">
+                                    <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-medium text-red-800 dark:text-red-300">Misconception #3: Technical Analysis is Too Subjective</h3>
+                                    <div class="mt-2 text-red-700 dark:text-red-200">
+                                        <p class="mb-2">Another misconception is that technical analysis is purely subjective and lacks objectivity.</p>
+                                        <div class="bg-white dark:bg-gray-800 rounded p-3 mt-3">
+                                            <h4 class="font-medium text-gray-900 dark:text-gray-100">Reality</h4>
+                                            <p class="text-gray-700 dark:text-gray-300">
+                                                While interpretation can vary between analysts, technical analysis provides a structured and systematic approach using clear rules, chart patterns, and technical indicators. It combines both objective criteria and subjective judgment to guide decision-making.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-lg p-5">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 mt-1">
+                                    <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-medium text-red-800 dark:text-red-300">Misconception #4: Technical Analysis is a Complete Trading Strategy</h3>
+                                    <div class="mt-2 text-red-700 dark:text-red-200">
+                                        <p class="mb-2">Some mistakenly view technical analysis as a complete, self-contained trading strategy.</p>
+                                        <div class="bg-white dark:bg-gray-800 rounded p-3 mt-3">
+                                            <h4 class="font-medium text-gray-900 dark:text-gray-100">Reality</h4>
+                                            <p class="text-gray-700 dark:text-gray-300">
+                                                Technical analysis is just one component of a comprehensive trading approach. Successful traders often integrate technical analysis with risk management, position sizing, and sometimes fundamental analysis to create a complete trading strategy.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Realistic Perspective -->
+                    <div class="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/30 rounded-lg p-5 mb-8">
+                        <h3 class="text-lg font-medium text-green-800 dark:text-green-300 mb-3">A Realistic Perspective on Technical Analysis</h3>
+                        
+                        <ul class="space-y-3 text-green-700 dark:text-green-200">
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span>Technical analysis is a tool for assessing probabilities, not predicting certainties.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span>It provides insights into market psychology and behavior patterns.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span>It works best when combined with other analysis methods and solid risk management.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span>Different technical approaches can be valid for different market conditions and timeframes.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span>Success requires both understanding technical principles and developing the discipline to follow them.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Video Section -->
+                    <div class="mb-8">
+                        <h3 class="font-semibold text-lg mb-3">Video: Debunking Technical Analysis Myths</h3>
+                        <div class="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                            <div class="text-center p-6">
+                                <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                                </svg>
+                                <p class="text-gray-500 dark:text-gray-400 mb-2">Video placeholder</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    (YouTube embedding will appear here)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Check -->
+                    <div class="bg-primary/10 dark:bg-primary/20 rounded-lg p-4">
+                        <h3 class="font-semibold text-lg mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+                            </svg>
+                            Quick Check
+                        </h3>
+                        <p class="mb-3">What does technical analysis provide regarding future price movements?</p>
+                        <div class="space-y-2">
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="false">
+                                Absolute certainty about future prices
+                            </div>
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="false">
+                                A way to always beat the market
+                            </div>
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="true">
+                                Assessment of probabilities based on historical patterns
+                            </div>
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="false">
+                                Perfect predictions of market tops and bottoms
+                            </div>
+                        </div>
+                        <div class="mt-4 hidden" id="quiz-result-6">
+                            <div class="correct-answer hidden text-green-600 dark:text-green-400 font-medium">
+                                Correct! Technical analysis helps assess the probabilities of different outcomes based on historical price patterns and market behavior.
+                            </div>
+                            <div class="incorrect-answer hidden text-red-600 dark:text-red-400 font-medium">
+                                Not quite. Technical analysis doesn't provide certainty about future prices but rather helps assess probabilities based on historical patterns and market behavior.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation -->
+                    <div class="mt-8 flex justify-between">
+                        <button class="prev-section-btn bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 font-medium py-2 px-4 rounded-lg transition-colors flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                            Previous: Chart Types
+                        </button>
+                        <button class="next-section-btn bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center">
+                            Next: Pros & Cons
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Section 7: Pros & Cons -->
+                <section id="section7" class="section-content bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 mb-8">
+                    <h2 class="text-2xl font-bold mb-6">Advantages and Disadvantages of Technical Analysis</h2>
+                    
+                    <p class="mb-6 text-gray-700 dark:text-gray-300">
+                        Like any approach to market analysis, technical analysis has its strengths and limitations. Understanding these can help you make informed decisions about incorporating technical analysis into your trading or investment strategy.
+                    </p>
+                    
+                    <div class="flex flex-col md:flex-row gap-6 mb-8">
+                        <div class="md:w-1/2 bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/30 rounded-lg p-5">
+                            <h3 class="text-xl font-bold text-green-800 dark:text-green-300 mb-4 flex items-center">
+                                <svg class="w-6 h-6 mr-2 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                Advantages
+                            </h3>
+                            
+                            <div class="space-y-4 text-green-700 dark:text-green-200">
+                                <div class="bg-white dark:bg-gray-800 rounded-lg p-3">
+                                    <h4 class="font-medium text-green-800 dark:text-green-300">Objective, Data-Driven Approach</h4>
+                                    <p class="mt-1 text-gray-700 dark:text-gray-300">
+                                        Technical analysis relies on objective data like price and volume, providing a systematic and structured approach to analyzing market behavior using established rules and indicators.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white dark:bg-gray-800 rounded-lg p-3">
+                                    <h4 class="font-medium text-green-800 dark:text-green-300">Timing Entry and Exit Points</h4>
+                                    <p class="mt-1 text-gray-700 dark:text-gray-300">
+                                        One of the key strengths of technical analysis is its ability to identify potential entry and exit points in the market by studying price patterns, support/resistance levels, and trend signals.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white dark:bg-gray-800 rounded-lg p-3">
+                                    <h4 class="font-medium text-green-800 dark:text-green-300">Visual Representation of Market Behavior</h4>
+                                    <p class="mt-1 text-gray-700 dark:text-gray-300">
+                                        Technical analysis uses various charts and indicators to visually represent market behavior, making it easier to interpret and analyze price trends, patterns, and relationships.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white dark:bg-gray-800 rounded-lg p-3">
+                                    <h4 class="font-medium text-green-800 dark:text-green-300">Widely Available Tools and Resources</h4>
+                                    <p class="mt-1 text-gray-700 dark:text-gray-300">
+                                        Technical analysis has been used by traders and investors for many years, resulting in the development of various tools, techniques, and indicators that provide traders with multiple options for conducting their analysis.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="md:w-1/2 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-lg p-5">
+                            <h3 class="text-xl font-bold text-red-800 dark:text-red-300 mb-4 flex items-center">
+                                <svg class="w-6 h-6 mr-2 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                </svg>
+                                Disadvantages
+                            </h3>
+                            
+                            <div class="space-y-4 text-red-700 dark:text-red-200">
+                                <div class="bg-white dark:bg-gray-800 rounded-lg p-3">
+                                    <h4 class="font-medium text-red-800 dark:text-red-300">Limitations in Predicting Fundamental Events</h4>
+                                    <p class="mt-1 text-gray-700 dark:text-gray-300">
+                                        Technical analysis focuses primarily on price and volume data, often overlooking fundamental factors that can significantly impact market behavior like economic announcements, geopolitical developments, or company news.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white dark:bg-gray-800 rounded-lg p-3">
+                                    <h4 class="font-medium text-red-800 dark:text-red-300">Interpretation Challenges and Subjectivity</h4>
+                                    <p class="mt-1 text-gray-700 dark:text-gray-300">
+                                        Despite its objective nature, there's room for interpretation and subjectivity in technical analysis. Different traders may interpret the same chart patterns or indicators differently, leading to divergent trading decisions.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white dark:bg-gray-800 rounded-lg p-3">
+                                    <h4 class="font-medium text-red-800 dark:text-red-300">Reliance on Historical Data</h4>
+                                    <p class="mt-1 text-gray-700 dark:text-gray-300">
+                                        Technical analysis heavily relies on historical price and volume data to identify patterns and trends. However, past performance doesn't guarantee future results, and market conditions can change rapidly.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white dark:bg-gray-800 rounded-lg p-3">
+                                    <h4 class="font-medium text-red-800 dark:text-red-300">Over-emphasis on Technical Factors</h4>
+                                    <p class="mt-1 text-gray-700 dark:text-gray-300">
+                                        Some critics argue that technical analysis can lead to an over-emphasis on technical factors while ignoring important fundamental considerations that may be driving the market in reality.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Integration with Other Approaches -->
+                    <div class="mb-8 bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-900/30 rounded-lg p-5">
+                        <h3 class="text-xl font-bold text-blue-800 dark:text-blue-300 mb-4">
+                            Integrating Technical Analysis with Other Approaches
+                        </h3>
+                        
+                        <p class="mb-4 text-blue-700 dark:text-blue-200">
+                            To maximize the effectiveness of technical analysis and mitigate its limitations, many traders and investors integrate it with other analytical approaches:
+                        </p>
+                        
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <div class="bg-white dark:bg-gray-800 rounded-lg p-4">
+                                <h4 class="font-medium text-blue-800 dark:text-blue-300 mb-2">Technical + Fundamental</h4>
+                                <p class="text-gray-700 dark:text-gray-300 text-sm">
+                                    Use fundamental analysis to select quality assets, then apply technical analysis to time entries and exits for better results.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-gray-800 rounded-lg p-4">
+                                <h4 class="font-medium text-blue-800 dark:text-blue-300 mb-2">Technical + Sentiment</h4>
+                                <p class="text-gray-700 dark:text-gray-300 text-sm">
+                                    Combine technical signals with sentiment indicators to identify potential market extremes and contrarian opportunities.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-gray-800 rounded-lg p-4">
+                                <h4 class="font-medium text-blue-800 dark:text-blue-300 mb-2">Technical + Risk Management</h4>
+                                <p class="text-gray-700 dark:text-gray-300 text-sm">
+                                    Use technical levels to set stop-losses and profit targets while implementing proper position sizing and portfolio management.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Practical Approach -->
+                    <div class="bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-900/30 rounded-lg p-5 mb-8">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <svg class="h-6 w-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-lg font-medium text-yellow-800 dark:text-yellow-300">Practical Approach to Technical Analysis</h3>
+                                <div class="mt-2 text-yellow-700 dark:text-yellow-200">
+                                    <p class="mb-2">
+                                        To make the most of technical analysis while minimizing its limitations, consider these practical approaches:
+                                    </p>
+                                    <ul class="list-disc pl-5 space-y-1">
+                                        <li>Use multiple timeframes to confirm signals and identify key levels</li>
+                                        <li>Combine different technical indicators that measure various aspects of the market</li>
+                                        <li>Stay aware of important fundamental events that could impact technical patterns</li>
+                                        <li>Implement proper risk management regardless of how strong a technical signal appears</li>
+                                        <li>Be adaptive and open to adjusting your approach as market conditions change</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Video Section -->
+                    <div class="mb-8">
+                        <h3 class="font-semibold text-lg mb-3">Video: Pros and Cons of Technical Analysis</h3>
+                        <div class="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                            <div class="text-center p-6">
+                                <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                                </svg>
+                                <p class="text-gray-500 dark:text-gray-400 mb-2">Video placeholder</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    (YouTube embedding will appear here)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Check -->
+                    <div class="bg-primary/10 dark:bg-primary/20 rounded-lg p-4">
+                        <h3 class="font-semibold text-lg mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+                            </svg>
+                            Quick Check
+                        </h3>
+                        <p class="mb-3">What is the best way to use technical analysis effectively?</p>
+                        <div class="space-y-2">
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="false">
+                                Use it as the only method for trading decisions
+                            </div>
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="false">
+                                Focus only on one technical indicator
+                            </div>
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="false">
+                                Ignore fundamental factors completely
+                            </div>
+                            <div class="quiz-option cursor-pointer border border-gray-300 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" data-correct="true">
+                                Combine it with other analytical approaches and risk management
+                            </div>
+                        </div>
+                        <div class="mt-4 hidden" id="quiz-result-7">
+                            <div class="correct-answer hidden text-green-600 dark:text-green-400 font-medium">
+                                Correct! Technical analysis is most effective when integrated with other analytical approaches and proper risk management strategies.
+                            </div>
+                            <div class="incorrect-answer hidden text-red-600 dark:text-red-400 font-medium">
+                                Not quite. Technical analysis is most effective when it's integrated with other analytical approaches (like fundamental and sentiment analysis) and proper risk management strategies.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Chapter Summary -->
+                    <div class="mt-8 bg-gray-50 dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-xl font-bold mb-4 flex items-center">
+                            <svg class="w-6 h-6 mr-2 text-primary" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"></path>
+                            </svg>
+                            Chapter 1 Summary
+                        </h3>
+                        
+                        <div class="space-y-3 text-gray-700 dark:text-gray-300">
+                            <p>
+                                In this chapter, we've covered the fundamentals of technical analysis, including its definition, basic assumptions, and how it compares to other forms of market analysis.
+                            </p>
+                            <p>
+                                We've explored different types of charts used in technical analysis, with a focus on candlestick charts which will be covered in more detail in Chapter 2.
+                            </p>
+                            <p>
+                                We've also addressed common misconceptions about technical analysis and discussed its advantages and limitations.
+                            </p>
+                            <p>
+                                Key takeaways include:
+                            </p>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>Technical analysis involves studying historical price and volume data to identify patterns and trends</li>
+                                <li>It's based on three main assumptions: markets discount everything, prices move in trends, and history tends to repeat</li>
+                                <li>Different chart types offer varying levels of detail, with candlestick charts being the most popular</li>
+                                <li>Technical analysis is most effective when combined with other approaches and proper risk management</li>
+                            </ul>
+                            <p class="mt-4">
+                                In Chapter 2, we'll dive deeper into candlestick patterns and their interpretations, building on the foundation established in this chapter.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation -->
+                    <div class="mt-8 flex justify-between">
+                        <button class="prev-section-btn bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 font-medium py-2 px-4 rounded-lg transition-colors flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                            Previous: Misconceptions
+                        </button>
+                        <button id="finishChapterBtn" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center">
+                            Finish Chapter 1
+                            <svg class="w-4 h-4 ml-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </section>
+            </div>
+            
+            <!-- Completion Modal -->
+            <div id="completionModal" class="fixed inset-0 z-50 hidden">
+                <div class="absolute inset-0 bg-black/50"></div>
+                <div class="relative top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-md w-full p-6">
+                    <div class="text-center">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 mb-4">
+                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Chapter 1 Complete!</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-6">
+                            Congratulations! You've completed Chapter 1 of the Technical Analysis course. You're now ready to move on to Chapter 2 where we'll explore Candlestick Patterns in detail.
+                        </p>
+                        <div class="flex flex-col sm:flex-row justify-center gap-3">
+                            <button id="closeModalBtn" class="border border-gray-300 dark:border-gray-700 rounded-lg py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                                Close
+                            </button>
+                            <button id="nextChapterBtn" class="bg-primary hover:bg-primary/90 text-white rounded-lg py-2 px-4 transition-colors">
+                                Go to Chapter 2
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="bg-white dark:bg-darkBg border-t border-gray-200 dark:border-gray-800 py-6">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-4 md:mb-0">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            © Ahmad Fauze Abdul Hamit, Ninalyn binti Fridrict, Maryam Qaameelah Othman
+                        </p>
+                    </div>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-primary transition-colors">
+                            <span class="sr-only">Course Home</span>
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-primary transition-colors">
+                            <span class="sr-only">Resources</span>
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-primary transition-colors">
+                            <span class="sr-only">Help</span>
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Dark mode toggle
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            darkModeToggle.addEventListener('click', function() {
+                document.documentElement.classList.toggle('dark');
+            });
+            
+            // Learning objectives
+            const showObjectivesBtn = document.getElementById('showObjectivesBtn');
+            const objectives = document.getElementById('objectives');
+            showObjectivesBtn.addEventListener('click', function() {
+                objectives.classList.toggle('hidden');
+                if (!objectives.classList.contains('hidden')) {
+                    objectives.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+            
+            // Start learning button
+            const startLearningBtn = document.getElementById('startLearningBtn');
+            startLearningBtn.addEventListener('click', function() {
+                document.getElementById('section1').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+            
+            // Section navigation
+            const sectionBtns = document.querySelectorAll('.section-btn');
+            const sections = document.querySelectorAll('.section-content');
+            
+            sectionBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const sectionId = this.getAttribute('data-section');
+                    
+                    // Update buttons
+                    sectionBtns.forEach(b => {
+                        b.classList.remove('active', 'bg-primary', 'text-white');
+                        b.classList.add('bg-gray-200', 'dark:bg-gray-800', 'hover:bg-gray-300', 'dark:hover:bg-gray-700');
+                    });
+                    this.classList.add('active', 'bg-primary', 'text-white');
+                    this.classList.remove('bg-gray-200', 'dark:bg-gray-800', 'hover:bg-gray-300', 'dark:hover:bg-gray-700');
+                    
+                    // Update sections
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    document.getElementById('section' + sectionId).classList.add('active');
+                    
+                    // Update progress
+                    updateProgress(parseInt(sectionId));
+                });
+            });
+            
+            // Next and previous section buttons
+            const nextSectionBtns = document.querySelectorAll('.next-section-btn');
+            const prevSectionBtns = document.querySelectorAll('.prev-section-btn');
+            
+            nextSectionBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const currentSection = document.querySelector('.section-content.active');
+                    const currentId = currentSection.id.replace('section', '');
+                    const nextId = parseInt(currentId) + 1;
+                    
+                    if (nextId <= sections.length) {
+                        // Simulate click on the corresponding section button
+                        document.querySelector(`.section-btn[data-section="${nextId}"]`).click();
+                        // Scroll to the section
+                        document.getElementById('sectionsNav').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+            
+            prevSectionBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const currentSection = document.querySelector('.section-content.active');
+                    const currentId = currentSection.id.replace('section', '');
+                    const prevId = parseInt(currentId) - 1;
+                    
+                    if (prevId >= 1) {
+                        // Simulate click on the corresponding section button
+                        document.querySelector(`.section-btn[data-section="${prevId}"]`).click();
+                        // Scroll to the section
+                        document.getElementById('sectionsNav').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+            
+            // Update progress bar
+            function updateProgress(sectionId) {
+                const progress = (sectionId / sections.length) * 100;
+                const progressBars = document.querySelectorAll('.progress-bar');
+                const progressText = document.querySelector('.progress-text');
+                
+                progressBars.forEach(bar => {
+                    bar.style.width = progress + '%';
+                });
+                
+                if (progressText) {
+                    progressText.textContent = Math.round(progress) + '%';
+                }
+            }
+            
+            // Initialize with first section
+            updateProgress(1);
+            
+            // Quiz options handling
+            const quizOptions = document.querySelectorAll('.quiz-option');
+            
+            quizOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const parentQuiz = this.closest('.bg-primary\\/10, .dark\\:bg-primary\\/20');
+                    const resultId = 'quiz-result-' + parentQuiz.querySelector('h3').textContent.trim().split('#')[0].trim().split(' ')[2];
+                    const resultDiv = document.getElementById(resultId);
+                    const options = parentQuiz.querySelectorAll('.quiz-option');
+                    const isCorrect = this.getAttribute('data-correct') === 'true';
+                    
+                    // Reset all options
+                    options.forEach(opt => {
+                        opt.classList.remove('selected', 'correct', 'incorrect');
+                    });
+                    
+                    // Mark selected option
+                    this.classList.add('selected');
+                    if (isCorrect) {
+                        this.classList.add('correct');
+                    } else {
+                        this.classList.add('incorrect');
+                        // Also highlight the correct answer
+                        options.forEach(opt => {
+                            if (opt.getAttribute('data-correct') === 'true') {
+                                opt.classList.add('correct');
+                            }
+                        });
+                    }
+                    
+                    // Show result message
+                    if (resultDiv) {
+                        resultDiv.classList.remove('hidden');
+                        const correctAnswer = resultDiv.querySelector('.correct-answer');
+                        const incorrectAnswer = resultDiv.querySelector('.incorrect-answer');
+                        
+                        if (isCorrect) {
+                            correctAnswer.classList.remove('hidden');
+                            incorrectAnswer.classList.add('hidden');
+                        } else {
+                            correctAnswer.classList.add('hidden');
+                            incorrectAnswer.classList.remove('hidden');
+                        }
+                    }
+                });
+            });
+            
+            // Trend phases interaction
+            const phase1 = document.getElementById('phase1');
+            const phase2 = document.getElementById('phase2');
+            const phase3 = document.getElementById('phase3');
+            const trendExplanation = document.getElementById('trendExplanation');
+            
+            if (phase1 && phase2 && phase3 && trendExplanation) {
+                phase1.addEventListener('mouseenter', function() {
+                    trendExplanation.innerHTML = '<p class="text-green-600 dark:text-green-400 font-medium">Accumulation Phase</p><p class="text-sm">Smart money begins buying near the end of a downtrend, anticipating a reversal. Volume is typically low as this happens quietly.</p>';
+                });
+                
+                phase2.addEventListener('mouseenter', function() {
+                    trendExplanation.innerHTML = '<p class="text-blue-600 dark:text-blue-400 font-medium">Public Participation Phase</p><p class="text-sm">The trend becomes evident and more participants join. Volume increases as trend followers and technical traders enter the market.</p>';
+                });
+                
+                phase3.addEventListener('mouseenter', function() {
+                    trendExplanation.innerHTML = '<p class="text-red-600 dark:text-red-400 font-medium">Distribution Phase</p><p class="text-sm">Smart money begins selling to the public as the uptrend becomes speculative. Often marked by excessive optimism and high volume.</p>';
+                });
+                
+                // Reset on mouse leave
+                [phase1, phase2, phase3].forEach(phase => {
+                    phase.addEventListener('mouseleave', function() {
+                        trendExplanation.innerHTML = '<p class="text-center">Hover over each phase to learn more</p>';
+                    });
+                });
+            }
+            
+            // Chapter completion modal
+            const finishChapterBtn = document.getElementById('finishChapterBtn');
+            const completionModal = document.getElementById('completionModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const nextChapterBtn = document.getElementById('nextChapterBtn');
+            
+            if (finishChapterBtn && completionModal) {
+                finishChapterBtn.addEventListener('click', function() {
+                    completionModal.classList.remove('hidden');
+                    updateProgress(7); // Set progress to 100%
+                });
+                
+                closeModalBtn.addEventListener('click', function() {
+                    completionModal.classList.add('hidden');
+                });
+                
+                nextChapterBtn.addEventListener('click', function() {
+                    // This would normally navigate to Chapter 2
+                    alert('This would navigate to Chapter 2: Candlesticks Patterns');
+                    completionModal.classList.add('hidden');
+                });
+                
+                // Close modal when clicking outside
+                completionModal.addEventListener('click', function(e) {
+                    if (e.target === completionModal) {
+                        completionModal.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
