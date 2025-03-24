@@ -1,0 +1,1535 @@
+<!DOCTYPE html><html lang="en" class="scroll-smooth"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support and Resistance | Technical Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        secondary: '#6366F1',
+                        dark: {
+                            bg: '#181818',
+                            card: '#262626',
+                            text: '#E5E7EB'
+                        },
+                        light: {
+                            bg: '#FFFFFF',
+                            card: '#F3F4F6',
+                            text: '#1F2937'
+                        }
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 2s infinite',
+                        'pulse-slow': 'pulse 3s infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        /* Chart Canvas Styles */
+        .chart-canvas {
+            width: 100%;
+            height: 200px;
+            position: relative;
+        }
+
+        /* Quiz Styles */
+        .quiz-option {
+            transition: all 0.3s ease;
+        }
+        .quiz-option:hover {
+            transform: translateX(5px);
+        }
+        .quiz-option.correct {
+            background-color: rgba(16, 185, 129, 0.2);
+            border-color: rgb(16, 185, 129);
+        }
+        .quiz-option.incorrect {
+            background-color: rgba(239, 68, 68, 0.2);
+            border-color: rgb(239, 68, 68);
+        }
+
+        /* Progress indicator */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+        .progress-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            background-color: #5D5CDE;
+        }
+        .dark .progress-container {
+            background-color: #333;
+        }
+
+        /* SVG charts will be styled inline */
+        
+        /* Animations for SVG elements */
+        @keyframes drawLine {
+            from { stroke-dashoffset: 1000; }
+            to { stroke-dashoffset: 0; }
+        }
+        .animated-line {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawLine 2s ease-in-out forwards;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: #333;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #5D5CDE;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b4bb2;
+        }
+    </style>
+</head>
+<body class="font-['Inter',sans-serif] bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text transition-colors duration-300">
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 bg-white dark:bg-dark-bg shadow-md">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 3a1 1 0 000 2h14a1 1 0 100-2H3zm0 6a1 1 0 000 2h9a1 1 0 100-2H3zm0 6a1 1 0 100 2h5a1 1 0 100-2H3z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="text-xl font-bold">TechAnalysis</span>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:flex space-x-4">
+                    <a href="#basics" class="hover:text-primary transition-colors">Basics</a>
+                    <a href="#methods" class="hover:text-primary transition-colors">Methods</a>
+                    <a href="#trading" class="hover:text-primary transition-colors">Trading</a>
+                    <a href="#psychology" class="hover:text-primary transition-colors">Psychology</a>
+                    <a href="#quiz" class="hover:text-primary transition-colors">Quiz</a>
+                </div>
+                
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                </button>
+                
+                <button id="menu-toggle" class="md:hidden p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden px-4 py-3 shadow-inner bg-gray-50 dark:bg-dark-card">
+            <div class="flex flex-col space-y-3">
+                <a href="#basics" class="hover:text-primary transition-colors">Basics</a>
+                <a href="#methods" class="hover:text-primary transition-colors">Methods</a>
+                <a href="#trading" class="hover:text-primary transition-colors">Trading</a>
+                <a href="#psychology" class="hover:text-primary transition-colors">Psychology</a>
+                <a href="#quiz" class="hover:text-primary transition-colors">Quiz</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Progress Bar -->
+    <div class="fixed top-14 left-0 right-0 z-40">
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <header class="relative overflow-hidden py-16 md:py-24 bg-gradient-to-br from-primary/10 to-secondary/5 dark:from-primary/20 dark:to-dark-bg">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto text-center">
+                <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">Support and Resistance</h1>
+                <p class="text-lg md:text-xl mb-8 text-gray-700 dark:text-gray-300">Learn the fundamental building blocks of technical analysis and master price action trading</p>
+                
+                <div class="flex justify-center space-x-4">
+                    <a href="#basics" class="btn px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors shadow-md">
+                        Start Learning
+                    </a>
+                    <a href="#quiz" class="btn px-6 py-3 bg-white dark:bg-dark-card text-primary border border-primary rounded-lg hover:bg-gray-50 dark:hover:bg-dark-bg/80 transition-colors shadow-md">
+                        Test Your Knowledge
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Decorative SVG background -->
+        <div class="absolute -bottom-10 left-0 right-0 h-40 pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" class="w-full h-full">
+                <path fill="currentColor" fill-opacity="0.1" d="M0,192L48,176C96,160,192,128,288,128C384,128,480,160,576,181.3C672,203,768,213,864,202.7C960,192,1056,160,1152,138.7C1248,117,1344,107,1392,101.3L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+            </svg>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <!-- Section 1: Basic Concepts -->
+        <section id="basics" class="mb-16 scroll-mt-20">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex items-center mb-6">
+                    <div class="h-10 w-10 rounded-full bg-primary/20 dark:bg-primary/30 flex items-center justify-center mr-3">
+                        <span class="text-primary font-semibold">1</span>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold">Basic Concepts of Support and Resistance</h2>
+                </div>
+                
+                <div class="bg-light-card dark:bg-dark-card rounded-xl p-6 shadow-md mb-8">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="flex flex-col justify-center">
+                            <h3 class="text-xl font-semibold mb-4">What is Support?</h3>
+                            <p class="mb-4">Support refers to a price level at which buying pressure is strong enough to prevent the price from falling further. It acts as a floor for the price, creating a barrier that keeps it from declining.</p>
+                            <p>When the price drops and approaches a support level, buying interest might increase and selling pressure tends to subside.</p>
+                        </div>
+                        <div class="flex items-center justify-center">
+                            <!-- SVG Chart for Support -->
+                            <svg width="300" height="200" class="w-full max-w-md" viewBox="0 0 300 200">
+                                <!-- Background Grid -->
+                                <g stroke="currentColor" stroke-opacity="0.1" stroke-width="1">
+                                    <line x1="0" y1="50" x2="300" y2="50"></line>
+                                    <line x1="0" y1="100" x2="300" y2="100"></line>
+                                    <line x1="0" y1="150" x2="300" y2="150"></line>
+                                    <line x1="50" y1="0" x2="50" y2="200"></line>
+                                    <line x1="100" y1="0" x2="100" y2="200"></line>
+                                    <line x1="150" y1="0" x2="150" y2="200"></line>
+                                    <line x1="200" y1="0" x2="200" y2="200"></line>
+                                    <line x1="250" y1="0" x2="250" y2="200"></line>
+                                </g>
+                                <!-- Price Line -->
+                                <path d="M20,100 L40,80 L60,110 L80,90 L100,140 L120,120 L140,150 L160,130 L180,150 L200,130 L220,150 L240,130 L260,150 L280,130" fill="none" stroke="#5D5CDE" stroke-width="2" class="animated-line"></path>
+                                <!-- Support Line -->
+                                <line x1="0" y1="150" x2="300" y2="150" stroke="#10B981" stroke-width="2" stroke-dasharray="5,5"></line>
+                                <!-- Text Label -->
+                                <text x="10" y="145" fill="#10B981" font-size="12">Support Level</text>
+                                <!-- Support Arrows -->
+                                <path d="M145,155 L145,170" stroke="#10B981" stroke-width="2" marker-end="url(#arrowhead)"></path>
+                                <path d="M220,155 L220,170" stroke="#10B981" stroke-width="2" marker-end="url(#arrowhead)"></path>
+                                <!-- Definitions -->
+                                <defs>
+                                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                                        <polygon points="0 0, 10 3.5, 0 7" fill="#10B981"></polygon>
+                                    </marker>
+                                </defs>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-light-card dark:bg-dark-card rounded-xl p-6 shadow-md mb-8">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="flex items-center justify-center md:order-last">
+                            <!-- SVG Chart for Resistance -->
+                            <svg width="300" height="200" class="w-full max-w-md" viewBox="0 0 300 200">
+                                <!-- Background Grid -->
+                                <g stroke="currentColor" stroke-opacity="0.1" stroke-width="1">
+                                    <line x1="0" y1="50" x2="300" y2="50"></line>
+                                    <line x1="0" y1="100" x2="300" y2="100"></line>
+                                    <line x1="0" y1="150" x2="300" y2="150"></line>
+                                    <line x1="50" y1="0" x2="50" y2="200"></line>
+                                    <line x1="100" y1="0" x2="100" y2="200"></line>
+                                    <line x1="150" y1="0" x2="150" y2="200"></line>
+                                    <line x1="200" y1="0" x2="200" y2="200"></line>
+                                    <line x1="250" y1="0" x2="250" y2="200"></line>
+                                </g>
+                                <!-- Price Line -->
+                                <path d="M20,100 L40,70 L60,50 L80,70 L100,50 L120,70 L140,50 L160,70 L180,50 L200,70 L220,50 L240,70 L260,50 L280,70" fill="none" stroke="#5D5CDE" stroke-width="2" class="animated-line"></path>
+                                <!-- Resistance Line -->
+                                <line x1="0" y1="50" x2="300" y2="50" stroke="#EF4444" stroke-width="2" stroke-dasharray="5,5"></line>
+                                <!-- Text Label -->
+                                <text x="10" y="45" fill="#EF4444" font-size="12">Resistance Level</text>
+                                <!-- Resistance Arrows -->
+                                <path d="M60,45 L60,30" stroke="#EF4444" stroke-width="2" marker-end="url(#arrowhead-red)"></path>
+                                <path d="M140,45 L140,30" stroke="#EF4444" stroke-width="2" marker-end="url(#arrowhead-red)"></path>
+                                <path d="M220,45 L220,30" stroke="#EF4444" stroke-width="2" marker-end="url(#arrowhead-red)"></path>
+                                <!-- Definitions -->
+                                <defs>
+                                    <marker id="arrowhead-red" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                                        <polygon points="0 0, 10 3.5, 0 7" fill="#EF4444"></polygon>
+                                    </marker>
+                                </defs>
+                            </svg>
+                        </div>
+                        <div class="flex flex-col justify-center md:order-first">
+                            <h3 class="text-xl font-semibold mb-4">What is Resistance?</h3>
+                            <p class="mb-4">Resistance refers to a price level at which selling pressure is significant enough to prevent the price from rising further. It acts as a ceiling for the price, creating a barrier that keeps it from advancing.</p>
+                            <p>When the price rises and approaches a resistance level, buying interest might subside and selling pressure generally increases.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-light-card dark:bg-dark-card rounded-xl p-6 shadow-md">
+                    <h3 class="text-xl font-semibold mb-4">Key Characteristics</h3>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="bg-white dark:bg-dark-bg rounded-lg p-4 shadow">
+                            <div class="text-primary mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
+                            </div>
+                            <h4 class="text-lg font-semibold mb-2">Role Reversal</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">When support is broken, it often becomes resistance. Similarly, when resistance is broken, it often becomes support.</p>
+                        </div>
+                        <div class="bg-white dark:bg-dark-bg rounded-lg p-4 shadow">
+                            <div class="text-primary mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                                </svg>
+                            </div>
+                            <h4 class="text-lg font-semibold mb-2">Zones Not Lines</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Support and resistance are better thought of as zones rather than precise price levels, as prices can often overshoot slightly.</p>
+                        </div>
+                        <div class="bg-white dark:bg-dark-bg rounded-lg p-4 shadow">
+                            <div class="text-primary mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                            </div>
+                            <h4 class="text-lg font-semibold mb-2">Strength by Time</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">The more times a level is tested without breaking, the stronger that support or resistance level becomes.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Video Placeholder -->
+                <div class="mt-8 bg-light-card dark:bg-dark-card rounded-xl p-6 shadow-md">
+                    <h3 class="text-xl font-semibold mb-4">Video Lesson: Introduction to Support and Resistance</h3>
+                    <div class="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
+                        <div class="flex items-center justify-center h-full">
+                            <div class="text-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <p class="mt-4 text-gray-500 dark:text-gray-400">YouTube Video Placeholder</p>
+                                <p class="text-sm text-gray-400 dark:text-gray-500">This would be an embedded video explaining support and resistance basics</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 2: Methods to Identify Support and Resistance -->
+        <section id="methods" class="mb-16 scroll-mt-20">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex items-center mb-6">
+                    <div class="h-10 w-10 rounded-full bg-primary/20 dark:bg-primary/30 flex items-center justify-center mr-3">
+                        <span class="text-primary font-semibold">2</span>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold">Methods to Identify Support and Resistance</h2>
+                </div>
+                
+                <div class="bg-light-card dark:bg-dark-card rounded-xl p-6 shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-6">Key Methods to Find Support and Resistance Zones</h3>
+                    
+                    <!-- Method 1 -->
+                    <div class="mb-8 border-b border-gray-200 dark:border-gray-700 pb-8">
+                        <div class="flex items-start mb-4">
+                            <div class="bg-primary/20 dark:bg-primary/30 rounded-full h-8 w-8 flex items-center justify-center mr-3 flex-shrink-0 mt-1">
+                                <span class="text-primary font-semibold">1</span>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold">Using Previous Price Levels</h4>
+                                <p class="mt-2 mb-4">Identify previous price levels where the stock had difficulty breaking through and create a zone of resistance (ceiling) or support (floor).</p>
+                                <p class="text-gray-600 dark:text-gray-400">Traders usually consider at least two touch points for confirmation. The more 'touch points' at the same price level, the stronger the support or resistance.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <!-- Interactive SVG Chart -->
+                            <svg width="100%" height="250" viewBox="0 0 600 250" class="w-full">
+                                <!-- Background -->
+                                <rect x="0" y="0" width="600" height="250" fill="none"></rect>
+                                
+                                <!-- Grid Lines -->
+                                <g stroke="currentColor" stroke-opacity="0.1" stroke-width="1">
+                                    <line x1="0" y1="50" x2="600" y2="50"></line>
+                                    <line x1="0" y1="100" x2="600" y2="100"></line>
+                                    <line x1="0" y1="150" x2="600" y2="150"></line>
+                                    <line x1="0" y1="200" x2="600" y2="200"></line>
+                                    
+                                    <line x1="50" y1="0" x2="50" y2="250"></line>
+                                    <line x1="150" y1="0" x2="150" y2="250"></line>
+                                    <line x1="250" y1="0" x2="250" y2="250"></line>
+                                    <line x1="350" y1="0" x2="350" y2="250"></line>
+                                    <line x1="450" y1="0" x2="450" y2="250"></line>
+                                    <line x1="550" y1="0" x2="550" y2="250"></line>
+                                </g>
+                                
+                                <!-- Price Candles -->
+                                <!-- Candle 1 -->
+                                <rect x="30" y="140" width="20" height="40" fill="#10B981" stroke="none"></rect>
+                                <line x1="40" y1="120" x2="40" y2="140" stroke="#10B981" stroke-width="2"></line>
+                                <line x1="40" y1="180" x2="40" y2="190" stroke="#10B981" stroke-width="2"></line>
+                                
+                                <!-- Candle 2 -->
+                                <rect x="70" y="160" width="20" height="25" fill="#10B981" stroke="none"></rect>
+                                <line x1="80" y1="150" x2="80" y2="160" stroke="#10B981" stroke-width="2"></line>
+                                <line x1="80" y1="185" x2="80" y2="195" stroke="#10B981" stroke-width="2"></line>
+                                
+                                <!-- Candle 3 -->
+                                <rect x="110" y="100" width="20" height="30" fill="#EF4444" stroke="none"></rect>
+                                <line x1="120" y1="90" x2="120" y2="100" stroke="#EF4444" stroke-width="2"></line>
+                                <line x1="120" y1="130" x2="120" y2="140" stroke="#EF4444" stroke-width="2"></line>
+                                
+                                <!-- Candle 4 -->
+                                <rect x="150" y="130" width="20" height="20" fill="#EF4444" stroke="none"></rect>
+                                <line x1="160" y1="120" x2="160" y2="130" stroke="#EF4444" stroke-width="2"></line>
+                                <line x1="160" y1="150" x2="160" y2="160" stroke="#EF4444" stroke-width="2"></line>
+                                
+                                <!-- Candle 5 -->
+                                <rect x="190" y="150" width="20" height="30" fill="#10B981" stroke="none"></rect>
+                                <line x1="200" y1="140" x2="200" y2="150" stroke="#10B981" stroke-width="2"></line>
+                                <line x1="200" y1="180" x2="200" y2="190" stroke="#10B981" stroke-width="2"></line>
+                                
+                                <!-- Candle 6 -->
+                                <rect x="230" y="170" width="20" height="15" fill="#10B981" stroke="none"></rect>
+                                <line x1="240" y1="160" x2="240" y2="170" stroke="#10B981" stroke-width="2"></line>
+                                <line x1="240" y1="185" x2="240" y2="195" stroke="#10B981" stroke-width="2"></line>
+                                
+                                <!-- Candle 7 -->
+                                <rect x="270" y="100" width="20" height="35" fill="#EF4444" stroke="none"></rect>
+                                <line x1="280" y1="85" x2="280" y2="100" stroke="#EF4444" stroke-width="2"></line>
+                                <line x1="280" y1="135" x2="280" y2="145" stroke="#EF4444" stroke-width="2"></line>
+                                
+                                <!-- Candle 8 -->
+                                <rect x="310" y="60" width="20" height="40" fill="#EF4444" stroke="none"></rect>
+                                <line x1="320" y1="50" x2="320" y2="60" stroke="#EF4444" stroke-width="2"></line>
+                                <line x1="320" y1="100" x2="320" y2="110" stroke="#EF4444" stroke-width="2"></line>
+                                
+                                <!-- Candle 9 -->
+                                <rect x="350" y="90" width="20" height="20" fill="#EF4444" stroke="none"></rect>
+                                <line x1="360" y1="80" x2="360" y2="90" stroke="#EF4444" stroke-width="2"></line>
+                                <line x1="360" y1="110" x2="360" y2="120" stroke="#EF4444" stroke-width="2"></line>
+                                
+                                <!-- Candle 10 -->
+                                <rect x="390" y="130" width="20" height="30" fill="#10B981" stroke="none"></rect>
+                                <line x1="400" y1="120" x2="400" y2="130" stroke="#10B981" stroke-width="2"></line>
+                                <line x1="400" y1="160" x2="400" y2="170" stroke="#10B981" stroke-width="2"></line>
+                                
+                                <!-- Candle 11 -->
+                                <rect x="430" y="160" width="20" height="20" fill="#10B981" stroke="none"></rect>
+                                <line x1="440" y1="150" x2="440" y2="160" stroke="#10B981" stroke-width="2"></line>
+                                <line x1="440" y1="180" x2="440" y2="190" stroke="#10B981" stroke-width="2"></line>
+                                
+                                <!-- Candle 12 -->
+                                <rect x="470" y="140" width="20" height="30" fill="#EF4444" stroke="none"></rect>
+                                <line x1="480" y1="130" x2="480" y2="140" stroke="#EF4444" stroke-width="2"></line>
+                                <line x1="480" y1="170" x2="480" y2="180" stroke="#EF4444" stroke-width="2"></line>
+                                
+                                <!-- Candle 13 -->
+                                <rect x="510" y="100" width="20" height="25" fill="#EF4444" stroke="none"></rect>
+                                <line x1="520" y1="90" x2="520" y2="100" stroke="#EF4444" stroke-width="2"></line>
+                                <line x1="520" y1="125" x2="520" y2="135" stroke="#EF4444" stroke-width="2"></line>
+                                
+                                <!-- Candle 14 -->
+                                <rect x="550" y="120" width="20" height="25" fill="#10B981" stroke="none"></rect>
+                                <line x1="560" y1="110" x2="560" y2="120" stroke="#10B981" stroke-width="2"></line>
+                                <line x1="560" y1="145" x2="560" y2="155" stroke="#10B981" stroke-width="2"></line>
+                                
+                                <!-- Support Line -->
+                                <line x1="0" y1="190" x2="600" y2="190" stroke="#10B981" stroke-width="2" stroke-dasharray="5,5"></line>
+                                <text x="10" y="185" fill="#10B981" font-size="12">Support</text>
+                                
+                                <!-- Resistance Line -->
+                                <line x1="0" y1="80" x2="600" y2="80" stroke="#EF4444" stroke-width="2" stroke-dasharray="5,5"></line>
+                                <text x="10" y="75" fill="#EF4444" font-size="12">Resistance</text>
+                                
+                                <!-- Touch Points -->
+                                <circle cx="80" cy="190" r="4" fill="#10B981"></circle>
+                                <circle cx="240" cy="190" r="4" fill="#10B981"></circle>
+                                <circle cx="440" cy="190" r="4" fill="#10B981"></circle>
+                                
+                                <circle cx="280" cy="80" r="4" fill="#EF4444"></circle>
+                                <circle cx="320" cy="80" r="4" fill="#EF4444"></circle>
+                                <circle cx="520" cy="80" r="4" fill="#EF4444"></circle>
+                            </svg>
+                            
+                            <div class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                                <p><span class="inline-block w-3 h-3 bg-red-500 rounded-sm mr-1"></span> Red candles represent bearish (downward) price movement</p>
+                                <p><span class="inline-block w-3 h-3 bg-green-500 rounded-sm mr-1"></span> Green candles represent bullish (upward) price movement</p>
+                                <p>Notice how price respects the support (green line) and resistance (red line) levels multiple times.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Method 2 -->
+                    <div class="mb-8 border-b border-gray-200 dark:border-gray-700 pb-8">
+                        <div class="flex items-start mb-4">
+                            <div class="bg-primary/20 dark:bg-primary/30 rounded-full h-8 w-8 flex items-center justify-center mr-3 flex-shrink-0 mt-1">
+                                <span class="text-primary font-semibold">2</span>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold">Utilizing Moving Averages</h4>
+                                <p class="mt-2">Moving averages can act as dynamic support and resistance levels. The most common moving averages used are the 50-day, 100-day, and 200-day moving averages.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <!-- Interactive SVG Chart for Moving Averages -->
+                            <svg width="100%" height="250" viewBox="0 0 600 250" class="w-full">
+                                <!-- Background -->
+                                <rect x="0" y="0" width="600" height="250" fill="none"></rect>
+                                
+                                <!-- Grid Lines -->
+                                <g stroke="currentColor" stroke-opacity="0.1" stroke-width="1">
+                                    <line x1="0" y1="50" x2="600" y2="50"></line>
+                                    <line x1="0" y1="100" x2="600" y2="100"></line>
+                                    <line x1="0" y1="150" x2="600" y2="150"></line>
+                                    <line x1="0" y1="200" x2="600" y2="200"></line>
+                                    
+                                    <line x1="50" y1="0" x2="50" y2="250"></line>
+                                    <line x1="150" y1="0" x2="150" y2="250"></line>
+                                    <line x1="250" y1="0" x2="250" y2="250"></line>
+                                    <line x1="350" y1="0" x2="350" y2="250"></line>
+                                    <line x1="450" y1="0" x2="450" y2="250"></line>
+                                    <line x1="550" y1="0" x2="550" y2="250"></line>
+                                </g>
+                                
+                                <!-- Price Line -->
+                                <path d="M25,180 L50,160 L75,140 L100,150 L125,130 L150,100 L175,80 L200,90 L225,70 L250,90 L275,110 L300,130 L325,150 L350,140 L375,160 L400,150 L425,170 L450,190 L475,180 L500,160 L525,170 L550,150 L575,140" fill="none" stroke="#5D5CDE" stroke-width="2"></path>
+                                
+                                <!-- 50-day Moving Average -->
+                                <path d="M25,170 L50,165 L75,155 L100,145 L125,135 L150,125 L175,115 L200,105 L225,100 L250,100 L275,105 L300,110 L325,120 L350,130 L375,140 L400,150 L425,160 L450,165 L475,170 L500,170 L525,165 L550,160 L575,155" fill="none" stroke="#F59E0B" stroke-width="2"></path>
+                                
+                                <!-- 200-day Moving Average -->
+                                <path d="M25,140 L50,140 L75,140 L100,140 L125,140 L150,135 L175,130 L200,125 L225,125 L250,125 L275,125 L300,125 L325,130 L350,130 L375,135 L400,140 L425,140 L450,145 L475,145 L500,145 L525,145 L550,145 L575,145" fill="none" stroke="#10B981" stroke-width="2"></path>
+                                
+                                <!-- Bounce Points -->
+                                <circle cx="225" cy="100" r="4" fill="#F59E0B"></circle>
+                                <circle cx="275" cy="105" r="4" fill="#F59E0B"></circle>
+                                <circle cx="575" cy="155" r="4" fill="#F59E0B"></circle>
+                                
+                                <circle cx="175" cy="130" r="4" fill="#10B981"></circle>
+                                <circle cx="325" cy="130" r="4" fill="#10B981"></circle>
+                                <circle cx="500" cy="145" r="4" fill="#10B981"></circle>
+                                
+                                <!-- Legend -->
+                                <rect x="400" y="10" width="180" height="70" rx="5" fill="currentColor" fill-opacity="0.05"></rect>
+                                <line x1="410" y1="25" x2="430" y2="25" stroke="#5D5CDE" stroke-width="2"></line>
+                                <text x="440" y="28" fill="currentColor" font-size="12">Price</text>
+                                
+                                <line x1="410" y1="45" x2="430" y2="45" stroke="#F59E0B" stroke-width="2"></line>
+                                <text x="440" y="48" fill="currentColor" font-size="12">50-day MA (Shorter-term)</text>
+                                
+                                <line x1="410" y1="65" x2="430" y2="65" stroke="#10B981" stroke-width="2"></line>
+                                <text x="440" y="68" fill="currentColor" font-size="12">200-day MA (Longer-term)</text>
+                            </svg>
+                            
+                            <div class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                                <p>Notice how price often bounces off the moving averages, which act as dynamic support or resistance.</p>
+                                <p>Shorter-term moving averages (like the 50-day) are more responsive to recent price action but provide weaker support/resistance.</p>
+                                <p>Longer-term moving averages (like the 200-day) are slower to respond but typically provide stronger support/resistance.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Method 3 -->
+                    <div>
+                        <div class="flex items-start mb-4">
+                            <div class="bg-primary/20 dark:bg-primary/30 rounded-full h-8 w-8 flex items-center justify-center mr-3 flex-shrink-0 mt-1">
+                                <span class="text-primary font-semibold">3</span>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold">Recognizing Chart Patterns</h4>
+                                <p class="mt-2">Certain chart patterns like head and shoulders, double tops/bottoms, and triangles can help identify potential support and resistance levels.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 grid md:grid-cols-2 gap-6">
+                            <!-- Double Top Pattern -->
+                            <div class="bg-white dark:bg-dark-bg p-4 rounded-lg shadow">
+                                <h5 class="font-semibold mb-3">Double Top Pattern</h5>
+                                <svg width="100%" height="200" viewBox="0 0 300 200">
+                                    <!-- Background Grid -->
+                                    <g stroke="currentColor" stroke-opacity="0.1" stroke-width="1">
+                                        <line x1="0" y1="50" x2="300" y2="50"></line>
+                                        <line x1="0" y1="100" x2="300" y2="100"></line>
+                                        <line x1="0" y1="150" x2="300" y2="150"></line>
+                                        <line x1="50" y1="0" x2="50" y2="200"></line>
+                                        <line x1="100" y1="0" x2="100" y2="200"></line>
+                                        <line x1="150" y1="0" x2="150" y2="200"></line>
+                                        <line x1="200" y1="0" x2="200" y2="200"></line>
+                                        <line x1="250" y1="0" x2="250" y2="200"></line>
+                                    </g>
+                                    
+                                    <!-- Price Chart -->
+                                    <path d="M25,150 L50,130 L75,110 L100,70 L125,50 L150,90 L175,110 L200,70 L225,90 L250,130 L275,170" fill="none" stroke="#5D5CDE" stroke-width="2"></path>
+                                    
+                                    <!-- Resistance Line -->
+                                    <line x1="125" y1="50" x2="200" y2="50" stroke="#EF4444" stroke-width="2" stroke-dasharray="5,5"></line>
+                                    
+                                    <!-- Support Line -->
+                                    <line x1="150" y1="110" x2="225" y2="110" stroke="#10B981" stroke-width="2" stroke-dasharray="5,5"></line>
+                                    
+                                    <!-- Labels -->
+                                    <text x="130" y="45" fill="#EF4444" font-size="10">Resistance</text>
+                                    <text x="160" y="125" fill="#10B981" font-size="10">Support</text>
+                                    
+                                    <!-- Pattern Highlight -->
+                                    <circle cx="125" cy="50" r="4" fill="#EF4444"></circle>
+                                    <circle cx="200" cy="70" r="4" fill="#EF4444"></circle>
+                                </svg>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">A double top forms when price reaches the same resistance level twice but fails to break through. The pattern suggests a potential reversal from bullish to bearish.</p>
+                            </div>
+                            
+                            <!-- Double Bottom Pattern -->
+                            <div class="bg-white dark:bg-dark-bg p-4 rounded-lg shadow">
+                                <h5 class="font-semibold mb-3">Double Bottom Pattern</h5>
+                                <svg width="100%" height="200" viewBox="0 0 300 200">
+                                    <!-- Background Grid -->
+                                    <g stroke="currentColor" stroke-opacity="0.1" stroke-width="1">
+                                        <line x1="0" y1="50" x2="300" y2="50"></line>
+                                        <line x1="0" y1="100" x2="300" y2="100"></line>
+                                        <line x1="0" y1="150" x2="300" y2="150"></line>
+                                        <line x1="50" y1="0" x2="50" y2="200"></line>
+                                        <line x1="100" y1="0" x2="100" y2="200"></line>
+                                        <line x1="150" y1="0" x2="150" y2="200"></line>
+                                        <line x1="200" y1="0" x2="200" y2="200"></line>
+                                        <line x1="250" y1="0" x2="250" y2="200"></line>
+                                    </g>
+                                    
+                                    <!-- Price Chart -->
+                                    <path d="M25,50 L50,70 L75,90 L100,130 L125,150 L150,110 L175,90 L200,150 L225,110 L250,70 L275,30" fill="none" stroke="#5D5CDE" stroke-width="2"></path>
+                                    
+                                    <!-- Resistance Line -->
+                                    <line x1="150" y1="90" x2="225" y2="90" stroke="#EF4444" stroke-width="2" stroke-dasharray="5,5"></line>
+                                    
+                                    <!-- Support Line -->
+                                    <line x1="125" y1="150" x2="200" y2="150" stroke="#10B981" stroke-width="2" stroke-dasharray="5,5"></line>
+                                    
+                                    <!-- Labels -->
+                                    <text x="160" y="85" fill="#EF4444" font-size="10">Resistance</text>
+                                    <text x="130" y="165" fill="#10B981" font-size="10">Support</text>
+                                    
+                                    <!-- Pattern Highlight -->
+                                    <circle cx="125" cy="150" r="4" fill="#10B981"></circle>
+                                    <circle cx="200" cy="150" r="4" fill="#10B981"></circle>
+                                </svg>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">A double bottom forms when price reaches the same support level twice but rebounds. The pattern suggests a potential reversal from bearish to bullish.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Video Placeholder -->
+                <div class="mt-8 bg-light-card dark:bg-dark-card rounded-xl p-6 shadow-md">
+                    <h3 class="text-xl font-semibold mb-4">Video Lesson: How to Identify Support and Resistance</h3>
+                    <div class="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
+                        <div class="flex items-center justify-center h-full">
+                            <div class="text-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <p class="mt-4 text-gray-500 dark:text-gray-400">YouTube Video Placeholder</p>
+                                <p class="text-sm text-gray-400 dark:text-gray-500">This would be an embedded video showing how to identify support and resistance levels</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 3: Trading with Support and Resistance -->
+        <section id="trading" class="mb-16 scroll-mt-20">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex items-center mb-6">
+                    <div class="h-10 w-10 rounded-full bg-primary/20 dark:bg-primary/30 flex items-center justify-center mr-3">
+                        <span class="text-primary font-semibold">3</span>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold">Trading with Support and Resistance</h2>
+                </div>
+                
+                <div class="bg-light-card dark:bg-dark-card rounded-xl p-6 shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-6">Two Main Strategies</h3>
+                    
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <!-- Strategy 1: Trading the Bounce -->
+                        <div class="bg-white dark:bg-dark-bg p-6 rounded-lg shadow">
+                            <div class="flex items-center mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
+                                <h4 class="text-lg font-semibold">1. Trading the Bounce</h4>
+                            </div>
+                            
+                            <p class="mb-4">This strategy involves entering trades when price reacts to a support or resistance level without breaking through it.</p>
+                            
+                            <ul class="space-y-2 mb-6">
+                                <li class="flex items-start">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span>Buy when price bounces up from a support level</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span>Sell when price bounces down from a resistance level</span>
+                                </li>
+                            </ul>
+                            
+                            <!-- Chart illustration -->
+                            <svg width="100%" height="180" viewBox="0 0 300 180">
+                                <!-- Background Grid -->
+                                <g stroke="currentColor" stroke-opacity="0.1" stroke-width="1">
+                                    <line x1="0" y1="45" x2="300" y2="45"></line>
+                                    <line x1="0" y1="90" x2="300" y2="90"></line>
+                                    <line x1="0" y1="135" x2="300" y2="135"></line>
+                                    <line x1="50" y1="0" x2="50" y2="180"></line>
+                                    <line x1="100" y1="0" x2="100" y2="180"></line>
+                                    <line x1="150" y1="0" x2="150" y2="180"></line>
+                                    <line x1="200" y1="0" x2="200" y2="180"></line>
+                                    <line x1="250" y1="0" x2="250" y2="180"></line>
+                                </g>
+                                
+                                <!-- Price Chart -->
+                                <path d="M25,90 L50,70 L75,50 L100,35 L125,55 L150,70 L175,90 L200,110 L225,130 L250,110 L275,135" fill="none" stroke="#5D5CDE" stroke-width="2"></path>
+                                
+                                <!-- Resistance Line -->
+                                <line x1="0" y1="45" x2="300" y2="45" stroke="#EF4444" stroke-width="2" stroke-dasharray="5,5"></line>
+                                
+                                <!-- Support Line -->
+                                <line x1="0" y1="135" x2="300" y2="135" stroke="#10B981" stroke-width="2" stroke-dasharray="5,5"></line>
+                                
+                                <!-- Trade Points -->
+                                <circle cx="100" cy="35" r="4" fill="#EF4444"></circle>
+                                <text x="100" y="25" text-anchor="middle" fill="#EF4444" font-size="10">SELL</text>
+                                
+                                <circle cx="225" cy="130" r="4" fill="#10B981"></circle>
+                                <text x="225" y="150" text-anchor="middle" fill="#10B981" font-size="10">BUY</text>
+                            </svg>
+                        </div>
+                        
+                        <!-- Strategy 2: Trading the Break -->
+                        <div class="bg-white dark:bg-dark-bg p-6 rounded-lg shadow">
+                            <div class="flex items-center mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                                <h4 class="text-lg font-semibold">2. Trading the Break</h4>
+                            </div>
+                            
+                            <p class="mb-4">This strategy involves entering trades when price breaks through a support or resistance level, suggesting a potential continuation in that direction.</p>
+                            
+                            <ul class="space-y-2 mb-6">
+                                <li class="flex items-start">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span>Buy when price breaks above a resistance level</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span>Sell when price breaks below a support level</span>
+                                </li>
+                            </ul>
+                            
+                            <!-- Chart illustration -->
+                            <svg width="100%" height="180" viewBox="0 0 300 180">
+                                <!-- Background Grid -->
+                                <g stroke="currentColor" stroke-opacity="0.1" stroke-width="1">
+                                    <line x1="0" y1="45" x2="300" y2="45"></line>
+                                    <line x1="0" y1="90" x2="300" y2="90"></line>
+                                    <line x1="0" y1="135" x2="300" y2="135"></line>
+                                    <line x1="50" y1="0" x2="50" y2="180"></line>
+                                    <line x1="100" y1="0" x2="100" y2="180"></line>
+                                    <line x1="150" y1="0" x2="150" y2="180"></line>
+                                    <line x1="200" y1="0" x2="200" y2="180"></line>
+                                    <line x1="250" y1="0" x2="250" y2="180"></line>
+                                </g>
+                                
+                                <!-- Price Chart -->
+                                <path d="M25,90 L50,70 L75,50 L100,45 L125,55 L150,45 L175,30 L200,20 L225,10 L250,5 L275,15" fill="none" stroke="#5D5CDE" stroke-width="2"></path>
+                                
+                                <!-- Previous Resistance now Support Line -->
+                                <line x1="0" y1="45" x2="300" y2="45" stroke="#10B981" stroke-width="2" stroke-dasharray="5,5"></line>
+                                
+                                <!-- Trade Point -->
+                                <circle cx="175" cy="30" r="4" fill="#10B981"></circle>
+                                <text x="175" y="20" text-anchor="middle" fill="#10B981" font-size="10">BUY</text>
+                                
+                                <!-- Breakout Arrow -->
+                                <path d="M150,45 L165,30" stroke="#10B981" stroke-width="2" marker-end="url(#arrowhead-breakout)"></path>
+                                
+                                <!-- Previous Resistance Label -->
+                                <text x="10" y="40" fill="#10B981" font-size="10">Previous Resistance</text>
+                                <text x="10" y="52" fill="#10B981" font-size="10">Now Support</text>
+                                
+                                <!-- Definitions -->
+                                <defs>
+                                    <marker id="arrowhead-breakout" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                                        <polygon points="0 0, 10 3.5, 0 7" fill="#10B981"></polygon>
+                                    </marker>
+                                </defs>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-4 rounded-r-lg">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h4 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Important Note</h4>
+                                <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                                    <p>False breakouts are common. To increase reliability, consider:</p>
+                                    <ul class="list-disc ml-5 mt-1 space-y-1">
+                                        <li>Waiting for confirmation (e.g., a candle close beyond the level)</li>
+                                        <li>Looking for increased volume on breakouts</li>
+                                        <li>Using multiple timeframes to confirm the significance of the level</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-light-card dark:bg-dark-card rounded-xl p-6 shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4">Identifying Breakouts and Reversals</h3>
+                    
+                    <p class="mb-6">The strength of a breakout or reversal at support and resistance levels can provide valuable insights into potential future price movements.</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Breakout -->
+                        <div class="bg-white dark:bg-dark-bg p-4 rounded-lg shadow">
+                            <h4 class="text-lg font-semibold mb-3">Valid Breakout</h4>
+                            
+                            <svg width="100%" height="180" viewBox="0 0 300 180">
+                                <!-- Background Grid -->
+                                <g stroke="currentColor" stroke-opacity="0.1" stroke-width="1">
+                                    <line x1="0" y1="45" x2="300" y2="45"></line>
+                                    <line x1="0" y1="90" x2="300" y2="90"></line>
+                                    <line x1="0" y1="135" x2="300" y2="135"></line>
+                                    <line x1="50" y1="0" x2="50" y2="180"></line>
+                                    <line x1="100" y1="0" x2="100" y2="180"></line>
+                                    <line x1="150" y1="0" x2="150" y2="180"></line>
+                                    <line x1="200" y1="0" x2="200" y2="180"></line>
+                                    <line x1="250" y1="0" x2="250" y2="180"></line>
+                                </g>
+                                
+                                <!-- Price Candles -->
+                                <!-- Before Breakout -->
+                                <rect x="50" y="100" width="10" height="25" fill="#EF4444"></rect>
+                                <line x1="55" y1="95" x2="55" y2="100" stroke="#EF4444" stroke-width="2"></line>
+                                <line x1="55" y1="125" x2="55" y2="130" stroke="#EF4444" stroke-width="2"></line>
+                                
+                                <rect x="70" y="110" width="10" height="15" fill="#EF4444"></rect>
+                                <line x1="75" y1="105" x2="75" y2="110" stroke="#EF4444" stroke-width="2"></line>
+                                <line x1="75" y1="125" x2="75" y2="130" stroke="#EF4444" stroke-width="2"></line>
+                                
+                                <rect x="90" y="95" width="10" height="30" fill="#10B981"></rect>
+                                <line x1="95" y1="90" x2="95" y2="95" stroke="#10B981" stroke-width="2"></line>
+                                <line x1="95" y1="125" x2="95" y2="135" stroke="#10B981" stroke-width="2"></line>
+                                
+                                <rect x="110" y="100" width="10" height="25" fill="#EF4444"></rect>
+                                <line x1="115" y1="95" x2="115" y2="100" stroke="#EF4444" stroke-width="2"></line>
+                                <line x1="115" y1="125" x2="115" y2="135" stroke="#EF4444" stroke-width="2"></line>
+                                
+                                <rect x="130" y="110" width="10" height="20" fill="#EF4444"></rect>
+                                <line x1="135" y1="105" x2="135" y2="110" stroke="#EF4444" stroke-width="2"></line>
+                                <line x1="135" y1="130" x2="135" y2="140" stroke="#EF4444" stroke-width="2"></line>
+                                
+                                <!-- Breakout Candle -->
+                                <rect x="150" y="70" width="10" height="75" fill="#10B981"></rect>
+                                <line x1="155" y1="65" x2="155" y2="70" stroke="#10B981" stroke-width="2"></line>
+                                <line x1="155" y1="145" x2="155" y2="150" stroke="#10B981" stroke-width="2"></line>
+                                
+                                <!-- After Breakout -->
+                                <rect x="170" y="55" width="10" height="25" fill="#10B981"></rect>
+                                <line x1="175" y1="50" x2="175" y2="55" stroke="#10B981" stroke-width="2"></line>
+                                <line x1="175" y1="80" x2="175" y2="85" stroke="#10B981" stroke-width="2"></line>
+                                
+                                <rect x="190" y="50" width="10" height="15" fill="#10B981"></rect>
+                                <line x1="195" y1="45" x2="195" y2="50" stroke="#10B981" stroke-width="2"></line>
+                                <line x1="195" y1="65" x2="195" y2="70" stroke="#10B981" stroke-width="2"></line>
+                                
+                                <rect x="210" y="55" width="10" height="20" fill="#10B981"></rect>
+                                <line x1="215" y1="50" x2="215" y2="55" stroke="#10B981" stroke-width="2"></line>
+                                <line x1="215" y1="75" x2="215" y2="80" stroke="#10B981" stroke-width="2"></line>
+                                
+                                <rect x="230" y="45" width="10" height="15" fill="#10B981"></rect>
+                                <line x1="235" y1="40" x2="235" y2="45" stroke="#10B981" stroke-width="2"></line>
+                                <line x1="235" y1="60" x2="235" y2="65" stroke="#10B981" stroke-width="2"></line>
+                                
+                                <!-- Resistance Line -->
+                                <line x1="0" y1="90" x2="140" y2="90" stroke="#EF4444" stroke-width="2" stroke-dasharray="5,5"></line>
+                                
+                                <!-- New Support Line -->
+                                <line x1="170" y1="90" x2="300" y2="90" stroke="#10B981" stroke-width="2" stroke-dasharray="5,5"></line>
+                                
+                                <!-- Volume Bars (simplified) -->
+                                <rect x="50" y="160" width="10" height="5" fill="currentColor" fill-opacity="0.3"></rect>
+                                <rect x="70" y="160" width="10" height="7" fill="currentColor" fill-opacity="0.3"></rect>
+                                <rect x="90" y="160" width="10" height="10" fill="currentColor" fill-opacity="0.3"></rect>
+                                <rect x="110" y="160" width="10" height="8" fill="currentColor" fill-opacity="0.3"></rect>
+                                <rect x="130" y="160" width="10" height="6" fill="currentColor" fill-opacity="0.3"></rect>
+                                <rect x="150" y="160" width="10" height="20" fill="currentColor" fill-opacity="0.5"></rect>
+                                <rect x="170" y="160" width="10" height="15" fill="currentColor" fill-opacity="0.3"></rect>
+                                <rect x="190" y="160" width="10" height="8" fill="currentColor" fill-opacity="0.3"></rect>
+                                <rect x="210" y="160" width="10" height="6" fill="currentColor" fill-opacity="0.3"></rect>
+                                <rect x="230" y="160" width="10" height="5" fill="currentColor" fill-opacity="0.3"></rect>
+                                
+                                <!-- Labels -->
+                                <text x="100" y="85" fill="#EF4444" font-size="10">Resistance</text>
+                                <text x="210" y="85" fill="#10B981" font-size="10">New Support</text>
+                                <text x="150" y="170" fill="currentColor" font-size="10">High Volume</text>
+                            </svg>
+                            
+                            <div class="mt-3">
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Key characteristics of a valid breakout:</p>
+                                <ul class="list-disc ml-5 mt-1 text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                                    <li>Strong momentum through the level</li>
+                                    <li>Increased trading volume during the breakout</li>
+                                    <li>Previous resistance becomes new support</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- False Breakout -->
+                        <div class="bg-white dark:bg-dark-bg p-4 rounded-lg shadow">
+                            <h4 class="text-lg font-semibold mb-3">False Breakout</h4>
+                            
+                            <svg width="100%" height="180" viewBox="0 0 300 180">
+                                <!-- Background Grid -->
+                                <g stroke="currentColor" stroke-opacity="0.1" stroke-width="1">
+                                    <line x1="0" y1="45" x2="300" y2="45"></line>
+                                    <line x1="0" y1="90" x2="300" y2="90"></line>
+                                    <line x1="0" y1="135" x2="300" y2="135"></line>
+                                    <line x1="50" y1="0" x2="50" y2="180"></line>
+                                    <line x1="100" y1="0" x2="100" y2="180"></line>
+                                    <line x1="150" y1="0" x2="150" y2="180"></line>
+                                    <line x1="200" y1="0" x2="200" y2="180"></line>
+                                    <line x1="250" y1="0" x2="250" y2="180"></line>
+                                </g>
+                                
+                                <!-- Price Candles -->
+                                <!-- Before Breakout -->
+                                <rect x="50" y="100" width="10" height="25" fill="#EF4444"></rect>
+                                <line x1="55" y1="95" x2="55" y2="100" stroke="#EF4444" stroke-width="2"></line>
+                                <line x1="55" y1="125" x2="55" y2="130" stroke="#EF4444" stroke-width="2"></line>
+                                
+                                <rect x="70" y="110" width="10" height="15" fill="#EF4444"></rect>
+                                <line x1="75" y1="105" x2="75" y2="110" stroke="#EF4444" stroke-width="2"></line>
+                                <line x1="75" y1="125" x2="75" y2="130" stroke="#EF4444" stroke-width="2"></line>
+                                
+                                <rect x="90" y="95" width="10" height="30" fill="#10B981"></rect>
+                                <line x1="95" y1="90" x2="95" y2="95" stroke="#10B981" stroke-width="2"></line>
+                                <line x1="95" y1="125" x2="95" y2="135" stroke="#10B981" stroke-width="2"></line>
+                                
+                                <rect x="110" y="100" width="10" height="25" fill="#EF4444"></rect>
+                                <line x1="115" y1="95" x2="115" y2="100" stroke="#EF4444" stroke-width="2"></line>
+                                <line x1="115" y1="125" x2="115" y2="135" stroke="#EF4444" stroke-width="2"></line>
+                                
+                                <rect x="130" y="110" width="10" height="20" fill="#EF4444"></rect>
+                                <line x1="135" y1="105" x2="135" y2="110" stroke="#EF4444" stroke-width="2"></line>
+                                <line x1="135" y1="130" x2="135" y2="140" stroke="#EF4444" stroke-width="2"></line>
+                                
+                                <!-- False Breakout Candle -->
+                                <rect x="150" y="80" width="10" height="20" fill="#10B981"></rect>
+                                <line x1="155" y1="75" x2="155" y2="80" stroke="#10B981" stroke-width="2"></line>
+                                <line x1="155" y1="100" x2="155" y2="105" stroke="#10B981" stroke-width="2"></line>
+                                
+                                <!-- Reversal Candle -->
+                                <rect x="170" y="95" width="10" height="30" fill="#EF4444"></rect>
+                                <line x1="175" y1="85" x2="175" y2="95" stroke="#EF4444" stroke-width="2"></line>
+                                <line x1="175" y1="125" x2="175" y2="130" stroke="#EF4444" stroke-width="2"></line>
+                                
+                                <!-- After False Breakout -->
+                                <rect x="190" y="105" width="10" height="25" fill="#EF4444"></rect>
+                                <line x1="195" y1="100" x2="195" y2="105" stroke="#EF4444" stroke-width="2"></line>
+                                <line x1="195" y1="130" x2="195" y2="135" stroke="#EF4444" stroke-width="2"></line>
+                                
+                                <rect x="210" y="115" width="10" height="20" fill="#EF4444"></rect>
+                                <line x1="215" y1="110" x2="215" y2="115" stroke="#EF4444" stroke-width="2"></line>
+                                <line x1="215" y1="135" x2="215" y2="140" stroke="#EF4444" stroke-width="2"></line>
+                                
+                                <rect x="230" y="125" width="10" height="15" fill="#EF4444"></rect>
+                                <line x1="235" y1="120" x2="235" y2="125" stroke="#EF4444" stroke-width="2"></line>
+                                <line x1="235" y1="140" x2="235" y2="145" stroke="#EF4444" stroke-width="2"></line>
+                                
+                                <!-- Resistance Line -->
+                                <line x1="0" y1="90" x2="300" y2="90" stroke="#EF4444" stroke-width="2" stroke-dasharray="5,5"></line>
+                                
+                                <!-- Volume Bars (simplified) -->
+                                <rect x="50" y="160" width="10" height="5" fill="currentColor" fill-opacity="0.3"></rect>
+                                <rect x="70" y="160" width="10" height="7" fill="currentColor" fill-opacity="0.3"></rect>
+                                <rect x="90" y="160" width="10" height="10" fill="currentColor" fill-opacity="0.3"></rect>
+                                <rect x="110" y="160" width="10" height="8" fill="currentColor" fill-opacity="0.3"></rect>
+                                <rect x="130" y="160" width="10" height="6" fill="currentColor" fill-opacity="0.3"></rect>
+                                <rect x="150" y="160" width="10" height="8" fill="currentColor" fill-opacity="0.3"></rect>
+                                <rect x="170" y="160" width="10" height="15" fill="currentColor" fill-opacity="0.5"></rect>
+                                <rect x="190" y="160" width="10" height="8" fill="currentColor" fill-opacity="0.3"></rect>
+                                <rect x="210" y="160" width="10" height="6" fill="currentColor" fill-opacity="0.3"></rect>
+                                <rect x="230" y="160" width="10" height="5" fill="currentColor" fill-opacity="0.3"></rect>
+                                
+                                <!-- Labels -->
+                                <text x="100" y="85" fill="#EF4444" font-size="10">Resistance</text>
+                                <text x="155" y="75" fill="#10B981" font-size="10">False Break</text>
+                                <text x="175" y="75" fill="#EF4444" font-size="10">Reversal</text>
+                            </svg>
+                            
+                            <div class="mt-3">
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Key characteristics of a false breakout:</p>
+                                <ul class="list-disc ml-5 mt-1 text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                                    <li>Price briefly breaks through the level but fails to maintain momentum</li>
+                                    <li>Often accompanied by lower volume</li>
+                                    <li>Price quickly reverses direction</li>
+                                    <li>The level continues to act as resistance/support</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Video Placeholder -->
+                <div class="mt-8 bg-light-card dark:bg-dark-card rounded-xl p-6 shadow-md">
+                    <h3 class="text-xl font-semibold mb-4">Video Lesson: Trading Strategies with Support and Resistance</h3>
+                    <div class="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
+                        <div class="flex items-center justify-center h-full">
+                            <div class="text-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <p class="mt-4 text-gray-500 dark:text-gray-400">YouTube Video Placeholder</p>
+                                <p class="text-sm text-gray-400 dark:text-gray-500">This would be an embedded video demonstrating trading strategies</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 4: Psychology of Support and Resistance -->
+        <section id="psychology" class="mb-16 scroll-mt-20">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex items-center mb-6">
+                    <div class="h-10 w-10 rounded-full bg-primary/20 dark:bg-primary/30 flex items-center justify-center mr-3">
+                        <span class="text-primary font-semibold">4</span>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold">Psychology of Support and Resistance</h2>
+                </div>
+                
+                <div class="bg-light-card dark:bg-dark-card rounded-xl p-6 shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-6">Market Participants and Their Behaviors</h3>
+                    
+                    <div class="grid md:grid-cols-3 gap-6 mb-8">
+                        <!-- The Longs -->
+                        <div class="bg-white dark:bg-dark-bg p-4 rounded-lg shadow">
+                            <div class="flex items-center mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                                </svg>
+                                <h4 class="text-lg font-semibold">The Longs</h4>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Investors who have already purchased securities and benefit from rising prices.</p>
+                            <div class="mt-3 bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
+                                <p class="text-xs text-green-800 dark:text-green-300">At Support: May buy more if price retraces to support where they previously bought.</p>
+                                <p class="text-xs text-green-800 dark:text-green-300 mt-2">At Resistance: May take profits, reducing buying pressure.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- The Shorts -->
+                        <div class="bg-white dark:bg-dark-bg p-4 rounded-lg shadow">
+                            <div class="flex items-center mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                                </svg>
+                                <h4 class="text-lg font-semibold">The Shorts</h4>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Investors who have sold securities and benefit from falling prices.</p>
+                            <div class="mt-3 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">
+                                <p class="text-xs text-red-800 dark:text-red-300">At Support: May close positions if support holds, adding buying pressure.</p>
+                                <p class="text-xs text-red-800 dark:text-red-300 mt-2">At Resistance: May add to positions, increasing selling pressure.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- The Uncommitted -->
+                        <div class="bg-white dark:bg-dark-bg p-4 rounded-lg shadow">
+                            <div class="flex items-center mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m-4 6H4m0 0l4 4m-4-4l4-4"></path>
+                                </svg>
+                                <h4 class="text-lg font-semibold">The Uncommitted</h4>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Investors who have not yet entered the market but are watching for opportunities.</p>
+                            <div class="mt-3 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                                <p class="text-xs text-blue-800 dark:text-blue-300">At Support: May enter long positions, increasing buying pressure.</p>
+                                <p class="text-xs text-blue-800 dark:text-blue-300 mt-2">At Resistance: May enter short positions, adding selling pressure.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-indigo-50 dark:bg-indigo-900/20 p-5 rounded-lg">
+                        <h4 class="text-lg font-semibold text-indigo-900 dark:text-indigo-300 mb-3">The Self-Fulfilling Prophecy</h4>
+                        <p class="text-sm text-indigo-800 dark:text-indigo-200">Support and resistance levels work in part because enough traders believe in them and act accordingly. This collective behavior creates a self-fulfilling prophecy:</p>
+                        
+                        <div class="mt-4 relative overflow-hidden">
+                            <!-- Arrow Flow Diagram -->
+                            <div class="flex flex-col md:flex-row items-center justify-between text-center">
+                                <div class="mb-4 md:mb-0 bg-white dark:bg-dark-bg p-3 rounded-lg shadow w-full md:w-1/4">
+                                    <div class="text-indigo-900 dark:text-indigo-300 font-semibold mb-1">Traders Identify Level</div>
+                                    <p class="text-xs text-indigo-700 dark:text-indigo-400">Support/resistance level identified by multiple traders</p>
+                                </div>
+                                
+                                <div class="hidden md:block text-indigo-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                                    </svg>
+                                </div>
+                                
+                                <div class="block md:hidden text-indigo-500 my-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                                    </svg>
+                                </div>
+                                
+                                <div class="mb-4 md:mb-0 bg-white dark:bg-dark-bg p-3 rounded-lg shadow w-full md:w-1/4">
+                                    <div class="text-indigo-900 dark:text-indigo-300 font-semibold mb-1">Traders Act</div>
+                                    <p class="text-xs text-indigo-700 dark:text-indigo-400">They place orders around these levels (buy at support, sell at resistance)</p>
+                                </div>
+                                
+                                <div class="hidden md:block text-indigo-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                                    </svg>
+                                </div>
+                                
+                                <div class="block md:hidden text-indigo-500 my-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                                    </svg>
+                                </div>
+                                
+                                <div class="bg-white dark:bg-dark-bg p-3 rounded-lg shadow w-full md:w-1/4">
+                                    <div class="text-indigo-900 dark:text-indigo-300 font-semibold mb-1">Price Reacts</div>
+                                    <p class="text-xs text-indigo-700 dark:text-indigo-400">The combined trading activity causes price to react as expected at these levels</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-light-card dark:bg-dark-card rounded-xl p-6 shadow-md">
+                    <h3 class="text-xl font-semibold mb-6">Role Reversal: When Support Becomes Resistance and Vice Versa</h3>
+                    
+                    <div class="bg-white dark:bg-dark-bg p-5 rounded-lg shadow">
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="text-lg font-semibold mb-4">Support Becoming Resistance</h4>
+                                <svg width="100%" height="200" viewBox="0 0 300 200">
+                                    <!-- Background Grid -->
+                                    <g stroke="currentColor" stroke-opacity="0.1" stroke-width="1">
+                                        <line x1="0" y1="50" x2="300" y2="50"></line>
+                                        <line x1="0" y1="100" x2="300" y2="100"></line>
+                                        <line x1="0" y1="150" x2="300" y2="150"></line>
+                                        <line x1="50" y1="0" x2="50" y2="200"></line>
+                                        <line x1="100" y1="0" x2="100" y2="200"></line>
+                                        <line x1="150" y1="0" x2="150" y2="200"></line>
+                                        <line x1="200" y1="0" x2="200" y2="200"></line>
+                                        <line x1="250" y1="0" x2="250" y2="200"></line>
+                                    </g>
+                                    
+                                    <!-- Price Chart -->
+                                    <path d="M25,100 L50,80 L75,90 L100,80 L125,100 L150,110 L175,130 L200,150 L225,170 L250,180 L275,175" fill="none" stroke="currentColor" stroke-width="1" stroke-opacity="0.3"></path>
+                                    
+                                    <!-- Support Line (Before Break) -->
+                                    <line x1="0" y1="100" x2="150" y2="100" stroke="#10B981" stroke-width="2" stroke-dasharray="5,5"></line>
+                                    <text x="10" y="95" fill="#10B981" font-size="10">Support</text>
+                                    
+                                    <!-- Break and Continuation -->
+                                    <path d="M150,110 L175,130 L200,150" fill="none" stroke="#EF4444" stroke-width="2"></path>
+                                    
+                                    <!-- New Resistance Line (After Break) -->
+                                    <line x1="200" y1="100" x2="300" y2="100" stroke="#EF4444" stroke-width="2" stroke-dasharray="5,5"></line>
+                                    <text x="210" y="95" fill="#EF4444" font-size="10">New Resistance</text>
+                                    
+                                    <!-- Psychology Explanation -->
+                                    <rect x="210" y="10" width="80" height="70" rx="5" fill="currentColor" fill-opacity="0.05"></rect>
+                                    <text x="215" y="25" fill="currentColor" font-size="9">Traders who:</text>
+                                    <text x="215" y="40" fill="currentColor" font-size="8">• Missed selling at support</text>
+                                    <text x="215" y="55" fill="currentColor" font-size="8">• Want to exit breakeven</text>
+                                    <text x="215" y="70" fill="currentColor" font-size="8">• New shorts entering</text>
+                                </svg>
+                                
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-3">When price breaks below a support level, that level often becomes resistance on subsequent price rises. Traders who missed the opportunity to sell at support may sell when price returns to that level.</p>
+                            </div>
+                            
+                            <div>
+                                <h4 class="text-lg font-semibold mb-4">Resistance Becoming Support</h4>
+                                <svg width="100%" height="200" viewBox="0 0 300 200">
+                                    <!-- Background Grid -->
+                                    <g stroke="currentColor" stroke-opacity="0.1" stroke-width="1">
+                                        <line x1="0" y1="50" x2="300" y2="50"></line>
+                                        <line x1="0" y1="100" x2="300" y2="100"></line>
+                                        <line x1="0" y1="150" x2="300" y2="150"></line>
+                                        <line x1="50" y1="0" x2="50" y2="200"></line>
+                                        <line x1="100" y1="0" x2="100" y2="200"></line>
+                                        <line x1="150" y1="0" x2="150" y2="200"></line>
+                                        <line x1="200" y1="0" x2="200" y2="200"></line>
+                                        <line x1="250" y1="0" x2="250" y2="200"></line>
+                                    </g>
+                                    
+                                    <!-- Price Chart -->
+                                    <path d="M25,100 L50,120 L75,110 L100,120 L125,100 L150,90 L175,70 L200,50 L225,30 L250,20 L275,25" fill="none" stroke="currentColor" stroke-width="1" stroke-opacity="0.3"></path>
+                                    
+                                    <!-- Resistance Line (Before Break) -->
+                                    <line x1="0" y1="100" x2="150" y2="100" stroke="#EF4444" stroke-width="2" stroke-dasharray="5,5"></line>
+                                    <text x="10" y="95" fill="#EF4444" font-size="10">Resistance</text>
+                                    
+                                    <!-- Break and Continuation -->
+                                    <path d="M150,90 L175,70 L200,50" fill="none" stroke="#10B981" stroke-width="2"></path>
+                                    
+                                    <!-- New Support Line (After Break) -->
+                                    <line x1="200" y1="100" x2="300" y2="100" stroke="#10B981" stroke-width="2" stroke-dasharray="5,5"></line>
+                                    <text x="210" y="95" fill="#10B981" font-size="10">New Support</text>
+                                    
+                                    <!-- Psychology Explanation -->
+                                    <rect x="210" y="10" width="80" height="70" rx="5" fill="currentColor" fill-opacity="0.05"></rect>
+                                    <text x="215" y="25" fill="currentColor" font-size="9">Traders who:</text>
+                                    <text x="215" y="40" fill="currentColor" font-size="8">• Missed buying at breakout</text>
+                                    <text x="215" y="55" fill="currentColor" font-size="8">• Want to enter on pullback</text>
+                                    <text x="215" y="70" fill="currentColor" font-size="8">• Former shorts covering</text>
+                                </svg>
+                                
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-3">When price breaks above a resistance level, that level often becomes support on subsequent price drops. Traders who missed the breakout may buy when price retraces to that level.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Video Placeholder -->
+                <div class="mt-8 bg-light-card dark:bg-dark-card rounded-xl p-6 shadow-md">
+                    <h3 class="text-xl font-semibold mb-4">Video Lesson: Psychology Behind Support and Resistance</h3>
+                    <div class="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
+                        <div class="flex items-center justify-center h-full">
+                            <div class="text-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <p class="mt-4 text-gray-500 dark:text-gray-400">YouTube Video Placeholder</p>
+                                <p class="text-sm text-gray-400 dark:text-gray-500">This would be an embedded video explaining market psychology</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 5: Quiz -->
+        <section id="quiz" class="mb-16 scroll-mt-20">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex items-center mb-6">
+                    <div class="h-10 w-10 rounded-full bg-primary/20 dark:bg-primary/30 flex items-center justify-center mr-3">
+                        <span class="text-primary font-semibold">5</span>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold">Test Your Knowledge</h2>
+                </div>
+                
+                <div class="bg-light-card dark:bg-dark-card rounded-xl p-6 shadow-md">
+                    <h3 class="text-xl font-semibold mb-6">Support and Resistance Quiz</h3>
+                    
+                    <div id="quiz-container" class="space-y-8">
+                        <!-- Question 1 -->
+                        <div class="quiz-question">
+                            <h4 class="text-lg font-semibold mb-3">1. What happens when a support level is broken?</h4>
+                            <div class="space-y-3">
+                                <div class="quiz-option p-3 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer transition-all" data-correct="false">
+                                    <p>A. It immediately becomes stronger support</p>
+                                </div>
+                                <div class="quiz-option p-3 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer transition-all" data-correct="true">
+                                    <p>B. It often becomes resistance</p>
+                                </div>
+                                <div class="quiz-option p-3 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer transition-all" data-correct="false">
+                                    <p>C. It no longer has any significance</p>
+                                </div>
+                                <div class="quiz-option p-3 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer transition-all" data-correct="false">
+                                    <p>D. It always creates a double bottom pattern</p>
+                                </div>
+                            </div>
+                            <div class="mt-3 hidden quiz-explanation bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                                <p class="text-sm text-blue-800 dark:text-blue-300">When a support level is broken, it often becomes a resistance level. This role reversal occurs because traders who missed the opportunity to sell at the support level may now be waiting to exit positions when price returns to that level.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Question 2 -->
+                        <div class="quiz-question">
+                            <h4 class="text-lg font-semibold mb-3">2. Which of the following can act as dynamic support and resistance?</h4>
+                            <div class="space-y-3">
+                                <div class="quiz-option p-3 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer transition-all" data-correct="true">
+                                    <p>A. Moving averages</p>
+                                </div>
+                                <div class="quiz-option p-3 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer transition-all" data-correct="false">
+                                    <p>B. Trading volume</p>
+                                </div>
+                                <div class="quiz-option p-3 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer transition-all" data-correct="false">
+                                    <p>C. Market capitalization</p>
+                                </div>
+                                <div class="quiz-option p-3 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer transition-all" data-correct="false">
+                                    <p>D. The opening price</p>
+                                </div>
+                            </div>
+                            <div class="mt-3 hidden quiz-explanation bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                                <p class="text-sm text-blue-800 dark:text-blue-300">Moving averages can act as dynamic support and resistance levels. Unlike static horizontal levels, moving averages change over time, but still often influence price behavior when price approaches them.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Question 3 -->
+                        <div class="quiz-question">
+                            <h4 class="text-lg font-semibold mb-3">3. What strategy involves buying when price bounces up from a support level?</h4>
+                            <div class="space-y-3">
+                                <div class="quiz-option p-3 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer transition-all" data-correct="true">
+                                    <p>A. Trading the bounce</p>
+                                </div>
+                                <div class="quiz-option p-3 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer transition-all" data-correct="false">
+                                    <p>B. Trading the break</p>
+                                </div>
+                                <div class="quiz-option p-3 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer transition-all" data-correct="false">
+                                    <p>C. Resistance trading</p>
+                                </div>
+                                <div class="quiz-option p-3 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer transition-all" data-correct="false">
+                                    <p>D. Momentum trading</p>
+                                </div>
+                            </div>
+                            <div class="mt-3 hidden quiz-explanation bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                                <p class="text-sm text-blue-800 dark:text-blue-300">"Trading the bounce" refers to entering trades when price reacts to support or resistance levels without breaking through. For example, buying when price bounces up from a support level, or selling when price bounces down from a resistance level.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Question 4 -->
+                        <div class="quiz-question">
+                            <h4 class="text-lg font-semibold mb-3">4. Which of the following can strengthen a support or resistance level?</h4>
+                            <div class="space-y-3">
+                                <div class="quiz-option p-3 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer transition-all" data-correct="false">
+                                    <p>A. The level being tested only once</p>
+                                </div>
+                                <div class="quiz-option p-3 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer transition-all" data-correct="false">
+                                    <p>B. Low trading volume around the level</p>
+                                </div>
+                                <div class="quiz-option p-3 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer transition-all" data-correct="true">
+                                    <p>C. Multiple price touches without breaking through</p>
+                                </div>
+                                <div class="quiz-option p-3 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer transition-all" data-correct="false">
+                                    <p>D. Price moving quickly through the level</p>
+                                </div>
+                            </div>
+                            <div class="mt-3 hidden quiz-explanation bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                                <p class="text-sm text-blue-800 dark:text-blue-300">The more times a support or resistance level is tested without breaking, the stronger that level becomes. This is because each successful test validates the level's significance and may attract more traders to watch and respect it.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Question 5 -->
+                        <div class="quiz-question">
+                            <h4 class="text-lg font-semibold mb-3">5. What chart pattern forms when price reaches the same resistance level twice but fails to break through?</h4>
+                            <div class="space-y-3">
+                                <div class="quiz-option p-3 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer transition-all" data-correct="false">
+                                    <p>A. Head and shoulders</p>
+                                </div>
+                                <div class="quiz-option p-3 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer transition-all" data-correct="true">
+                                    <p>B. Double top</p>
+                                </div>
+                                <div class="quiz-option p-3 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer transition-all" data-correct="false">
+                                    <p>C. Cup and handle</p>
+                                </div>
+                                <div class="quiz-option p-3 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer transition-all" data-correct="false">
+                                    <p>D. Ascending triangle</p>
+                                </div>
+                            </div>
+                            <div class="mt-3 hidden quiz-explanation bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                                <p class="text-sm text-blue-800 dark:text-blue-300">A double top pattern forms when price reaches the same resistance level twice but fails to break through. This pattern suggests a potential reversal from bullish to bearish momentum, as buyers have twice failed to push prices higher.</p>
+                            </div>
+                        </div>
+                        
+                        <div id="quiz-results" class="hidden mt-8 p-4 rounded-lg bg-indigo-50 dark:bg-indigo-900/20">
+                            <h4 class="text-lg font-semibold text-indigo-900 dark:text-indigo-300 mb-2">Quiz Results</h4>
+                            <p id="quiz-score" class="text-indigo-800 dark:text-indigo-200">You scored: <span id="score">0</span>/5</p>
+                            <div class="mt-4">
+                                <button id="retry-quiz" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">Retry Quiz</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <h3 class="text-xl font-semibold mb-4">Technical Analysis Microlearning</h3>
+                <p class="mb-4">Chapter 2: Support and Resistance</p>
+                <p class="text-sm text-gray-400">© 2023 by Ahmad Fauze Abdul Hamit, Ninalyn Fridrict, Maryam Qaameelah Othman of Universiti Teknologi MARA</p>
+                <p class="text-sm text-gray-400 mt-2">Licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Dark mode toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        
+        // Check for user preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        
+        // Listen for changes in user preference
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+        
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+        });
+        
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Close mobile menu when clicking a link
+        const mobileLinks = mobileMenu.querySelectorAll('a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+        
+        // Progress bar
+        const progressBar = document.getElementById('progress-bar');
+        
+        window.addEventListener('scroll', () => {
+            const windowHeight = window.innerHeight;
+            const fullHeight = document.body.scrollHeight;
+            const scrolled = window.scrollY;
+            
+            const progress = (scrolled / (fullHeight - windowHeight)) * 100;
+            progressBar.style.width = `${progress}%`;
+        });
+        
+        // Quiz functionality
+        const quizQuestions = document.querySelectorAll('.quiz-question');
+        const quizResults = document.getElementById('quiz-results');
+        const scoreElement = document.getElementById('score');
+        const retryButton = document.getElementById('retry-quiz');
+        
+        let score = 0;
+        let questionsAnswered = 0;
+        
+        // Initialize quiz
+        function initQuiz() {
+            score = 0;
+            questionsAnswered = 0;
+            quizResults.classList.add('hidden');
+            
+            quizQuestions.forEach(question => {
+                const options = question.querySelectorAll('.quiz-option');
+                const explanation = question.querySelector('.quiz-explanation');
+                
+                explanation.classList.add('hidden');
+                
+                options.forEach(option => {
+                    option.classList.remove('correct', 'incorrect');
+                    option.addEventListener('click', handleOptionClick);
+                });
+            });
+        }
+        
+        function handleOptionClick(e) {
+            const option = e.currentTarget;
+            const question = option.closest('.quiz-question');
+            const options = question.querySelectorAll('.quiz-option');
+            const explanation = question.querySelector('.quiz-explanation');
+            
+            // Prevent multiple answers for the same question
+            if (options[0].classList.contains('correct') || options[0].classList.contains('incorrect')) {
+                return;
+            }
+            
+            questionsAnswered++;
+            
+            // Mark selected option
+            if (option.dataset.correct === 'true') {
+                option.classList.add('correct');
+                score++;
+            } else {
+                option.classList.add('incorrect');
+                
+                // Find and highlight the correct answer
+                options.forEach(opt => {
+                    if (opt.dataset.correct === 'true') {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            
+            // Show explanation
+            explanation.classList.remove('hidden');
+            
+            // Check if all questions are answered
+            if (questionsAnswered === quizQuestions.length) {
+                showResults();
+            }
+        }
+        
+        function showResults() {
+            scoreElement.textContent = score;
+            quizResults.classList.remove('hidden');
+            
+            // Scroll to results
+            quizResults.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Retry quiz
+        retryButton.addEventListener('click', () => {
+            initQuiz();
+        });
+        
+        // Initialize quiz on load
+        initQuiz();
+    </script>
+
+
+</body></html>
