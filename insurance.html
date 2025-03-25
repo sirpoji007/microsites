@@ -1,0 +1,1035 @@
+<!DOCTYPE html><html lang="en"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protecting Assets and Insuring Risks | FIN333</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #5D5CDE;
+            --secondary-color: #8785fa;
+            --accent-color: #FFA500;
+            --success-color: #10B981;
+            --text-dark: #333333;
+            --bg-light: #FFFFFF;
+            --bg-dark: #181818;
+            --card-light: #F9FAFB;
+            --card-dark: #252525;
+        }
+        
+        .animate-pulse-slow {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .7;
+            }
+        }
+        
+        .dark .dark-invert {
+            filter: invert(1);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .dark {
+            color-scheme: dark;
+        }
+        
+        .dark body {
+            background-color: var(--bg-dark);
+            color: white;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #f1f1f1;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .progress-value {
+            height: 100%;
+            border-radius: 4px;
+            background-color: var(--primary-color);
+            transition: width 1s ease-in-out;
+        }
+        
+        /* Quiz Styles */
+        .quiz-option {
+            transition: all 0.2s ease;
+        }
+        
+        .quiz-option:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .dark .quiz-option:hover {
+            background-color: #2d2d2d;
+        }
+        
+        .quiz-option.selected {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .quiz-option.correct {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .quiz-option.incorrect {
+            background-color: #EF4444;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100">
+    <!-- Dark Mode Toggle -->
+    <div class="fixed top-4 right-4 z-50">
+        <button id="darkModeToggle" class="bg-gray-200 dark:bg-gray-700 rounded-full p-2 focus:outline-none">
+            <i class="fas fa-moon dark:hidden"></i>
+            <i class="fas fa-sun hidden dark:block text-yellow-300"></i>
+        </button>
+    </div>
+    
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-md">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <i class="fas fa-shield-alt text-primary-600 text-3xl mr-3 text-indigo-600 dark:text-indigo-400"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">FIN333: Fundamentals of Personal Financial Planning</h1>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">Chapter 5: Protecting Assets and Insuring Risks</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="hidden md:inline text-sm text-gray-600 dark:text-gray-300">Your progress</span>
+                    <div class="progress-bar">
+                        <div id="progressValue" class="progress-value" style="width: 0%"></div>
+                    </div>
+                    <span id="progressText" class="text-sm font-medium">0%</span>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Chapter Introduction -->
+        <section class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-2/3 mb-6 md:mb-0 md:pr-8">
+                    <h2 class="text-2xl font-bold mb-4 text-indigo-600 dark:text-indigo-400">Introduction to Protecting Assets and Insuring Risks</h2>
+                    <p class="mb-4 text-gray-700 dark:text-gray-300">In this chapter, we explore how to safeguard your financial future through appropriate insurance and risk management strategies. Learn about different types of insurance/takaful products and how they can protect you and your loved ones from unforeseen events.</p>
+                    <div class="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-2">
+                        <i class="fas fa-book mr-2"></i>
+                        <span>Estimated Reading Time: 20 minutes</span>
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                        <i class="fas fa-graduation-cap mr-2"></i>
+                        <span>Learning Objectives: 3</span>
+                    </div>
+                </div>
+                <div class="md:w-1/3">
+                    <img src="https://images.unsplash.com/photo-1551184451-76b792a6e5f2?ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=500&amp;q=80" alt="Insurance concept" class="rounded-lg w-full h-auto shadow-lg">
+                </div>
+            </div>
+        </section>
+
+        <!-- Learning Objectives -->
+        <section class="bg-indigo-50 dark:bg-gray-750 rounded-lg shadow-md p-6 mb-8">
+            <h3 class="text-xl font-bold mb-4 text-indigo-600 dark:text-indigo-400">Learning Objectives</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow card-hover">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-indigo-100 dark:bg-indigo-900 p-2 rounded-full mr-3">
+                            <i class="fas fa-bullseye text-indigo-600 dark:text-indigo-400"></i>
+                        </div>
+                        <span class="font-semibold">Objective 1</span>
+                    </div>
+                    <p class="text-gray-700 dark:text-gray-300 text-sm">Describe the definition and importance of insurance/takaful</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow card-hover">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-indigo-100 dark:bg-indigo-900 p-2 rounded-full mr-3">
+                            <i class="fas fa-bullseye text-indigo-600 dark:text-indigo-400"></i>
+                        </div>
+                        <span class="font-semibold">Objective 2</span>
+                    </div>
+                    <p class="text-gray-700 dark:text-gray-300 text-sm">Identify types of insurance/takaful</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow card-hover">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-indigo-100 dark:bg-indigo-900 p-2 rounded-full mr-3">
+                            <i class="fas fa-bullseye text-indigo-600 dark:text-indigo-400"></i>
+                        </div>
+                        <span class="font-semibold">Objective 3</span>
+                    </div>
+                    <p class="text-gray-700 dark:text-gray-300 text-sm">Outline the process of insurance/takaful claims in Malaysia</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5.1 -->
+        <section id="section-5-1" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-4 text-indigo-600 dark:text-indigo-400">5.1 Basics of Insurance/Takaful</h2>
+            
+            <!-- Video Embed Placeholder -->
+            <div class="mb-6 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
+                <div class="aspect-w-16 aspect-h-9 flex items-center justify-center p-4 bg-gray-200 dark:bg-gray-700">
+                    <div class="text-center p-8">
+                        <i class="fas fa-video text-4xl mb-4 text-indigo-500"></i>
+                        <p class="font-medium">This is where a YouTube video about Insurance/Takaful basics would be embedded</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <h3 class="text-xl font-bold mb-3 text-gray-800 dark:text-gray-200">5.1.1 Definition and Importance of Insurance/Takaful</h3>
+                <div class="flex flex-col md:flex-row mb-4">
+                    <div class="md:w-2/3 md:pr-6">
+                        <p class="mb-4 text-gray-700 dark:text-gray-300">Insurance is a contract between an insurer and an insured, where the insurer agrees to pay a certain amount of money to the insured or their beneficiaries in the event of a specified loss or damage. The insured pays a premium to the insurer in exchange for this protection.</p>
+                        <p class="mb-4 text-gray-700 dark:text-gray-300">Takaful is a form of Islamic insurance that is based on the principles of cooperation and solidarity. Takaful participants contribute to a pool of funds that is used to help each other in case of misfortune or calamity.</p>
+                        <div class="mt-4 p-4 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg">
+                            <h4 class="font-bold text-indigo-600 dark:text-indigo-400 mb-2">Key Differences Between Insurance and Takaful</h4>
+                            <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 text-sm">
+                                <li>Insurance operates on risk transfer, while Takaful operates on risk sharing</li>
+                                <li>Insurance is profit-oriented, while Takaful emphasizes mutual protection</li>
+                                <li>Takaful adheres to Shariah principles that prohibit interest, gambling, and uncertainty</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="md:w-1/3 mt-4 md:mt-0">
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow-sm">
+                            <h4 class="font-bold text-gray-800 dark:text-gray-200 mb-3">Insurance Penetration in Malaysia</h4>
+                            <canvas id="insurancePenetrationChart" width="400" height="300"></canvas>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">Source: PwC Malaysia (2023)</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <h4 class="font-bold text-gray-800 dark:text-gray-200 mb-3">Importance of Insurance/Takaful</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white dark:bg-gray-750 border border-gray-200 dark:border-gray-700 p-4 rounded-lg shadow-sm card-hover">
+                            <div class="text-center mb-3">
+                                <i class="fas fa-shield-alt text-3xl text-indigo-500 mb-2"></i>
+                                <h5 class="font-bold">Financial Security</h5>
+                            </div>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">Provides financial security and peace of mind to the insured or their beneficiaries in case of unforeseen events.</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-750 border border-gray-200 dark:border-gray-700 p-4 rounded-lg shadow-sm card-hover">
+                            <div class="text-center mb-3">
+                                <i class="fas fa-balance-scale text-3xl text-indigo-500 mb-2"></i>
+                                <h5 class="font-bold">Risk Transfer</h5>
+                            </div>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">Helps reduce the burden on society and government by transferring the risk from the individual to the collective.</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-750 border border-gray-200 dark:border-gray-700 p-4 rounded-lg shadow-sm card-hover">
+                            <div class="text-center mb-3">
+                                <i class="fas fa-chart-line text-3xl text-indigo-500 mb-2"></i>
+                                <h5 class="font-bold">Economic Growth</h5>
+                            </div>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">Encourages economic development by facilitating trade, investment, and entrepreneurship.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border-l-4 border-yellow-500">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-lightbulb text-yellow-500"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Did You Know?</h3>
+                        <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                            <p>According to a report by PwC Malaysia (2023), Malaysia has a low insurance/takaful penetration rate of 56% compared to the regional average of 68% in Southeast Asia.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6">
+                <button class="section-complete-btn px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition duration-200 flex items-center" data-section="5.1">
+                    <span>Mark as Complete</span>
+                    <i class="fas fa-check ml-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Section 5.2 -->
+        <section id="section-5-2" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-4 text-indigo-600 dark:text-indigo-400">5.2 Types of Insurance/Takaful</h2>
+            
+            <!-- Video Embed Placeholder -->
+            <div class="mb-6 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
+                <div class="aspect-w-16 aspect-h-9 flex items-center justify-center p-4 bg-gray-200 dark:bg-gray-700">
+                    <div class="text-center p-8">
+                        <i class="fas fa-video text-4xl mb-4 text-indigo-500"></i>
+                        <p class="font-medium">This is where a YouTube video about Types of Insurance/Takaful would be embedded</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="mb-6">
+                <div class="border-b border-gray-200 dark:border-gray-700">
+                    <nav class="flex flex-wrap -mb-px">
+                        <button class="insurance-tab mr-2 inline-block py-2 px-4 text-sm font-medium text-center text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:text-gray-700 hover:border-gray-300 dark:hover:text-gray-300 active" data-target="life-insurance">
+                            Life Insurance/Family Takaful
+                        </button>
+                        <button class="insurance-tab mr-2 inline-block py-2 px-4 text-sm font-medium text-center text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:text-gray-700 hover:border-gray-300 dark:hover:text-gray-300" data-target="general-insurance">
+                            General Insurance/Takaful
+                        </button>
+                        <button class="insurance-tab inline-block py-2 px-4 text-sm font-medium text-center text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:text-gray-700 hover:border-gray-300 dark:hover:text-gray-300" data-target="medical-insurance">
+                            Medical and Health Insurance/Takaful
+                        </button>
+                    </nav>
+                </div>
+                
+                <!-- Tab Content -->
+                <div class="mt-4">
+                    <!-- Life Insurance Tab -->
+                    <div id="life-insurance" class="tab-content active">
+                        <div class="flex flex-col md:flex-row">
+                            <div class="md:w-2/3 md:pr-6">
+                                <h3 class="text-xl font-bold mb-3 text-gray-800 dark:text-gray-200">Life Insurance/Family Takaful</h3>
+                                <p class="mb-4 text-gray-700 dark:text-gray-300">Life insurance/family takaful provides protection for the life of the policyholder or participant, or a specified period. It pays a lump sum amount to the beneficiary in case of death, total permanent disability, or critical illness of the policyholder or participant.</p>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                        <h4 class="font-bold text-indigo-600 dark:text-indigo-400 mb-2">Term Life Insurance/Takaful</h4>
+                                        <p class="text-sm text-gray-700 dark:text-gray-300">Provides coverage for a fixed period. If the insured dies within the term, the insurer will pay the sum assured to the beneficiaries. If the insured survives the term, no benefit will be paid.</p>
+                                    </div>
+                                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                        <h4 class="font-bold text-indigo-600 dark:text-indigo-400 mb-2">Permanent Life Insurance/Takaful</h4>
+                                        <p class="text-sm text-gray-700 dark:text-gray-300">Provides coverage for the whole life of the insured or until a certain age, usually 100 years. It also has a cash value component that accumulates over time.</p>
+                                    </div>
+                                </div>
+                                
+                                <h4 class="font-bold text-gray-800 dark:text-gray-200 mb-3">Products of Life Insurance/Takaful</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="bg-gray-50 dark:bg-gray-750 p-3 rounded-lg">
+                                        <h5 class="font-semibold text-indigo-600 dark:text-indigo-400">Whole Life Insurance/Takaful</h5>
+                                        <p class="text-sm text-gray-700 dark:text-gray-300">Permanent coverage that provides a fixed sum assured upon death or permanent disability.</p>
+                                    </div>
+                                    <div class="bg-gray-50 dark:bg-gray-750 p-3 rounded-lg">
+                                        <h5 class="font-semibold text-indigo-600 dark:text-indigo-400">Endowment Insurance/Takaful</h5>
+                                        <p class="text-sm text-gray-700 dark:text-gray-300">Coverage for a specified period that pays a fixed sum upon death, disability, or maturity.</p>
+                                    </div>
+                                    <div class="bg-gray-50 dark:bg-gray-750 p-3 rounded-lg">
+                                        <h5 class="font-semibold text-indigo-600 dark:text-indigo-400">Investment-linked Insurance/Takaful</h5>
+                                        <p class="text-sm text-gray-700 dark:text-gray-300">Permanent coverage with variable sum assured depending on investment fund performance.</p>
+                                    </div>
+                                    <div class="bg-gray-50 dark:bg-gray-750 p-3 rounded-lg">
+                                        <h5 class="font-semibold text-indigo-600 dark:text-indigo-400">MRTA/MRTT</h5>
+                                        <p class="text-sm text-gray-700 dark:text-gray-300">Decreasing term coverage to settle outstanding mortgage loan upon death or disability.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="md:w-1/3 mt-4 md:mt-0">
+                                <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-lg">
+                                    <h4 class="font-bold text-indigo-600 dark:text-indigo-400 mb-3">Key Benefits</h4>
+                                    <ul class="space-y-2 text-gray-700 dark:text-gray-300 text-sm">
+                                        <li class="flex items-start">
+                                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                            <span>Financial protection for dependents</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                            <span>Income replacement for surviving family members</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                            <span>Estate planning and wealth transfer</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                            <span>Savings and investment component (for permanent life insurance)</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                            <span>Tax benefits for certain products</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="mt-4">
+                                    <img src="https://images.unsplash.com/photo-1590935217281-8f102120d683?ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=500&amp;q=80" alt="Life insurance concept" class="rounded-lg w-full h-auto shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- General Insurance Tab -->
+                    <div id="general-insurance" class="tab-content">
+                        <div class="flex flex-col md:flex-row">
+                            <div class="md:w-2/3 md:pr-6">
+                                <h3 class="text-xl font-bold mb-3 text-gray-800 dark:text-gray-200">General Insurance/Takaful</h3>
+                                <p class="mb-4 text-gray-700 dark:text-gray-300">General insurance/takaful covers the losses or damage caused by various risks such as fire, theft, accident, natural disaster, or liability. It may cover property, vehicles, travel, personal accident, or business.</p>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                        <div class="flex items-center mb-2">
+                                            <i class="fas fa-car text-indigo-500 mr-2"></i>
+                                            <h4 class="font-bold text-indigo-600 dark:text-indigo-400">Motor Vehicle Insurance/Takaful</h4>
+                                        </div>
+                                        <p class="text-sm text-gray-700 dark:text-gray-300">Covers loss or damage to your vehicle due to accident, fire, theft, etc. Also covers liability for bodily injury or property damage to third parties.</p>
+                                    </div>
+                                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                        <div class="flex items-center mb-2">
+                                            <i class="fas fa-fire text-indigo-500 mr-2"></i>
+                                            <h4 class="font-bold text-indigo-600 dark:text-indigo-400">Fire Insurance/Takaful</h4>
+                                        </div>
+                                        <p class="text-sm text-gray-700 dark:text-gray-300">Covers loss or damage to your property due to fire, lightning, explosion, etc. Can also cover loss of rent or income due to business interruption.</p>
+                                    </div>
+                                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                        <div class="flex items-center mb-2">
+                                            <i class="fas fa-home text-indigo-500 mr-2"></i>
+                                            <h4 class="font-bold text-indigo-600 dark:text-indigo-400">Homeowners Insurance/Takaful</h4>
+                                        </div>
+                                        <p class="text-sm text-gray-700 dark:text-gray-300">Covers loss or damage to your house and its contents due to various causes, such as fire, theft, flood, earthquake, etc.</p>
+                                    </div>
+                                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                        <div class="flex items-center mb-2">
+                                            <i class="fas fa-plane text-indigo-500 mr-2"></i>
+                                            <h4 class="font-bold text-indigo-600 dark:text-indigo-400">Travel Insurance/Takaful</h4>
+                                        </div>
+                                        <p class="text-sm text-gray-700 dark:text-gray-300">Covers various risks during travel, such as medical expenses, loss of baggage, flight delay, cancellation, etc.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="md:w-1/3 mt-4 md:mt-0">
+                                <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-lg">
+                                    <h4 class="font-bold text-indigo-600 dark:text-indigo-400 mb-3">Key Considerations</h4>
+                                    <ul class="space-y-2 text-gray-700 dark:text-gray-300 text-sm">
+                                        <li class="flex items-start">
+                                            <i class="fas fa-info-circle text-blue-500 mt-1 mr-2"></i>
+                                            <span>Coverage limits and exclusions</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <i class="fas fa-info-circle text-blue-500 mt-1 mr-2"></i>
+                                            <span>Deductibles and premium costs</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <i class="fas fa-info-circle text-blue-500 mt-1 mr-2"></i>
+                                            <span>Policy duration and renewal terms</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <i class="fas fa-info-circle text-blue-500 mt-1 mr-2"></i>
+                                            <span>Claim process and settlement procedures</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <i class="fas fa-info-circle text-blue-500 mt-1 mr-2"></i>
+                                            <span>Customer service and support</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="mt-4">
+                                    <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=500&amp;q=80" alt="Property insurance concept" class="rounded-lg w-full h-auto shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Medical Insurance Tab -->
+                    <div id="medical-insurance" class="tab-content">
+                        <div class="flex flex-col md:flex-row">
+                            <div class="md:w-2/3 md:pr-6">
+                                <h3 class="text-xl font-bold mb-3 text-gray-800 dark:text-gray-200">Medical and Health Insurance/Takaful</h3>
+                                <p class="mb-4 text-gray-700 dark:text-gray-300">Medical and health insurance/takaful covers the medical expenses incurred due to illness or injury. It may also provide benefits such as hospitalization allowance, daily cash benefit, or funeral expenses.</p>
+                                
+                                <div class="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border-l-4 border-yellow-500">
+                                    <div class="flex">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-lightbulb text-yellow-500"></i>
+                                        </div>
+                                        <div class="ml-3">
+                                            <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Medical Card</h3>
+                                            <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                                                <p>A medical card allows you to access medical services at panel hospitals or clinics without paying upfront. The insurer or takaful operator will pay the medical bills directly to the hospital or clinic according to the terms and conditions of the contract.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <h4 class="font-bold text-gray-800 dark:text-gray-200 mb-3">Common Coverage in Health Insurance/Takaful</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="bg-gray-50 dark:bg-gray-750 p-3 rounded-lg">
+                                        <h5 class="font-semibold text-indigo-600 dark:text-indigo-400">Hospitalization and Surgery</h5>
+                                        <p class="text-sm text-gray-700 dark:text-gray-300">Covers room and board, surgical procedures, and hospital services during inpatient care.</p>
+                                    </div>
+                                    <div class="bg-gray-50 dark:bg-gray-750 p-3 rounded-lg">
+                                        <h5 class="font-semibold text-indigo-600 dark:text-indigo-400">Outpatient Treatment</h5>
+                                        <p class="text-sm text-gray-700 dark:text-gray-300">Covers doctor consultations, diagnostic tests, and treatments that don't require hospital stays.</p>
+                                    </div>
+                                    <div class="bg-gray-50 dark:bg-gray-750 p-3 rounded-lg">
+                                        <h5 class="font-semibold text-indigo-600 dark:text-indigo-400">Critical Illness Coverage</h5>
+                                        <p class="text-sm text-gray-700 dark:text-gray-300">Provides a lump sum payment upon diagnosis of specified critical illnesses like cancer, heart attack, etc.</p>
+                                    </div>
+                                    <div class="bg-gray-50 dark:bg-gray-750 p-3 rounded-lg">
+                                        <h5 class="font-semibold text-indigo-600 dark:text-indigo-400">Emergency Treatment</h5>
+                                        <p class="text-sm text-gray-700 dark:text-gray-300">Covers emergency medical services, ambulance fees, and urgent care treatments.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="md:w-1/3 mt-4 md:mt-0">
+                                <div class="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-lg">
+                                    <h4 class="font-bold text-indigo-600 dark:text-indigo-400 mb-3">Benefits of Health Insurance/Takaful</h4>
+                                    <ul class="space-y-2 text-gray-700 dark:text-gray-300 text-sm">
+                                        <li class="flex items-start">
+                                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                            <span>Access to quality healthcare without financial barriers</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                            <span>Protection against catastrophic medical expenses</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                            <span>Cashless hospitalization with medical cards</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                            <span>Coverage for various medical conditions and treatments</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                            <span>Peace of mind during health emergencies</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="mt-4">
+                                    <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=500&amp;q=80" alt="Medical insurance concept" class="rounded-lg w-full h-auto shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6">
+                <button class="section-complete-btn px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition duration-200 flex items-center" data-section="5.2">
+                    <span>Mark as Complete</span>
+                    <i class="fas fa-check ml-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Section 5.3 -->
+        <section id="section-5-3" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-4 text-indigo-600 dark:text-indigo-400">5.3 Insurance/Takaful Claims</h2>
+            
+            <!-- Video Embed Placeholder -->
+            <div class="mb-6 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
+                <div class="aspect-w-16 aspect-h-9 flex items-center justify-center p-4 bg-gray-200 dark:bg-gray-700">
+                    <div class="text-center p-8">
+                        <i class="fas fa-video text-4xl mb-4 text-indigo-500"></i>
+                        <p class="font-medium">This is where a YouTube video about Insurance/Takaful Claims would be embedded</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <h3 class="text-xl font-bold mb-3 text-gray-800 dark:text-gray-200">The Claims Process</h3>
+                <p class="mb-4 text-gray-700 dark:text-gray-300">A claim is a request by the insured or the participant to receive compensation or benefit from the insurer or the takaful operator for a loss or damage that is covered by the policy or the certificate.</p>
+                
+                <div class="relative mb-8">
+                    <div class="absolute left-5 inset-0 flex items-center" aria-hidden="true">
+                        <div class="h-0.5 w-full bg-gray-200 dark:bg-gray-700"></div>
+                    </div>
+                    <div class="relative flex justify-between">
+                        <div>
+                            <span class="bg-indigo-500 h-10 w-10 rounded-full flex items-center justify-center ring-8 ring-white dark:ring-gray-800">
+                                <i class="fas fa-exclamation-triangle text-white"></i>
+                            </span>
+                            <div class="mt-2 text-center w-24">
+                                <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Report Incident</h4>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="bg-indigo-500 h-10 w-10 rounded-full flex items-center justify-center ring-8 ring-white dark:ring-gray-800">
+                                <i class="fas fa-file-alt text-white"></i>
+                            </span>
+                            <div class="mt-2 text-center w-24">
+                                <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Submit Claim</h4>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="bg-indigo-500 h-10 w-10 rounded-full flex items-center justify-center ring-8 ring-white dark:ring-gray-800">
+                                <i class="fas fa-search text-white"></i>
+                            </span>
+                            <div class="mt-2 text-center w-24">
+                                <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Investigation</h4>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="bg-indigo-500 h-10 w-10 rounded-full flex items-center justify-center ring-8 ring-white dark:ring-gray-800">
+                                <i class="fas fa-check-circle text-white"></i>
+                            </span>
+                            <div class="mt-2 text-center w-24">
+                                <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">Settlement</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <h4 class="font-bold text-gray-800 dark:text-gray-200 mb-3">Steps in the Claims Process</h4>
+                        <ol class="list-decimal pl-5 space-y-2 text-gray-700 dark:text-gray-300 text-sm">
+                            <li>Reporting the loss or damage to the insurer or the takaful operator as soon as possible and providing relevant information and documents.</li>
+                            <li>Filling out a claim form and submitting it to the insurer or the takaful operator, along with any supporting evidence, such as receipts, invoices, police reports, medical reports, etc.</li>
+                            <li>Cooperating with the insurer or the takaful operator in the investigation and assessment of the claim and providing any additional information or documents if requested.</li>
+                            <li>Receiving the payment or benefit from the insurer or the takaful operator, either by cheque, bank transfer, or other methods.</li>
+                        </ol>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-800 dark:text-gray-200 mb-3">Guidelines for Successful Claims</h4>
+                        <ul class="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300 text-sm">
+                            <li>Read and understand your policy or certificate carefully and know what is covered and what is not.</li>
+                            <li>Keep your policy or certificate in a safe place and have a copy of it handy when making a claim.</li>
+                            <li>Notify your insurer or takaful operator immediately after a loss or damage occurs and follow their instructions on how to make a claim.</li>
+                            <li>Provide accurate and complete information and documents when making a claim and avoid making false or exaggerated claims.</li>
+                            <li>Keep all receipts and records related to your claim and be prepared to answer any questions from your insurer or takaful operator.</li>
+                            <li>Be patient and cooperative during the claim process and respect the decision of your insurer or takaful operator.</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg mb-6">
+                    <h4 class="font-bold text-green-600 dark:text-green-400 mb-2">Resources for Assistance with Claims</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div class="flex items-start">
+                            <i class="fas fa-user-tie text-green-500 mt-1 mr-2"></i>
+                            <div>
+                                <h5 class="font-semibold text-gray-800 dark:text-gray-200">Insurance Agent or Takaful Agent</h5>
+                                <p class="text-gray-700 dark:text-gray-300">Can assist in filling out claim forms and liaising with the insurer or takaful operator.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-handshake text-green-500 mt-1 mr-2"></i>
+                            <div>
+                                <h5 class="font-semibold text-gray-800 dark:text-gray-200">Insurance Broker or Takaful Broker</h5>
+                                <p class="text-gray-700 dark:text-gray-300">Can advise on rights and obligations and negotiate with the insurer or takaful operator.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-balance-scale text-green-500 mt-1 mr-2"></i>
+                            <div>
+                                <h5 class="font-semibold text-gray-800 dark:text-gray-200">Ombudsman for Financial Services (OFS)</h5>
+                                <p class="text-gray-700 dark:text-gray-300">Can mediate between you and your insurer or takaful operator in case of disputes.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-landmark text-green-500 mt-1 mr-2"></i>
+                            <div>
+                                <h5 class="font-semibold text-gray-800 dark:text-gray-200">Bank Negara Malaysia (BNM)</h5>
+                                <p class="text-gray-700 dark:text-gray-300">Regulates and supervises the insurance and takaful industry in Malaysia.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6">
+                <button class="section-complete-btn px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition duration-200 flex items-center" data-section="5.3">
+                    <span>Mark as Complete</span>
+                    <i class="fas fa-check ml-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Chapter Quiz -->
+        <section id="chapter-quiz" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-4 text-indigo-600 dark:text-indigo-400">Knowledge Check</h2>
+            <p class="mb-6 text-gray-700 dark:text-gray-300">Test your understanding of the chapter with this short quiz.</p>
+            
+            <div class="space-y-6">
+                <div class="quiz-question p-4 bg-gray-50 dark:bg-gray-750 rounded-lg">
+                    <h3 class="font-semibold mb-3">1. What is the main difference between insurance and takaful?</h3>
+                    <div class="space-y-2">
+                        <div class="quiz-option p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer" data-correct="false">
+                            <span>There is no difference; they are the same financial product.</span>
+                        </div>
+                        <div class="quiz-option p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer" data-correct="true">
+                            <span>Insurance operates on risk transfer, while takaful operates on risk sharing based on mutual cooperation and solidarity.</span>
+                        </div>
+                        <div class="quiz-option p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer" data-correct="false">
+                            <span>Takaful only covers property damage, while insurance covers all types of risks.</span>
+                        </div>
+                        <div class="quiz-option p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer" data-correct="false">
+                            <span>Insurance is only available in Malaysia, while takaful is available globally.</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="quiz-question p-4 bg-gray-50 dark:bg-gray-750 rounded-lg">
+                    <h3 class="font-semibold mb-3">2. Which of the following is NOT a type of life insurance/family takaful product?</h3>
+                    <div class="space-y-2">
+                        <div class="quiz-option p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer" data-correct="false">
+                            <span>Whole life insurance/takaful</span>
+                        </div>
+                        <div class="quiz-option p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer" data-correct="false">
+                            <span>Endowment insurance/takaful</span>
+                        </div>
+                        <div class="quiz-option p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer" data-correct="false">
+                            <span>Investment-linked insurance/takaful</span>
+                        </div>
+                        <div class="quiz-option p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer" data-correct="true">
+                            <span>Homeowners insurance/takaful</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="quiz-question p-4 bg-gray-50 dark:bg-gray-750 rounded-lg">
+                    <h3 class="font-semibold mb-3">3. What is a medical card in the context of health insurance/takaful?</h3>
+                    <div class="space-y-2">
+                        <div class="quiz-option p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer" data-correct="true">
+                            <span>A card that allows access to medical services at panel hospitals without paying upfront, with the insurer paying the bills directly.</span>
+                        </div>
+                        <div class="quiz-option p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer" data-correct="false">
+                            <span>A discount card that offers reduced rates for medical services at any hospital.</span>
+                        </div>
+                        <div class="quiz-option p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer" data-correct="false">
+                            <span>An identification card that proves you have medical insurance but doesn't affect payment methods.</span>
+                        </div>
+                        <div class="quiz-option p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer" data-correct="false">
+                            <span>A credit card specifically designed for medical expenses with special interest rates.</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="quiz-question p-4 bg-gray-50 dark:bg-gray-750 rounded-lg">
+                    <h3 class="font-semibold mb-3">4. What is the first step in the insurance/takaful claims process?</h3>
+                    <div class="space-y-2">
+                        <div class="quiz-option p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer" data-correct="true">
+                            <span>Report the loss or damage to the insurer or takaful operator as soon as possible.</span>
+                        </div>
+                        <div class="quiz-option p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer" data-correct="false">
+                            <span>File a police report regardless of the type of claim.</span>
+                        </div>
+                        <div class="quiz-option p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer" data-correct="false">
+                            <span>Pay the deductible or excess amount to activate the claim process.</span>
+                        </div>
+                        <div class="quiz-option p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer" data-correct="false">
+                            <span>Contact your bank to arrange for the claim payment.</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="quiz-question p-4 bg-gray-50 dark:bg-gray-750 rounded-lg">
+                    <h3 class="font-semibold mb-3">5. According to the chapter, what is the insurance/takaful penetration rate in Malaysia?</h3>
+                    <div class="space-y-2">
+                        <div class="quiz-option p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer" data-correct="false">
+                            <span>92%</span>
+                        </div>
+                        <div class="quiz-option p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer" data-correct="false">
+                            <span>78%</span>
+                        </div>
+                        <div class="quiz-option p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer" data-correct="true">
+                            <span>56%</span>
+                        </div>
+                        <div class="quiz-option p-3 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer" data-correct="false">
+                            <span>33%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 flex justify-between">
+                <button id="submit-quiz" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition duration-200">Submit Answers</button>
+                <div id="quiz-result" class="hidden">
+                    <span class="font-bold">Your Score: </span>
+                    <span id="quiz-score">0/5</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chapter Summary -->
+        <section class="bg-indigo-50 dark:bg-indigo-900/30 rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-bold mb-4 text-indigo-600 dark:text-indigo-400">Chapter Summary</h2>
+            <div class="space-y-4 text-gray-700 dark:text-gray-300">
+                <p>In this chapter, we explored the fundamental concepts of insurance and takaful as tools for protecting assets and managing risks. We learned about the definition and importance of insurance/takaful in providing financial security, reducing societal burden, and promoting economic development.</p>
+                <p>We examined various types of insurance/takaful products, including life insurance/family takaful, general insurance/takaful, and medical and health insurance/takaful. Each type serves different purposes and offers specific benefits to policyholders or participants.</p>
+                <p>Finally, we discussed the claims process, highlighting the steps involved from reporting an incident to receiving settlement. We also explored guidelines for successful claims and resources available for assistance with claims in Malaysia.</p>
+                <p>Understanding these concepts is crucial for making informed decisions about protecting your assets and managing risks in your personal financial planning journey.</p>
+            </div>
+            
+            <div class="mt-6 p-4 bg-white dark:bg-gray-800 rounded-lg">
+                <h3 class="font-bold text-indigo-600 dark:text-indigo-400 mb-3">Key Takeaways</h3>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300 text-sm">
+                    <li>Insurance operates on risk transfer, while takaful operates on risk sharing based on mutual cooperation and solidarity.</li>
+                    <li>Different types of insurance/takaful products cater to different needs, such as life protection, property protection, and health protection.</li>
+                    <li>Malaysia has a relatively low insurance/takaful penetration rate of 56% compared to the regional average of 68%.</li>
+                    <li>The claims process involves reporting the incident, submitting the claim, cooperating with investigation, and receiving settlement.</li>
+                    <li>Various resources are available to assist with claims, including agents, brokers, the OFS, and BNM.</li>
+                </ul>
+            </div>
+            
+            <div class="mt-6 flex justify-center">
+                <button id="complete-chapter" class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition duration-200 flex items-center">
+                    <span>Complete Chapter</span>
+                    <i class="fas fa-check-double ml-2"></i>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-gray-800 shadow-md mt-8">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <p class="text-sm text-gray-600 dark:text-gray-300">© 2023 FIN333 Fundamentals of Personal Financial Planning</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
+                        <i class="fas fa-book"></i>
+                        <span class="ml-1">Syllabus</span>
+                    </a>
+                    <a href="#" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
+                        <i class="fas fa-question-circle"></i>
+                        <span class="ml-1">Help</span>
+                    </a>
+                    <a href="#" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
+                        <i class="fas fa-envelope"></i>
+                        <span class="ml-1">Contact</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Dark Mode Toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        
+        // Check for saved theme preference or use system preference
+        if (localStorage.getItem('darkMode') === 'true' || 
+            (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && 
+             localStorage.getItem('darkMode') !== 'false')) {
+            document.documentElement.classList.add('dark');
+        }
+        
+        darkModeToggle.addEventListener('click', () => {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('darkMode', 'false');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('darkMode', 'true');
+            }
+        });
+        
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+        
+        // Insurance Tabs
+        const insuranceTabs = document.querySelectorAll('.insurance-tab');
+        insuranceTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                insuranceTabs.forEach(t => {
+                    t.classList.remove('text-indigo-600', 'dark:text-indigo-400', 'border-indigo-600', 'dark:border-indigo-400');
+                    t.classList.add('text-gray-500', 'dark:text-gray-400', 'border-transparent');
+                });
+                
+                // Add active class to clicked tab
+                tab.classList.remove('text-gray-500', 'dark:text-gray-400', 'border-transparent');
+                tab.classList.add('text-indigo-600', 'dark:text-indigo-400', 'border-indigo-600', 'dark:border-indigo-400');
+                
+                // Hide all tab content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Show corresponding tab content
+                const target = tab.getAttribute('data-target');
+                document.getElementById(target).classList.add('active');
+            });
+        });
+        
+        // Progress Tracking
+        const sections = ['5.1', '5.2', '5.3'];
+        let completedSections = JSON.parse(localStorage.getItem('completedSections')) || [];
+        
+        function updateProgress() {
+            const progress = (completedSections.length / sections.length) * 100;
+            document.getElementById('progressValue').style.width = `${progress}%`;
+            document.getElementById('progressText').textContent = `${Math.round(progress)}%`;
+        }
+        
+        document.querySelectorAll('.section-complete-btn').forEach(btn => {
+            const section = btn.getAttribute('data-section');
+            
+            // Update button state based on localStorage
+            if (completedSections.includes(section)) {
+                btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+                btn.classList.add('bg-green-600', 'hover:bg-green-700');
+                btn.innerHTML = '<span>Completed</span><i class="fas fa-check ml-2"></i>';
+            }
+            
+            btn.addEventListener('click', () => {
+                if (!completedSections.includes(section)) {
+                    completedSections.push(section);
+                    localStorage.setItem('completedSections', JSON.stringify(completedSections));
+                    
+                    btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+                    btn.classList.add('bg-green-600', 'hover:bg-green-700');
+                    btn.innerHTML = '<span>Completed</span><i class="fas fa-check ml-2"></i>';
+                    
+                    updateProgress();
+                }
+            });
+        });
+        
+        // Initialize progress on page load
+        updateProgress();
+        
+        // Quiz functionality
+        const quizOptions = document.querySelectorAll('.quiz-option');
+        const submitQuizBtn = document.getElementById('submit-quiz');
+        const quizResult = document.getElementById('quiz-result');
+        const quizScore = document.getElementById('quiz-score');
+        
+        quizOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                // Unselect all options in the same question
+                const questionOptions = option.parentElement.querySelectorAll('.quiz-option');
+                questionOptions.forEach(o => o.classList.remove('selected'));
+                
+                // Select clicked option
+                option.classList.add('selected');
+            });
+        });
+        
+        submitQuizBtn.addEventListener('click', () => {
+            let score = 0;
+            const questions = document.querySelectorAll('.quiz-question');
+            
+            questions.forEach(question => {
+                const selectedOption = question.querySelector('.selected');
+                const options = question.querySelectorAll('.quiz-option');
+                
+                options.forEach(option => {
+                    option.classList.remove('correct', 'incorrect');
+                    
+                    if (option.getAttribute('data-correct') === 'true') {
+                        option.classList.add('correct');
+                    }
+                });
+                
+                if (selectedOption) {
+                    if (selectedOption.getAttribute('data-correct') === 'true') {
+                        score++;
+                    } else {
+                        selectedOption.classList.add('incorrect');
+                    }
+                }
+            });
+            
+            quizScore.textContent = `${score}/${questions.length}`;
+            quizResult.classList.remove('hidden');
+        });
+        
+        // Complete Chapter Button
+        document.getElementById('complete-chapter').addEventListener('click', () => {
+            // Mark all sections as complete if not already
+            sections.forEach(section => {
+                if (!completedSections.includes(section)) {
+                    completedSections.push(section);
+                }
+            });
+            
+            localStorage.setItem('completedSections', JSON.stringify(completedSections));
+            
+            // Update all buttons and progress
+            document.querySelectorAll('.section-complete-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+                btn.classList.add('bg-green-600', 'hover:bg-green-700');
+                btn.innerHTML = '<span>Completed</span><i class="fas fa-check ml-2"></i>';
+            });
+            
+            updateProgress();
+            
+            // Provide feedback
+            alert('Congratulations! You have completed Chapter 5: Protecting Assets and Insuring Risks.');
+        });
+        
+        // Charts
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('insurancePenetrationChart').getContext('2d');
+            const insurancePenetrationChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Malaysia', 'Southeast Asia Average'],
+                    datasets: [{
+                        label: 'Insurance/Takaful Penetration Rate (%)',
+                        data: [56, 68],
+                        backgroundColor: [
+                            'rgba(93, 92, 222, 0.7)',
+                            'rgba(255, 159, 64, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(93, 92, 222, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+
+</body></html>
