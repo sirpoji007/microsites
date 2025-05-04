@@ -12,17 +12,19 @@
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="EduCode Prompter" />
-  <meta property="og:description" content="Build prompts to create interactive educational games and learning tools with modern design, engaging interactions, and effective learning patterns" />
+  <meta property="og:description" content="Build prompts to create educational games and learning tools that are interactive,intuitive, and effective!" />
   <meta property="og:image" content="https://i.imgur.com/N0aGwdi.png" />
   
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="EduCode Prompter" />
-  <meta name="twitter:description" content="Build prompts to create interactive educational games and learning tools with modern design, engaging interactions, and effective learning patterns" />
+  <meta name="twitter:description" content="Build prompts to create educational games and learning tools that are interactive,intuitive, and effective!" />
   <meta name="twitter:image" content="https://i.imgur.com/N0aGwdi.png" />
   
+  <!-- Ensure highlight.js is loaded properly -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/atom-one-dark.min.css">
   <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/lib/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/lib/languages/markdown.min.js"></script>
   <style>
     :root {
       --primary: #5D5CDE;
@@ -428,6 +430,21 @@
       justify-content: center;
       color: var(--gray-500);
       font-style: italic;
+    }
+
+    /* Add basic styling for code blocks even without highlight.js */
+    #output code {
+      font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+      padding: 0.2em 0.4em;
+      border-radius: var(--radius-sm);
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    #output pre {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 1em;
+      border-radius: var(--radius-sm);
+      overflow-x: auto;
     }
 
     #copyBtn {
@@ -864,9 +881,9 @@
   <header>
     <div class="logo-container">
       <img src="https://i.imgur.com/N0aGwdi.png" alt="SirPoji Logo" class="app-logo">
-      <h1>Canva Code Prompter</h1>
+      <h1>EduCode Prompter</h1>
     </div>
-    <p class="header-subtitle">Build prompts to create educational games and learning tools that are interactive,intuitive,and effective!</p>
+    <p class="header-subtitle">Build prompts to create educational games and learning tools that are interactive, intuitive, and effective!</p>
     <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -924,11 +941,12 @@
             <label for="targetAge">Target Age Group / Grade Level</label>
             <select id="targetAge" name="targetAge">
               <option value="">-- Select target age group --</option>
-              <option value="Early Childhood (Ages 3-5)">Early Childhood (Ages 3-5)</option>
-              <option value="Elementary School (Ages 6-10)">Elementary School (Ages 6-10)</option>
-              <option value="Middle School (Ages 11-13)">Middle School (Ages 11-13)</option>
-              <option value="High School (Ages 14-18)">High School (Ages 14-18)</option>
-              <option value="College / Adult Learners">College / Adult Learners</option>
+              <option value="Early Childhood (Ages 3-6)">Early Childhood (Ages 3-6)</option>
+              <option value="Primary School (Ages 7-12)">Primary School (Ages 7-12)</option>
+              <option value="Secondary School (Ages 13-17)">Secondary School (Ages 13-17)</option>
+              <option value="Pra-U / Foundations (Ages 18-19)">Pra-U / Foundations (Ages 18-19)</option>
+              <option value="College / Adult Learners">University / Adult Learners (Ages 20 - 25)</option>
+              <option value="Professional Development">Professional Development (Ages 26 and above)</option>
               <option value="All Ages">All Ages</option>
             </select>
           </div>
@@ -940,11 +958,11 @@
               <option value="Mathematics">Mathematics</option>
               <option value="Science">Science</option>
               <option value="Finance">Finance</option>
-              <option value="Economics">Economics</option>
               <option value="Financial Education">Financial Education</option>
+              <option value="Economics">Economics</option>
               <option value="Marketing">Marketing</option>
               <option value="Entrepreneurship">Entrepreneurship</option>
-              <option value="Education">Education</option>
+              <option value="learning Design">Learning Design</option>
               <option value="Multi-subject">Multi-subject</option>
             </select>
           </div>
@@ -1431,6 +1449,9 @@
 </footer>
 
 <script>
+  // Check for highlight.js before using it
+  let highlightJsAvailable = typeof hljs !== 'undefined';
+
   // Theme handling
   const themeToggle = document.getElementById('themeToggle');
   const body = document.body;
@@ -1739,12 +1760,6 @@
     return input?.trim().replace(/\s+/g, ' ') || '';
   }
 
-  // Highlight.js initialization
-  hljs.configure({
-    languages: ['markdown'],
-    ignoreUnescapedHTML: true
-  });
-
   // Helper to sync preset dropdown with text input
   function handlePresetChange(presetSelectId, inputId) {
     const presetSelect = document.getElementById(presetSelectId);
@@ -1802,7 +1817,8 @@
   const generateBtn = document.getElementById('generateBtn');
   const descriptionGroup = document.getElementById('descriptionGroup');
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', function(e) {
+    // Prevent default form submission
     e.preventDefault();
 
     const description = sanitize(form.description.value);
@@ -1817,175 +1833,207 @@
     generateBtn.innerHTML = '<span class="loading"></span><span>Generating...</span>';
     generateBtn.disabled = true;
 
-    // Gather all inputs
-    // Basic Info
-    const targetAge = sanitize(form.targetAge.value);
-    const subjectArea = sanitize(form.subjectArea.value);
-    const learningObjectives = tags.length > 0 ? tags : [];
-    
-    // Game Type & Template
-    const gameType = sanitize(form.gameType.value);
-    const customGameType = form.customGameType ? sanitize(form.customGameType.value) : '';
-    const selectedTemplate = form.selectedTemplate ? sanitize(form.selectedTemplate.value) : '';
-    
-    // Interactivity
-    const interactiveElements = getCheckboxValues('interactiveElements');
-    const gameMechanics = getCheckboxValues('gameMechanics');
-    const difficultyLevels = sanitize(form.difficultyLevels.value);
-    const feedbackSystem = sanitize(form.feedbackSystem.value);
-    const engagementFeatures = sanitize(form.engagementFeatures.value);
-    
-    // Design
-    const visualStyle = sanitize(form.visualStyle.value);
-    const colors = sanitize(form.colors.value);
-    const fonts = sanitize(form.fonts.value);
-    const animations = sanitize(form.animations.value);
-    const uiElements = getCheckboxValues('uiElements');
-    const visualElements = sanitize(form.visualElements.value);
-    
-    // Multimedia & Technical
-    const multimediaElements = getCheckboxValues('multimediaElements');
-    const responsiveness = sanitize(form.responsiveness.value);
-    const compatibilityRequirements = sanitize(form.compatibilityRequirements.value);
-    const codingTechniques = getCheckboxValues('codingTechniques');
-    const otherTechnicalRequirements = sanitize(form.otherTechnicalRequirements.value);
-    
-    // Accessibility
-    const accessibilityFeatures = getCheckboxValues('accessibilityFeatures');
-    const inclusivityConsiderations = sanitize(form.inclusivityConsiderations.value);
-    const accessibilityStandards = sanitize(form.accessibilityStandards.value);
-
-    // Build the prompt
-    let prompt = `Create an interactive educational game: ${description}`;
-
-    // Basic Information
-    prompt += `\n\n## Basic Information:`;
-    if (targetAge) prompt += `\n- Target Age Group: ${targetAge}`;
-    if (subjectArea) prompt += `\n- Subject Area: ${subjectArea}`;
-    if (learningObjectives.length > 0) {
-      prompt += `\n- Learning Objectives:`;
-      learningObjectives.forEach(objective => {
-        prompt += `\n  * ${objective}`;
-      });
-    }
-
-    // Game Type & Template
-    prompt += `\n\n## Game Type & Structure:`;
-    if (gameType === 'custom' && customGameType) {
-      prompt += `\n- Custom Game Type: ${customGameType}`;
-    } else if (gameType) {
-      const gameTypeMap = {
-        'quiz': 'Quiz / Multiple Choice Game',
-        'matching': 'Matching / Memory Game',
-        'flashcards': 'Interactive Flashcards',
-        'puzzle': 'Educational Puzzle',
-        'sorting': 'Sorting / Categorization Game',
-        'simulation': 'Interactive Simulation',
-        'adventure': 'Educational Adventure',
-        'drawing': 'Drawing / Creation Tool',
-        'storytelling': 'Interactive Storytelling',
-        'word': 'Word Game / Vocabulary Builder'
-      };
-      prompt += `\n- Game Type: ${gameTypeMap[gameType] || gameType}`;
-    }
-    if (selectedTemplate) prompt += `\n- Game Template: ${selectedTemplate}`;
-
-    // Interactivity & Game Mechanics
-    if (interactiveElements.length > 0 || gameMechanics.length > 0 || difficultyLevels || feedbackSystem || engagementFeatures) {
-      prompt += `\n\n## Interactivity & Game Mechanics:`;
+    try {
+      // Gather all inputs
+      // Basic Info
+      const targetAge = sanitize(form.targetAge.value);
+      const subjectArea = sanitize(form.subjectArea.value);
+      const learningObjectives = tags.length > 0 ? tags : [];
       
-      if (interactiveElements.length > 0) {
-        prompt += `\n- Interactive Elements:`;
-        interactiveElements.forEach(element => {
-          prompt += `\n  * ${element}`;
+      // Game Type & Template
+      const gameType = sanitize(form.gameType.value);
+      const customGameType = form.customGameType ? sanitize(form.customGameType.value) : '';
+      const selectedTemplate = document.getElementById('selectedTemplate') ? sanitize(document.getElementById('selectedTemplate').value) : '';
+      
+      // Interactivity
+      const interactiveElements = getCheckboxValues('interactiveElements');
+      const gameMechanics = getCheckboxValues('gameMechanics');
+      const difficultyLevels = sanitize(form.difficultyLevels.value);
+      const feedbackSystem = sanitize(form.feedbackSystem.value);
+      const engagementFeatures = sanitize(form.engagementFeatures.value);
+      
+      // Design
+      const visualStyle = sanitize(form.visualStyle.value);
+      const colors = sanitize(form.colors.value);
+      const fonts = sanitize(form.fonts.value);
+      const animations = sanitize(form.animations.value);
+      const uiElements = getCheckboxValues('uiElements');
+      const visualElements = sanitize(form.visualElements.value);
+      
+      // Multimedia & Technical
+      const multimediaElements = getCheckboxValues('multimediaElements');
+      const responsiveness = sanitize(form.responsiveness.value);
+      const compatibilityRequirements = sanitize(form.compatibilityRequirements.value);
+      const codingTechniques = getCheckboxValues('codingTechniques');
+      const otherTechnicalRequirements = sanitize(form.otherTechnicalRequirements.value);
+      
+      // Accessibility
+      const accessibilityFeatures = getCheckboxValues('accessibilityFeatures');
+      const inclusivityConsiderations = sanitize(form.inclusivityConsiderations.value);
+      const accessibilityStandards = sanitize(form.accessibilityStandards.value);
+
+      // Build the prompt
+      let prompt = `Create an interactive educational game: ${description}`;
+
+      // Basic Information
+      prompt += `\n\n## Basic Information:`;
+      if (targetAge) prompt += `\n- Target Age Group: ${targetAge}`;
+      if (subjectArea) prompt += `\n- Subject Area: ${subjectArea}`;
+      if (learningObjectives.length > 0) {
+        prompt += `\n- Learning Objectives:`;
+        learningObjectives.forEach(objective => {
+          prompt += `\n  * ${objective}`;
         });
       }
-      
-      if (gameMechanics.length > 0) {
-        prompt += `\n- Game Mechanics:`;
-        gameMechanics.forEach(mechanic => {
-          prompt += `\n  * ${mechanic}`;
-        });
-      }
-      
-      if (difficultyLevels) prompt += `\n- Difficulty Structure: ${difficultyLevels}`;
-      if (feedbackSystem) prompt += `\n- Feedback System: ${feedbackSystem}`;
-      if (engagementFeatures) prompt += `\n- Additional Engagement Features: ${engagementFeatures}`;
-    }
 
-    // Design & Visual Elements
-    if (visualStyle || colors || fonts || animations || uiElements.length > 0 || visualElements) {
-      prompt += `\n\n## Design & Visual Elements:`;
-      
-      if (visualStyle) prompt += `\n- Visual Style / Theme: ${visualStyle}`;
-      if (colors) prompt += `\n- Color Palette: ${colors}`;
-      if (fonts) prompt += `\n- Typography / Fonts: ${fonts}`;
-      if (animations) prompt += `\n- Animations & Transitions: ${animations}`;
-      
-      if (uiElements.length > 0) {
-        prompt += `\n- UI Components:`;
-        uiElements.forEach(element => {
-          prompt += `\n  * ${element}`;
-        });
+      // Game Type & Template
+      prompt += `\n\n## Game Type & Structure:`;
+      if (gameType === 'custom' && customGameType) {
+        prompt += `\n- Custom Game Type: ${customGameType}`;
+      } else if (gameType) {
+        const gameTypeMap = {
+          'quiz': 'Quiz / Multiple Choice Game',
+          'matching': 'Matching / Memory Game',
+          'flashcards': 'Interactive Flashcards',
+          'puzzle': 'Educational Puzzle',
+          'sorting': 'Sorting / Categorization Game',
+          'simulation': 'Interactive Simulation',
+          'adventure': 'Educational Adventure',
+          'drawing': 'Drawing / Creation Tool',
+          'storytelling': 'Interactive Storytelling',
+          'word': 'Word Game / Vocabulary Builder'
+        };
+        prompt += `\n- Game Type: ${gameTypeMap[gameType] || gameType}`;
       }
-      
-      if (visualElements) prompt += `\n- Additional Visual Elements: ${visualElements}`;
-    }
+      if (selectedTemplate) prompt += `\n- Game Template: ${selectedTemplate}`;
 
-    // Multimedia & Technical
-    if (multimediaElements.length > 0 || responsiveness || compatibilityRequirements || codingTechniques.length > 0 || otherTechnicalRequirements) {
-      prompt += `\n\n## Multimedia & Technical Specifications:`;
-      
-      if (multimediaElements.length > 0) {
-        prompt += `\n- Multimedia Elements:`;
-        multimediaElements.forEach(element => {
-          prompt += `\n  * ${element}`;
-        });
+      // Interactivity & Game Mechanics
+      if (interactiveElements.length > 0 || gameMechanics.length > 0 || difficultyLevels || feedbackSystem || engagementFeatures) {
+        prompt += `\n\n## Interactivity & Game Mechanics:`;
+        
+        if (interactiveElements.length > 0) {
+          prompt += `\n- Interactive Elements:`;
+          interactiveElements.forEach(element => {
+            prompt += `\n  * ${element}`;
+          });
+        }
+        
+        if (gameMechanics.length > 0) {
+          prompt += `\n- Game Mechanics:`;
+          gameMechanics.forEach(mechanic => {
+            prompt += `\n  * ${mechanic}`;
+          });
+        }
+        
+        if (difficultyLevels) prompt += `\n- Difficulty Structure: ${difficultyLevels}`;
+        if (feedbackSystem) prompt += `\n- Feedback System: ${feedbackSystem}`;
+        if (engagementFeatures) prompt += `\n- Additional Engagement Features: ${engagementFeatures}`;
       }
-      
-      if (responsiveness) prompt += `\n- Responsive Design: ${responsiveness}`;
-      if (compatibilityRequirements) prompt += `\n- Compatibility Requirements: ${compatibilityRequirements}`;
-      
-      if (codingTechniques.length > 0) {
-        prompt += `\n- Preferred Coding Techniques/Libraries:`;
-        codingTechniques.forEach(technique => {
-          prompt += `\n  * ${technique}`;
-        });
+
+      // Design & Visual Elements
+      if (visualStyle || colors || fonts || animations || uiElements.length > 0 || visualElements) {
+        prompt += `\n\n## Design & Visual Elements:`;
+        
+        if (visualStyle) prompt += `\n- Visual Style / Theme: ${visualStyle}`;
+        if (colors) prompt += `\n- Color Palette: ${colors}`;
+        if (fonts) prompt += `\n- Typography / Fonts: ${fonts}`;
+        if (animations) prompt += `\n- Animations & Transitions: ${animations}`;
+        
+        if (uiElements.length > 0) {
+          prompt += `\n- UI Components:`;
+          uiElements.forEach(element => {
+            prompt += `\n  * ${element}`;
+          });
+        }
+        
+        if (visualElements) prompt += `\n- Additional Visual Elements: ${visualElements}`;
       }
-      
-      if (otherTechnicalRequirements) prompt += `\n- Other Technical Requirements: ${otherTechnicalRequirements}`;
-    }
 
-    // Accessibility & Inclusivity
-    if (accessibilityFeatures.length > 0 || inclusivityConsiderations || accessibilityStandards) {
-      prompt += `\n\n## Accessibility & Inclusivity:`;
-      
-      if (accessibilityFeatures.length > 0) {
-        prompt += `\n- Accessibility Features:`;
-        accessibilityFeatures.forEach(feature => {
-          prompt += `\n  * ${feature}`;
-        });
+      // Multimedia & Technical
+      if (multimediaElements.length > 0 || responsiveness || compatibilityRequirements || codingTechniques.length > 0 || otherTechnicalRequirements) {
+        prompt += `\n\n## Multimedia & Technical Specifications:`;
+        
+        if (multimediaElements.length > 0) {
+          prompt += `\n- Multimedia Elements:`;
+          multimediaElements.forEach(element => {
+            prompt += `\n  * ${element}`;
+          });
+        }
+        
+        if (responsiveness) prompt += `\n- Responsive Design: ${responsiveness}`;
+        if (compatibilityRequirements) prompt += `\n- Compatibility Requirements: ${compatibilityRequirements}`;
+        
+        if (codingTechniques.length > 0) {
+          prompt += `\n- Preferred Coding Techniques/Libraries:`;
+          codingTechniques.forEach(technique => {
+            prompt += `\n  * ${technique}`;
+          });
+        }
+        
+        if (otherTechnicalRequirements) prompt += `\n- Other Technical Requirements: ${otherTechnicalRequirements}`;
       }
-      
-      if (inclusivityConsiderations) prompt += `\n- Inclusivity Considerations: ${inclusivityConsiderations}`;
-      if (accessibilityStandards) prompt += `\n- Accessibility Standards: ${accessibilityStandards}`;
-    }
 
-    // Final instructions
-    prompt += `\n\n## Output Requirements:`;
-    prompt += `\n- Provide clean, well-commented HTML, CSS, and JavaScript code`;
-    prompt += `\n- Ensure the game is responsive and works on desktop and mobile devices`;
-    prompt += `\n- Include clear instructions within the game`;
-    prompt += `\n- Use modern coding practices for optimal performance`;
-    prompt += `\n- Make sure all user interactions have appropriate feedback`;
-    prompt += `\n- Ensure the educational content is accurate and pedagogically sound`;
+      // Accessibility & Inclusivity
+      if (accessibilityFeatures.length > 0 || inclusivityConsiderations || accessibilityStandards) {
+        prompt += `\n\n## Accessibility & Inclusivity:`;
+        
+        if (accessibilityFeatures.length > 0) {
+          prompt += `\n- Accessibility Features:`;
+          accessibilityFeatures.forEach(feature => {
+            prompt += `\n  * ${feature}`;
+          });
+        }
+        
+        if (inclusivityConsiderations) prompt += `\n- Inclusivity Considerations: ${inclusivityConsiderations}`;
+        if (accessibilityStandards) prompt += `\n- Accessibility Standards: ${accessibilityStandards}`;
+      }
 
-    // Simulate a small delay for better UX
-    setTimeout(() => {
-      output.textContent = prompt;
-      output.classList.remove('empty');
+      // Final instructions
+      prompt += `\n\n## Output Requirements:`;
+      prompt += `\n- Provide clean, well-commented HTML, CSS, and JavaScript code`;
+      prompt += `\n- Ensure the game is responsive and works on desktop and mobile devices`;
+      prompt += `\n- Include clear instructions within the game`;
+      prompt += `\n- Use modern coding practices for optimal performance`;
+      prompt += `\n- Make sure all user interactions have appropriate feedback`;
+      prompt += `\n- Ensure the educational content is accurate and pedagogically sound`;
+
+      // Simulate a small delay for better UX
+      setTimeout(() => {
+        // Update output with the generated prompt
+        output.textContent = prompt;
+        output.classList.remove('empty');
+        
+        // Reset button state
+        generateBtn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5v14"></path>
+            <path d="M19 12l-7 7-7-7"></path>
+          </svg>
+          <span>Generate Game Prompt</span>
+        `;
+        generateBtn.disabled = false;
+        
+        // Apply syntax highlighting if highlight.js is available
+        if (highlightJsAvailable) {
+          try {
+            output.innerHTML = hljs.highlight(prompt, {language: 'markdown'}).value;
+          } catch (err) {
+            console.error('Error applying syntax highlighting:', err);
+            // Fallback to plain text if highlighting fails
+            output.textContent = prompt;
+          }
+        } else {
+          // Apply basic formatting if highlight.js is not available
+          output.innerHTML = prompt
+            .replace(/^## .+$/gm, match => `<strong style="color:#5D5CDE">${match}</strong>`)
+            .replace(/^\- .+$/gm, match => `<span style="color:#f0f0f0">${match}</span>`)
+            .replace(/^\s\s\* .+$/gm, match => `<span style="color:#a0aec0; margin-left: 1em; display: block;">${match}</span>`);
+        }
+      }, 600);
+    } catch (error) {
+      console.error('Error generating prompt:', error);
       
-      // Reset button state
+      // Reset button state and show error
       generateBtn.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 5v14"></path>
@@ -1995,15 +2043,10 @@
       `;
       generateBtn.disabled = false;
       
-      // Highlight the output with syntax highlighting
-      try {
-        output.innerHTML = hljs.highlight(prompt, {language: 'markdown'}).value;
-      } catch (err) {
-        console.error('Error applying syntax highlighting:', err);
-        // Fallback to plain text if highlighting fails
-        output.textContent = prompt;
-      }
-    }, 600);
+      // Show error message in output
+      output.textContent = "An error occurred while generating the prompt. Please try again.";
+      output.classList.remove('empty');
+    }
   });
 
   // Copy button functionality
