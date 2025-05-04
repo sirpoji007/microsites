@@ -4,27 +4,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>EduCode Prompter</title>
-  
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="https://i.imgur.com/N0aGwdi.png" />
   <link rel="apple-touch-icon" href="https://i.imgur.com/N0aGwdi.png" />
-  
-  <!-- Open Graph / Facebook -->
+
   <meta property="og:type" content="website" />
   <meta property="og:title" content="EduCode Prompter" />
   <meta property="og:description" content="Build prompts to create educational games and learning tools that are interactive,intuitive, and effective!" />
   <meta property="og:image" content="https://i.imgur.com/N0aGwdi.png" />
-  
-  <!-- Twitter -->
+
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="EduCode Prompter" />
   <meta name="twitter:description" content="Build prompts to create educational games and learning tools that are interactive,intuitive, and effective!" />
   <meta name="twitter:image" content="https://i.imgur.com/N0aGwdi.png" />
-  
-  <!-- Ensure highlight.js is loaded properly -->
+
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/atom-one-dark.min.css">
   <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/lib/highlight.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/lib/languages/markdown.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.1.392/pdf.min.js"></script>
+
   <style>
     :root {
       --primary: #5D5CDE;
@@ -123,14 +121,14 @@
       border-radius: var(--radius);
       box-shadow: var(--shadow);
     }
-    
+
     .logo-container {
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 1rem;
     }
-    
+
     .app-logo {
       width: 120px;
       height: 120px;
@@ -173,11 +171,11 @@
       h1 {
         font-size: 1.75rem;
       }
-      
+
       .header-subtitle {
         font-size: 1rem;
       }
-      
+
       .app-logo {
         width: 100px;
         height: 100px;
@@ -323,12 +321,12 @@
       align-items: center;
       gap: 1rem;
     }
-    
+
     .range-container input[type="range"] {
       flex: 1;
       margin-bottom: 0;
     }
-    
+
     .range-value {
       width: 2.5rem;
       text-align: center;
@@ -481,7 +479,7 @@
       display: block;
     }
 
-    .error input, 
+    .error input,
     .error textarea,
     .error select {
       border-color: var(--danger);
@@ -561,7 +559,8 @@
       position: relative;
     }
 
-    .completed-step::after {
+    /* Removed the checkmark pseudo-element from completed-step for cleaner UI */
+    /* .completed-step::after {
       content: '✓';
       display: inline-block;
       position: absolute;
@@ -569,7 +568,7 @@
       top: 0.75rem;
       color: var(--success);
       font-weight: bold;
-    }
+    } */
 
     /* Game Template Cards */
     .template-grid {
@@ -744,7 +743,7 @@
     .form-section-content {
       overflow: hidden;
       transition: max-height 0.3s ease;
-      max-height: 2000px;
+      max-height: 2000px; /* Sufficiently large value */
     }
 
     .form-section-content.collapsed {
@@ -842,6 +841,7 @@
       font-size: 0.9rem;
       background: transparent;
       color: var(--text-color);
+      min-width: 100px; /* Ensure input is visible */
     }
 
     /* Tips section */
@@ -872,6 +872,67 @@
 
     .tips-content li {
       margin-bottom: 0.5rem;
+    }
+
+    /* PDF Upload and summary display */
+    .pdf-upload-group {
+      margin-bottom: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .pdf-summary-box {
+      background: #faf8ed;
+      color: #444;
+      font-size: 0.98rem;
+      border: 1px solid #f59e0b;
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+      box-shadow: 0 1px 2px #f59e0b22;
+      white-space: pre-wrap;
+    }
+    .summary-loading {
+      color: var(--warning); /* Using warning color from root */
+      font-weight: 500;
+      font-style: italic;
+      margin-bottom: 0.5rem;
+    }
+    .pdf-upload-label {
+      font-size: 0.98rem;
+      color: var(--primary); /* Using primary color from root */
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .pdf-upload-label svg {
+      vertical-align: middle;
+    }
+    .pdf-upload-input {
+      font-size: 1rem;
+      color: var(--text-color); /* Using text color from root */
+      background: var(--card-bg); /* Using card bg from root */
+      border: 1.5px solid var(--input-border); /* Using input border from root */
+      border-radius: var(--radius-sm); /* Using radius-sm from root */
+      padding: 0.35rem 0.5rem;
+      transition: border 0.2s;
+    }
+    .pdf-upload-input:focus {
+      outline: none;
+      border-color: var(--primary); /* Using primary color from root */
+    }
+    @media (max-width:600px){
+      .pdf-summary-box{font-size:0.94rem;}
+      .pdf-upload-label{font-size:0.95rem;}
+    }
+     /* Styling for error state in summary box */
+    .pdf-summary-box.error {
+        background: var(--danger);
+        color: white;
+        border-color: var(--danger-hover);
     }
   </style>
 </head>
@@ -912,7 +973,6 @@
   </div>
 
   <form id="promptForm" autocomplete="off" spellcheck="false">
-    <!-- Basic Information Section -->
     <div class="form-section">
       <div class="form-section-header">
         <h2>
@@ -930,6 +990,16 @@
         </button>
       </div>
       <div class="form-section-content">
+
+        <div class="pdf-upload-group">
+          <label class="pdf-upload-label" for="pdfUpload">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16h16V4H4zm8 4h4M8 8h.01M8 12h8M8 16h8"/></svg>
+            Upload PDF (optional):
+          </label>
+          <input id="pdfUpload" class="pdf-upload-input" type="file" accept="application/pdf" />
+          <div id="pdfSummaryLoading" class="summary-loading" style="display:none;">Extracting and summarizing PDF content...</div>
+          <div id="pdfSummaryBox" class="pdf-summary-box" style="display:none;"></div>
+        </div>
         <div class="col-1 form-group" id="descriptionGroup">
           <label for="description">Educational Game Description <small>(What do you want to create?)</small></label>
           <textarea id="description" name="description" placeholder="E.g., Create an interactive math quiz game for elementary students to practice multiplication tables with colorful visuals and immediate feedback..." required></textarea>
@@ -979,7 +1049,6 @@
       </div>
     </div>
 
-    <!-- Game Type & Templates Section -->
     <div class="form-section">
       <div class="form-section-header">
         <h2>
@@ -1017,8 +1086,7 @@
         <div id="templateSection" class="form-group" style="display: none;">
           <label>Game Templates <small>(Select a template to quickly start with common game patterns)</small></label>
           <div class="template-grid">
-            <!-- Templates will be dynamically populated based on selected game type -->
-          </div>
+            </div>
         </div>
 
         <div id="customGameTypeGroup" class="form-group" style="display: none;">
@@ -1028,7 +1096,6 @@
       </div>
     </div>
 
-    <!-- Interactivity & Game Mechanics Section -->
     <div class="form-section">
       <div class="form-section-header">
         <h2>
@@ -1049,7 +1116,7 @@
       </div>
       <div class="form-section-content">
         <div class="form-group">
-          <label>Interactive Elements 
+          <label>Interactive Elements
             <span class="tooltip">ⓘ
               <span class="tooltip-text">These elements define how users interact with your educational game.</span>
             </span>
@@ -1122,7 +1189,7 @@
               <option value="User-selectable difficulty">User-Selectable Difficulty</option>
             </select>
           </div>
-          
+
           <div class="col-2 form-group">
             <label for="feedbackSystem">Feedback System</label>
             <select id="feedbackSystem" name="feedbackSystem">
@@ -1143,7 +1210,6 @@
       </div>
     </div>
 
-    <!-- Design & Visual Elements Section -->
     <div class="form-section">
       <div class="form-section-header">
         <h2>
@@ -1260,7 +1326,6 @@
       </div>
     </div>
 
-    <!-- Multimedia & Technical Section -->
     <div class="form-section">
       <div class="form-section-header">
         <h2>
@@ -1360,7 +1425,6 @@
       </div>
     </div>
 
-    <!-- Accessibility & Inclusivity Section -->
     <div class="form-section">
       <div class="form-section-header">
         <h2>
@@ -1455,14 +1519,14 @@
   // Theme handling
   const themeToggle = document.getElementById('themeToggle');
   const body = document.body;
-  
+
   // Check for preferred color scheme
   if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
     document.body.classList.remove('light-mode');
     document.body.classList.add('dark-mode');
     updateThemeIcon('dark');
   }
-  
+
   // Listen for changes in color scheme preference
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
     if (event.matches) {
@@ -1475,7 +1539,7 @@
       updateThemeIcon('light');
     }
   });
-  
+
   themeToggle.addEventListener('click', () => {
     if (body.classList.contains('light-mode')) {
       body.classList.remove('light-mode');
@@ -1487,11 +1551,11 @@
       updateThemeIcon('light');
     }
   });
-  
+
   function updateThemeIcon(theme) {
     if (theme === 'dark') {
       themeToggle.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" 
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="5"></circle>
           <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -1506,7 +1570,7 @@
       `;
     } else {
       themeToggle.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" 
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
         </svg>
@@ -1538,7 +1602,7 @@
         title: 'Timed Quiz Challenge',
         description: 'Race against the clock to answer questions',
         tags: ['Engaging', 'Competitive'],
-        image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iI0ZGNkI2QiIgb3BhY2l0eT0iMC4yIi8+PHRleHQgeD0iMjUiIHk9IjMwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMyNDI0MjQiPlRpbWVkIFF1aXogQ2hhbGxlbmdlPC90ZXh0PjxjaXJjbGUgY3g9IjEyNSIgY3k9IjgwIiByPSIzMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRkY2QjZCIiBzdHJva2Utd2lkdGg9IjMiLz48cGF0aCBkPSJNMTI1IDU1IEwxMjUgODAgTDE0MCA5NSIgc3Ryb2tlPSIjRkY2QjZCIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjx0ZXh0IHg9IjgwIiB5PSIxMzAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzQyNDI0MiI+VGltZSBsZWZ0OiAzMHM8L3RleHQ+PC9zdmc+',
+        image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iI0ZGNkI2YiIgb3BhY2l0eT0iMC4yIi8+PHRleHQgeD0iMjUiIHk9IjMwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMyNDI0MjQiPlRpbWVkIFF1aXogQ2hhbGxlbmdlPC90ZXh0PjxjaXJjbGUgY3g9IjEyNSIgY3k9IjgwIiByPSIzMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRkY2QjZCIiBzdHJva2Utd2lkdGg9IjMiLz48cGF0aCBkPSJNMTI1IDU1IEwxMjUgODAgTDE0MCA5NSIgc3Ryb2tlPSIjRkY2QjZCIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjx0ZXh0IHg9IjgwIiB5PSIxMzAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzQyNDI0MiI+VGltZSBsZWZ0OiAzMHM8L3RleHQ+PC9zdmc+',
         value: 'Timed quiz with countdown timer. Players race against the clock with bonus points for quick answers. Includes multiple difficulty levels.'
       }
     ],
@@ -1556,7 +1620,7 @@
         title: 'Sorting Categories',
         description: 'Sort items into correct categories',
         tags: ['Drag & Drop', 'Organization'],
-        image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iIzRFQ0RDNCIgb3BhY2l0eT0iMC4yIi8+PHRleHQgeD0iNzAiIHk9IjIwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMyNDI0MjQiPlNvcnRpbmcgQ2F0ZWdvcmllczwvdGV4dD48cmVjdCB4PSIyMCIgeT0iMzUiIHdpZHRoPSI5MCIgaGVpZ2h0PSIyNSIgcng9IjQiIHJ5PSI0IiBmaWxsPSIjNUQ1Q0RFIiBzdHJva2U9IiM1NTUiLz48dGV4dCB4PSI0NSIgeT0iNTIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0id2hpdGUiPkZydWl0czwvdGV4dD48cmVjdCB4PSIxNDAiIHk9IjM1IiB3aWR0aD0iOTAiIGhlaWdodD0iMjUiIHJ4PSI0IiByeT0iNCIgZmlsbD0iI0ZGNkI2QiIgc3Ryb2tlPSIjNTU1Ii8+PHRleHQgeD0iMTYwIiB5PSI1MiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSI+VmVnZ2llczwvdGV4dD48cmVjdCB4PSI0MCIgeT0iNzUiIHdpZHRoPSI1MCIgaGVpZ2h0PSIyMCIgcng9IjEwIiByeT0iMTAiIGZpbGw9IiNmMGYwZjAiIHN0cm9rZT0iI2RkZCIvPjx0ZXh0IHg9IjQ4IiB5PSI4OCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSIjNDI0MjQyIj5BcHBsZTwvdGV4dD48cmVjdCB4PSIxMDAiIHk9Ijc1IiB3aWR0aD0iNTAiIGhlaWdodD0iMjAiIHJ4PSIxMCIgcnk9IjEwIiBmaWxsPSIjZjBmMGYwIiBzdHJva2U9IiNkZGQiLz48dGV4dCB4PSIxMDgiIHk9Ijg4IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiM0MjQyNDIiPkNhcnJvdDwvdGV4dD48cmVjdCB4PSIxNjAiIHk9Ijc1IiB3aWR0aD0iNTAiIGhlaWdodD0iMjAiIHJ4PSIxMCIgcnk9IjEwIiBmaWxsPSIjZjBmMGYwIiBzdHJva2U9IiNkZGQiLz48dGV4dCB4PSIxNzAiIHk9Ijg4IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiM0MjQyNDIiPkJhbmFuYTwvdGV4dD48cmVjdCB4PSI0MCIgeT0iMTA1IiB3aWR0aD0iNTAiIGhlaWdodD0iMjAiIHJ4PSIxMCIgcnk9IjEwIiBmaWxsPSIjZjBmMGYwIiBzdHJva2U9IiNkZGQiLz48dGV4dCB4PSI0NSIgeT0iMTE4IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiM0MjQyNDIiPkJyb2Njb2xpPC90ZXh0PjxyZWN0IHg9IjEwMCIgeT0iMTA1IiB3aWR0aD0iNTAiIGhlaWdodD0iMjAiIHJ4PSIxMCIgcnk9IjEwIiBmaWxsPSIjZjBmMGYwIiBzdHJva2U9IiNkZGQiLz48dGV4dCB4PSIxMTAiIHk9IjExOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSIjNDI0MjQyIj5QZWFjaDwvdGV4dD48cmVjdCB4PSIxNjAiIHk9IjEwNSIgd2lkdGg9IjUwIiBoZWlnaHQ9IjIwIiByeD0iMTAiIHJ5PSIxMCIgZmlsbD0iI2YwZjBmMCIgc3Ryb2tlPSIjZGRkIi8+PHRleHQgeD0iMTcyIiB5PSIxMTgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMCIgZmlsbD0iIzQyNDI0MiI+Q29ybjwvdGV4dD48L3N2Zz4=',
+        image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iIzRFQ0RDNCIgb3BhY2l0eT0iMC4yIi8+PHRleHQgeD0iNzAiIHk9IjIwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMyNDI0MjQiPlNvcnRpbmcgQ2F0ZWdvcmllczwvdGV4dD48cmVjdCB4PSIyMCIgeT0iMzUiIHdpZHRoPSI5MCIgaGVpZ2h0PSIyNSIgcng9IjQiIHJ5PSI0IiBmaWxsPSIjNUQ1Q0RFIiBzdHJva2U9IiM1NTUiLz48dGV4dCB4PSI0NSIgeT0iNTIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0id2hpdGUiPkZydWl0czwvdGV4dD48cmVjdCB4PSIxNDAiIHk9IjM1IiB3aWR0aD0iOTAiIGhlaWdodD0iMjUiIHJ4PSI0IiByeT0iNCIgZmlsbD0iI0ZGNkI2QiIHN0cm9rZT0iIzU1NSIvPjx0ZXh0IHg9IjE2MCIgeT0iNTIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0id2hpdGUiPlZlZ2d5cDx0ZXh0IHg9IjE2MCIgeT0iNTIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0id2hpdGUiPlZlZ2dpZXMyPC90ZXh0PjxyZWN0IHg9IjQwIiB5PSI3NSIgd2lkdGg9IjUwIiBoZWlnaHQ9IjIwIiByeD0iMTAiIHJ5PSIxMCIgZmlsbD0iI2YwZjBmMCIgc3Ryb2tlPSIjZGRkIi8+PHRleHQgeD0iNDgiIHk9Ijg4IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiM0MjQyNDIiPkFwcGxlPC90ZXh0PjxyZWN0IHg9IjEwMCIgeT0iNzUiIHdpZHRoPSI1MCIgaGVpZ2h0PSIyMCIgcng9IjEwIiByeT0iMTAiIGZpbGw9IiNmMGYwZjAiIHN0cm9rZT0iI2RkZCIvPjx0ZXh0IHg9IjEwOCIgeT0iODgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMCIgZmlsbD0iIzQyNDI0MiI+Q2Fycm90PC90ZXh0PjxyZWN0IHg9IjE2MCIgeT0iNzUiIHdpZHRoPSI1MCIgaGVpZ2h0PSIyMCIgcng9IjEwIiByeT0iMTAiIGZpbGw9IiNmMGYwZjAiIHN0cm9rZT0iI2RkZCIvPjx0ZXh0IHg9IjE3MCIgeT0iODgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMCIgZm9udC1zaXplPSIxMCIgZmlsbD0iIzQyNDI0MiI+QmFuYW5hPC90ZXh0PjxyZWN0IHg9IjQwIiB5PSIxMDUiIHdpZHRoPSI1MCIgaGVpZ2h0PSIyMCIgcng9IjEwIiByeT0iMTAiIGZpbGw9IiNmMGYwZjAiIHN0cm9rZT0iI2RkZCIvPjx0ZXh0IHg9IjQ1IiB5PSIxMTgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMCIgZmlsbD0iIzQyNDI0MiI+QnJvY2NvbGk8L3RleHQ+PHJlY3QgeD0iMTAwIiB5PSIxMDUiIHdpZHRoPSI1MCIgaGVpZ2h0PSIyMCIgcng9IjEwIiByeT0iMTAiIGZpbGw9IiNmMGYwZjAiIHN0cm9rZT0iI2RkZCIvPjx0ZXh0IHg9IjExMCIgeT0iMTE4IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiM0MjQyNDIiPlBlYWNoPC90ZXh0PjxyZWN0IHg9IjE2MCIgeT0iMTA1IiB3aWR0aD0iNTAiIGhlaWdodD0iMjAiIHJ4PSIxMCIgcnk9IjEwIiBmaWxsPSIjZjBmMGYwIiBzdHJva2U9IiNkZGQiLz48dGV4dCB4PSIxNzIiIHk9IjExOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSIjNDI0MjQyIj5Db3JuPC90ZXh0Pjwvc3ZnPg==',
         value: 'Drag and drop sorting game where players categorize items correctly. Includes multiple categories, item validation, and scoring system.'
       },
       {
@@ -1564,7 +1628,7 @@
         title: 'Connect with Lines',
         description: 'Draw lines to connect matching items',
         tags: ['Interactive', 'Intuitive'],
-        image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iI0ZGNkI2QiIgb3BhY2l0eT0iMC4yIi8+PHRleHQgeD0iNjUiIHk9IjIwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMyNDI0MjQiPkNvbm5lY3Qgd2l0aCBMaW5lczwvdGV4dD48cmVjdCB4PSIyMCIgeT0iNDAiIHdpZHRoPSI4MCIgaGVpZ2h0PSIyNSIgcng9IjQiIHJ5PSI0IiBmaWxsPSIjZjBmMGYwIiBzdHJva2U9IiNkZGQiLz48dGV4dCB4PSI0MCIgeT0iNTciIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMCIgZmlsbD0iIzQyNDI0MiI+RG9nPC90ZXh0PjxyZWN0IHg9IjIwIiB5PSI3NSIgd2lkdGg9IjgwIiBoZWlnaHQ9IjI1IiByeD0iNCIgcnk9IjQiIGZpbGw9IiNmMGYwZjAiIHN0cm9rZT0iI2RkZCIvPjx0ZXh0IHg9IjQwIiB5PSI5MiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSIjNDI0MjQyIj5DYXQ8L3RleHQ+PHJlY3QgeD0iMjAiIHk9IjExMCIgd2lkdGg9IjgwIiBoZWlnaHQ9IjI1IiByeD0iNCIgcnk9IjQiIGZpbGw9IiNmMGYwZjAiIHN0cm9rZT0iI2RkZCIvPjx0ZXh0IHg9IjQwIiB5PSIxMjciIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMCIgZmlsbD0iIzQyNDI0MiI+QmlyZDwvdGV4dD48cmVjdCB4PSIxNTAiIHk9IjQwIiB3aWR0aD0iODAiIGhlaWdodD0iMjUiIHJ4PSI0IiByeT0iNCIgZmlsbD0iI2YwZjBmMCIgc3Ryb2tlPSIjZGRkIi8+PHRleHQgeD0iMTcwIiB5PSI1NyIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSIjNDI0MjQyIj5NZW93PC90ZXh0PjxyZWN0IHg9IjE1MCIgeT0iNzUiIHdpZHRoPSI4MCIgaGVpZ2h0PSIyNSIgcng9IjQiIHJ5PSI0IiBmaWxsPSIjZjBmMGYwIiBzdHJva2U9IiNkZGQiLz48dGV4dCB4PSIxNzAiIHk9IjkyIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiM0MjQyNDIiPldvb2Y8L3RleHQ+PHJlY3QgeD0iMTUwIiB5PSIxMTAiIHdpZHRoPSI4MCIgaGVpZ2h0PSIyNSIgcng9IjQiIHJ5PSI0IiBmaWxsPSIjZjBmMGYwIiBzdHJva2U9IiNkZGQiLz48dGV4dCB4PSIxNzAiIHk9IjEyNyIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSIjNDI0MjQyIj5UdWl0PC90ZXh0PjxwYXRoIGQ9Ik0xMDAgNTIgTDE1MCA5MiIgc3Ryb2tlPSIjRkY2QjZCIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNMTAwIDg3IEwxNTAgNTIiIHN0cm9rZT0iIzVENUNERSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSI0IDIiLz48L3N2Zz4=',
+        image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iI0ZGNkI2QiIgb3BhY2l0eT0iMC4yIi8+PHRleHQgeD0iNjUiIHk9IjIwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMyNDI0MjQiPkNvbm5lY3Qgd2l0aCBMaW5lczwvdGV4dD48cmVjdCB4PSIyMCIgeT0iNDAiIHdpZHRoPSI4MCIgaGVpZ2h0PSIyNSIgcng9IjQiIHJ5PSI0IiBmaWxsPSIjZjBmMGYwIiBzdHJva2U9IiNkZGQiLz48dGV4dCB4PSI0MCIgeT0iNTciIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMCIgZmlsbD0iIzQyNDI0MiI+RG9nPC90ZXh0PjxyZWN0IHg9IjIwIiB5PSI3NSIgd2lkdGg9IjgwIiBoZWlnaHQ9IjI1IiByeD0iNCIgcnk9IjQiIGZpbGw9IiNmMGYwZjAiIHN0cm9rZT0iI2RkZCIvPjx0ZXh0IHg9IjQwIiB5PSI5MiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSIjNDI0MjQyIj5DYXQ8L3RleHQ+PHJlY3QgeD0iMjAiIHk9IjExMCIgd2lkdGg9IjgwIiBoZWlnaHQ9IjI1IiByeD0iNCIgcnk9IjQiIGZpbGw9IiNmMGYwZjAiIHN0cm9rZT0iI2RkZCIvPjx0ZXh0IHg9IjQwIiB5PSIxMjciIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMCIgZmlsbD0iIzQyNDI0MiI+QmlyZDwvdGV4dD48cmVjdCB4PSIxNTAiIHk9IjQwIiB3aWR0aD0iODAiIGhlaWdodD0iMjUiIHJ4PSI0IiByeT0iNCIgZmlsbD0iI2YwZjBmMCIgc3Ryb2tlPSIjZGRkIi8+PHRleHQgeD0iMTcwIiB5PSI1NyIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSIjNDI0MjQyIj5NZW93PC90ZXh0PjxyZWN0IHg9IjE1MCIgeT0iNzUiIHdpZHRoPSI4MCIgaGVpZ2h0PSIyNSIgcng9IjQiIHJ5PSI0IiBmaWxsPSIjZjBmMGYwIiBzdHJva2U9IiNkZGQiLz48dGV4dCB4PSIxNzAiIHk9IjkyIiBmb2ZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiM0MjQyNDIiPldvb2Y8L3RleHQ+PHJlY3QgeD0iMTUwIiB5PSIxMTAiIHdpZHRoPSI4MCIgaGVpZ2h0PSIyNSIgcng9IjQiIHJ5PSI0IiBmaWxsPSIjZjBmMGYwIiBzdHJva2U9IiNkZGQiLz48dGV4dCB4PSIxNzAiIHk9IjEyNyIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSIjNDI0MjQyIj5UdWl0PC90ZXh0PjxwYXRoIGQ9Ik0xMDAgNTIgTDE1MCA5MiIgc3Ryb2tlPSIjRkY2QjZCIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNMTAwIDg3IEwxNTAgNTIiIHN0cm9rZT0iIzVENUNERSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSI0IDIiLz48L3N2Zz4=',
         value: 'Interactive connection game where players draw lines between related items. Features line-drawing functionality, connection validation, and visual feedback.'
       }
     ],
@@ -1605,7 +1669,7 @@
 
   gameTypeSelect.addEventListener('change', () => {
     const selectedType = gameTypeSelect.value;
-    
+
     // Handle custom game type
     if (selectedType === 'custom') {
       customGameTypeGroup.style.display = 'block';
@@ -1614,21 +1678,21 @@
     } else {
       customGameTypeGroup.style.display = 'none';
     }
-    
+
     // Show template section if templates exist for this game type
     if (selectedType && gameTemplates[selectedType]) {
       templateSection.style.display = 'block';
-      
+
       // Clear and populate template grid
       templateGrid.innerHTML = '';
-      
+
       // Add templates for the selected game type
       gameTemplates[selectedType].forEach(template => {
         const templateCard = document.createElement('div');
         templateCard.classList.add('template-card');
         templateCard.dataset.value = template.value;
         templateCard.dataset.id = template.id;
-        
+
         templateCard.innerHTML = `
           <div class="template-img" style="background-image: url('${template.image}')"></div>
           <div class="template-content">
@@ -1639,7 +1703,7 @@
             </div>
           </div>
         `;
-        
+
         // Handle template selection
         templateCard.addEventListener('click', () => {
           document.querySelectorAll('.template-card').forEach(card => {
@@ -1648,7 +1712,7 @@
           templateCard.classList.add('selected');
           document.getElementById('selectedTemplate').value = template.value;
         });
-        
+
         templateGrid.appendChild(templateCard);
       });
     } else {
@@ -1665,12 +1729,12 @@
 
   // Form section collapse functionality
   const sectionCollapseButtons = document.querySelectorAll('.form-section-collapse');
-  
+
   sectionCollapseButtons.forEach(button => {
     button.addEventListener('click', () => {
       const section = button.closest('.form-section');
       const content = section.querySelector('.form-section-content');
-      
+
       if (content.classList.contains('collapsed')) {
         content.classList.remove('collapsed');
         button.classList.remove('collapsed');
@@ -1695,7 +1759,7 @@
         tagsContainer.removeChild(child);
       }
     });
-    
+
     // Add tags back to container
     tags.forEach((tag, index) => {
       const tagElement = document.createElement('div');
@@ -1706,7 +1770,7 @@
       `;
       tagsContainer.insertBefore(tagElement, tagsInput);
     });
-    
+
     // Add event listeners to close buttons
     document.querySelectorAll('.tag-close').forEach(closeBtn => {
       closeBtn.addEventListener('click', (e) => {
@@ -1737,10 +1801,10 @@
   function updateColorPalette() {
     const colorInput = colorsInput.value;
     colorPalettePreview.innerHTML = '';
-    
+
     // Extract hex codes using regex
     const hexCodes = colorInput.match(/#[0-9A-Fa-f]{3,6}/g) || [];
-    
+
     // Create color preview elements
     hexCodes.forEach(hex => {
       const colorPreview = document.createElement('div');
@@ -1771,10 +1835,10 @@
         // If input is empty, just set it; else append (with separator)
         if (input.value.trim() === '') {
           input.value = presetValue;
-          input.classList.add('completed-step');
+          // input.classList.add('completed-step'); // Removed completed-step class add here
         } else if (!input.value.includes(presetValue)) {
           input.value = input.value.trim() + '; ' + presetValue;
-          input.classList.add('completed-step');
+          // input.classList.add('completed-step'); // Removed completed-step class add here
         }
         // Add visual feedback for selection
         presetSelect.parentElement.classList.add('fade-in');
@@ -1784,6 +1848,9 @@
       }
       // Reset select back to placeholder after selection
       presetSelect.selectedIndex = 0;
+      // Trigger input event to update completed-step state if needed
+      const event = new Event('input');
+      input.dispatchEvent(event);
     });
   }
 
@@ -1795,7 +1862,10 @@
   handlePresetChange('responsivenessPreset', 'responsiveness');
 
   // Form input validation
-  document.getElementById('description').addEventListener('input', function() {
+  const descriptionTextarea = document.getElementById('description');
+  const descriptionGroup = document.getElementById('descriptionGroup');
+
+  descriptionTextarea.addEventListener('input', function() {
     if (this.value.trim() !== '') {
       descriptionGroup.classList.remove('error');
       this.classList.add('completed-step');
@@ -1815,43 +1885,191 @@
   const output = document.getElementById('output');
   const copyBtn = document.getElementById('copyBtn');
   const generateBtn = document.getElementById('generateBtn');
-  const descriptionGroup = document.getElementById('descriptionGroup');
+
+  // ========== PDF UPLOAD & SUMMARY INTEGRATION ==========
+  const pdfUpload = document.getElementById('pdfUpload');
+  const pdfSummaryBox = document.getElementById('pdfSummaryBox');
+  const pdfSummaryLoading = document.getElementById('pdfSummaryLoading');
+  let pdfAutoSummary = ""; // Will hold summary for prompt generation
+
+  // PDF.js worker - Make sure this is only set once globally if possible, or handled carefully
+  // It's already included via the script tag in the head, so no need to redefine workerSrc here
+  // pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.1.392/pdf.worker.min.js";
+
+
+  pdfUpload.addEventListener('change', async function () {
+    const file = pdfUpload.files[0];
+    pdfSummaryBox.style.display = 'none';
+    pdfSummaryLoading.style.display = 'none';
+    pdfAutoSummary = ""; // Reset summary
+
+    if (!file) return;
+    if (file.type !== "application/pdf") {
+      pdfSummaryBox.style.display = "block";
+      pdfSummaryBox.classList.add('error'); // Add error class for styling
+      pdfSummaryBox.textContent = "Please select a valid PDF file.";
+      pdfSummaryLoading.style.display = "none";
+      // Clear description if it was previously filled by a failed PDF
+      descriptionTextarea.value = '';
+      descriptionTextarea.classList.remove('completed-step');
+      return;
+    }
+
+    // Reset previous error state if any
+    pdfSummaryBox.classList.remove('error');
+
+    pdfSummaryLoading.style.display = "block";
+    pdfSummaryLoading.textContent = "Extracting and summarizing PDF content...";
+    pdfSummaryBox.textContent = ''; // Clear previous summary
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      let rawText = '';
+      let maxPages = Math.min(pdf.numPages, 15); // Limit to first 15 pages for speed
+      for (let i = 1; i <= maxPages; i++) {
+        const page = await pdf.getPage(i);
+        const txt = await page.getTextContent();
+        rawText += txt.items.map(item => item.str).join(' ') + "\n";
+      }
+      // Basic extractive summarization: pick the first N sentences and any that look like learning objectives
+      let sentences = rawText
+        .replace(/(\r?\n)+/g, '. ') // Replace newlines with sentence breaks
+        .replace(/\s{2,}/g, ' ')
+        .split(/(?<=[.!?])\s+/)
+        .map(s => s.trim())
+        .filter(s => s.length > 40 && s.length < 300); // Filter out very short/long sentences
+
+      let summary = sentences.slice(0, 5).join(' '); // first 5 sentences
+      // Add any sentences that mention "objective", "goal", "learn", etc.
+      let learningRelated = sentences.filter(s => /(objective|goal|learn|students? will|outcomes?)/i.test(s));
+      if (learningRelated.length) {
+         // Only add learning-related sentences that aren't already in the summary
+        const uniqueLearningRelated = learningRelated.filter(s => !summary.includes(s));
+        if (uniqueLearningRelated.length > 0) {
+           summary += '\n\nKey Learning Points:\n' + uniqueLearningRelated.slice(0,5).map(s=>'• '+s).join('\n');
+        }
+      }
+
+      // Trim summary to a reasonable size (e.g., 1200 characters, adjusting for prompt safety)
+       const maxSummaryLength = 1150; // A bit less than 1200 for safety
+       if (summary.length > maxSummaryLength) {
+           summary = summary.slice(0, maxSummaryLength) + "… [truncated]";
+       }
+
+
+      pdfSummaryBox.style.display = "block";
+      pdfSummaryBox.textContent = summary || "Could not extract meaningful text from the PDF."; // Display message if summary is empty
+      pdfSummaryBox.style.background = "#faf8ed"; // Reset background for success
+      pdfSummaryBox.style.color = "#444"; // Reset text color for success
+
+      // Insert summary into description textarea for editing
+      descriptionTextarea.value = summary;
+      if (summary) { // Mark as completed only if summary is not empty
+        descriptionTextarea.classList.add('completed-step');
+      } else {
+         descriptionTextarea.classList.remove('completed-step');
+      }
+      pdfAutoSummary = summary; // Store the generated summary
+      pdfSummaryLoading.style.display = "none";
+    } catch (err) {
+      console.error("PDF processing error:", err);
+      pdfSummaryBox.style.display = "block";
+      pdfSummaryBox.classList.add('error'); // Add error class for styling
+      pdfSummaryBox.textContent = "Failed to read or process PDF. It might be encrypted, corrupted, or contain only images.";
+      pdfSummaryLoading.style.display = "none";
+      pdfAutoSummary = ""; // Clear summary on failure
+       // Clear description if it was previously filled by a failed PDF process
+      descriptionTextarea.value = '';
+      descriptionTextarea.classList.remove('completed-step');
+    }
+  });
+  // ========== END PDF UPLOAD & SUMMARY INTEGRATION ==========
+
 
   form.addEventListener('submit', function(e) {
     // Prevent default form submission
     e.preventDefault();
 
-    const description = sanitize(form.description.value);
+    // ========== MODIFIED DESCRIPTION HANDLING ==========
+    let description = sanitize(descriptionTextarea.value);
+    // If a PDF summary was generated and the description hasn't been manually edited
+    // Note: A simple equality check might not be enough if the user added to the summary.
+    // A more robust check might involve comparing original summary + user input vs current description.
+    // For simplicity based on the provided code, we'll just use the textarea value, but warn if too long.
+    // The previous logic of checking pdfAutoSummary and description === pdfAutoSummary is removed
+    // in favor of simply using the final description value from the textarea, and truncating if needed.
+
+    // Warn and truncate if description is too long for Canva Code
+    const maxDescriptionLength = 1200; // Canva Code limit
+    if (description.length > maxDescriptionLength) {
+        // Use alert or update a specific message area instead of output for user feedback pre-generation
+        // For this integration, we'll update the output area first with a warning.
+         output.textContent = `⚠️ The game description exceeds the recommended length (${maxDescriptionLength} characters). It has been truncated for potential compatibility with tools like Canva Code.`;
+         output.classList.remove('empty');
+         // A small delay before showing the actual prompt might be nice, but let's keep it simple for now.
+         description = description.slice(0, maxDescriptionLength - 50) + "… [truncated]"; // Truncate, leaving room for truncation message
+    }
+
+
     if (!description) {
       descriptionGroup.classList.add('error');
       output.textContent = 'Please provide a description of the educational game you want to create.';
       output.classList.add('empty');
+      // Reset button state
+        generateBtn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5v14"></path>
+            <path d="M19 12l-7 7-7-7"></path>
+          </svg>
+          <span>Generate Game Prompt</span>
+        `;
+        generateBtn.disabled = false;
       return;
     }
+     // If a warning was displayed, append the truncation message to the description used in the prompt
+    if (description.includes("… [truncated]") && !output.textContent.startsWith('⚠️')) {
+         // This case handles when the user might have edited the truncated text but it's still too long.
+         // Re-truncating and adding the message.
+         description = description.slice(0, maxDescriptionLength - 50) + "… [truncated]";
+          output.textContent = `⚠️ The game description was truncated to ${maxDescriptionLength} characters for potential compatibility.`;
+          output.classList.remove('empty');
+    } else if (output.textContent.startsWith('⚠️') && !description.includes("… [truncated]")) {
+         // If a warning was shown, but the user fixed it, clear the warning.
+         output.textContent = '';
+         output.classList.add('empty'); // Will be removed later when prompt is generated
+    }
+     // If no warning, ensure output is clean before generation
+    if (!output.textContent.startsWith('⚠️')) {
+         output.textContent = '';
+         output.classList.add('empty');
+    }
+
 
     // Show loading state
     generateBtn.innerHTML = '<span class="loading"></span><span>Generating...</span>';
     generateBtn.disabled = true;
 
+
     try {
-      // Gather all inputs
+      // Gather all inputs (using the potentially modified description)
       // Basic Info
       const targetAge = sanitize(form.targetAge.value);
       const subjectArea = sanitize(form.subjectArea.value);
       const learningObjectives = tags.length > 0 ? tags : [];
-      
+
       // Game Type & Template
       const gameType = sanitize(form.gameType.value);
       const customGameType = form.customGameType ? sanitize(form.customGameType.value) : '';
       const selectedTemplate = document.getElementById('selectedTemplate') ? sanitize(document.getElementById('selectedTemplate').value) : '';
-      
+
       // Interactivity
       const interactiveElements = getCheckboxValues('interactiveElements');
       const gameMechanics = getCheckboxValues('gameMechanics');
       const difficultyLevels = sanitize(form.difficultyLevels.value);
       const feedbackSystem = sanitize(form.feedbackSystem.value);
       const engagementFeatures = sanitize(form.engagementFeatures.value);
-      
+
       // Design
       const visualStyle = sanitize(form.visualStyle.value);
       const colors = sanitize(form.colors.value);
@@ -1859,21 +2077,22 @@
       const animations = sanitize(form.animations.value);
       const uiElements = getCheckboxValues('uiElements');
       const visualElements = sanitize(form.visualElements.value);
-      
+
       // Multimedia & Technical
       const multimediaElements = getCheckboxValues('multimediaElements');
       const responsiveness = sanitize(form.responsiveness.value);
       const compatibilityRequirements = sanitize(form.compatibilityRequirements.value);
       const codingTechniques = getCheckboxValues('codingTechniques');
       const otherTechnicalRequirements = sanitize(form.otherTechnicalRequirements.value);
-      
+
       // Accessibility
       const accessibilityFeatures = getCheckboxValues('accessibilityFeatures');
       const inclusivityConsiderations = sanitize(form.inclusivityConsiderations.value);
       const accessibilityStandards = sanitize(form.accessibilityStandards.value);
 
       // Build the prompt
-      let prompt = `Create an interactive educational game: ${description}`;
+      // Start with the description (which might be from PDF or manually edited)
+      let prompt = `Create an interactive educational game:\n\n${description}`;
 
       // Basic Information
       prompt += `\n\n## Basic Information:`;
@@ -1910,21 +2129,21 @@
       // Interactivity & Game Mechanics
       if (interactiveElements.length > 0 || gameMechanics.length > 0 || difficultyLevels || feedbackSystem || engagementFeatures) {
         prompt += `\n\n## Interactivity & Game Mechanics:`;
-        
+
         if (interactiveElements.length > 0) {
           prompt += `\n- Interactive Elements:`;
           interactiveElements.forEach(element => {
             prompt += `\n  * ${element}`;
           });
         }
-        
+
         if (gameMechanics.length > 0) {
           prompt += `\n- Game Mechanics:`;
           gameMechanics.forEach(mechanic => {
             prompt += `\n  * ${mechanic}`;
           });
         }
-        
+
         if (difficultyLevels) prompt += `\n- Difficulty Structure: ${difficultyLevels}`;
         if (feedbackSystem) prompt += `\n- Feedback System: ${feedbackSystem}`;
         if (engagementFeatures) prompt += `\n- Additional Engagement Features: ${engagementFeatures}`;
@@ -1933,57 +2152,57 @@
       // Design & Visual Elements
       if (visualStyle || colors || fonts || animations || uiElements.length > 0 || visualElements) {
         prompt += `\n\n## Design & Visual Elements:`;
-        
+
         if (visualStyle) prompt += `\n- Visual Style / Theme: ${visualStyle}`;
         if (colors) prompt += `\n- Color Palette: ${colors}`;
         if (fonts) prompt += `\n- Typography / Fonts: ${fonts}`;
         if (animations) prompt += `\n- Animations & Transitions: ${animations}`;
-        
+
         if (uiElements.length > 0) {
           prompt += `\n- UI Components:`;
           uiElements.forEach(element => {
             prompt += `\n  * ${element}`;
           });
         }
-        
+
         if (visualElements) prompt += `\n- Additional Visual Elements: ${visualElements}`;
       }
 
       // Multimedia & Technical
       if (multimediaElements.length > 0 || responsiveness || compatibilityRequirements || codingTechniques.length > 0 || otherTechnicalRequirements) {
         prompt += `\n\n## Multimedia & Technical Specifications:`;
-        
+
         if (multimediaElements.length > 0) {
           prompt += `\n- Multimedia Elements:`;
           multimediaElements.forEach(element => {
             prompt += `\n  * ${element}`;
           });
         }
-        
+
         if (responsiveness) prompt += `\n- Responsive Design: ${responsiveness}`;
         if (compatibilityRequirements) prompt += `\n- Compatibility Requirements: ${compatibilityRequirements}`;
-        
+
         if (codingTechniques.length > 0) {
           prompt += `\n- Preferred Coding Techniques/Libraries:`;
           codingTechniques.forEach(technique => {
             prompt += `\n  * ${technique}`;
           });
         }
-        
+
         if (otherTechnicalRequirements) prompt += `\n- Other Technical Requirements: ${otherTechnicalRequirements}`;
       }
 
       // Accessibility & Inclusivity
       if (accessibilityFeatures.length > 0 || inclusivityConsiderations || accessibilityStandards) {
         prompt += `\n\n## Accessibility & Inclusivity:`;
-        
+
         if (accessibilityFeatures.length > 0) {
           prompt += `\n- Accessibility Features:`;
           accessibilityFeatures.forEach(feature => {
             prompt += `\n  * ${feature}`;
           });
         }
-        
+
         if (inclusivityConsiderations) prompt += `\n- Inclusivity Considerations: ${inclusivityConsiderations}`;
         if (accessibilityStandards) prompt += `\n- Accessibility Standards: ${accessibilityStandards}`;
       }
@@ -1999,10 +2218,39 @@
 
       // Simulate a small delay for better UX
       setTimeout(() => {
+        // Check if a truncation warning was shown
+        const hadWarning = output.textContent.startsWith('⚠️');
+        let finalOutputText = prompt;
+
         // Update output with the generated prompt
-        output.textContent = prompt;
-        output.classList.remove('empty');
-        
+        if (highlightJsAvailable) {
+            try {
+                output.innerHTML = hljs.highlight(finalOutputText, {language: 'markdown'}).value;
+            } catch (err) {
+                console.error('Error applying syntax highlighting:', err);
+                // Fallback to plain text if highlighting fails
+                output.textContent = finalOutputText;
+            }
+        } else {
+            // Apply basic formatting if highlight.js is not available
+            output.innerHTML = finalOutputText
+              .replace(/^## .+$/gm, match => `<strong style="color:#5D5CDE">${match}</strong>`)
+              .replace(/^\- .+$/gm, match => `<span style="color:#f0f0f0">${match}</span>`)
+              .replace(/^\s\s\* .+$/gm, match => `<span style="color:#a0aec0; margin-left: 1em; display: block;">${match}</span>`);
+        }
+
+        // If there was a warning, append it below the highlighted code
+        if (hadWarning) {
+             const warningDiv = document.createElement('div');
+             warningDiv.style.color = 'var(--warning)'; // Use CSS variable for color
+             warningDiv.style.marginTop = '1em';
+             warningDiv.style.fontSize = '0.9em';
+             warningDiv.textContent = output.textContent; // Use the warning text
+             output.appendChild(warningDiv); // Append warning below the prompt
+        }
+
+        output.classList.remove('empty'); // Remove empty class if it was added for a warning
+
         // Reset button state
         generateBtn.innerHTML = `
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2012,27 +2260,11 @@
           <span>Generate Game Prompt</span>
         `;
         generateBtn.disabled = false;
-        
-        // Apply syntax highlighting if highlight.js is available
-        if (highlightJsAvailable) {
-          try {
-            output.innerHTML = hljs.highlight(prompt, {language: 'markdown'}).value;
-          } catch (err) {
-            console.error('Error applying syntax highlighting:', err);
-            // Fallback to plain text if highlighting fails
-            output.textContent = prompt;
-          }
-        } else {
-          // Apply basic formatting if highlight.js is not available
-          output.innerHTML = prompt
-            .replace(/^## .+$/gm, match => `<strong style="color:#5D5CDE">${match}</strong>`)
-            .replace(/^\- .+$/gm, match => `<span style="color:#f0f0f0">${match}</span>`)
-            .replace(/^\s\s\* .+$/gm, match => `<span style="color:#a0aec0; margin-left: 1em; display: block;">${match}</span>`);
-        }
+
       }, 600);
     } catch (error) {
       console.error('Error generating prompt:', error);
-      
+
       // Reset button state and show error
       generateBtn.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2042,7 +2274,7 @@
         <span>Generate Game Prompt</span>
       `;
       generateBtn.disabled = false;
-      
+
       // Show error message in output
       output.textContent = "An error occurred while generating the prompt. Please try again.";
       output.classList.remove('empty');
@@ -2051,17 +2283,18 @@
 
   // Copy button functionality
   copyBtn.addEventListener('click', () => {
-    const promptText = output.innerText || output.textContent;
-    
+    // Get the plain text content, excluding any appended warning message
+    const promptText = output.querySelector('code')?.textContent || output.textContent;
+
     if (!promptText || output.classList.contains('empty')) {
       return;
     }
-    
+
     try {
       navigator.clipboard.writeText(promptText).then(() => {
         copyBtn.textContent = 'Copied!';
         copyBtn.classList.add('copied');
-        
+
         setTimeout(() => {
           copyBtn.textContent = 'Copy';
           copyBtn.classList.remove('copied');
@@ -2069,7 +2302,7 @@
       }).catch(err => {
         console.error('Failed to copy text:', err);
         copyBtn.textContent = 'Error!';
-        
+
         setTimeout(() => {
           copyBtn.textContent = 'Copy';
         }, 2000);
@@ -2080,10 +2313,11 @@
       const textarea = document.createElement('textarea');
       textarea.value = promptText;
       textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px'; // Hide off screen
       document.body.appendChild(textarea);
       textarea.focus();
       textarea.select();
-      
+
       try {
         const successful = document.execCommand('copy');
         copyBtn.textContent = successful ? 'Copied!' : 'Error!';
@@ -2092,7 +2326,7 @@
         console.error('Failed to copy text with execCommand:', err);
         copyBtn.textContent = 'Error!';
       }
-      
+
       document.body.removeChild(textarea);
       setTimeout(() => {
         copyBtn.textContent = 'Copy';
@@ -2102,16 +2336,42 @@
   });
 
   // Handle input changes for visual feedback
-  const inputs = document.querySelectorAll('input[type="text"], textarea, select');
+  const inputs = document.querySelectorAll('input[type="text"], textarea, select, input[type="file"]'); // Include file input
   inputs.forEach(input => {
     input.addEventListener('change', function() {
-      if (this.value.trim() !== '') {
+      if (this.value.trim() !== '' || (this.type === 'file' && this.files.length > 0)) {
         this.classList.add('completed-step');
       } else {
         this.classList.remove('completed-step');
       }
     });
   });
+
+   // Initial check for completed steps on page load
+   inputs.forEach(input => {
+        if (input.value.trim() !== '' || (input.type === 'file' && input.files.length > 0)) {
+            input.classList.add('completed-step');
+        }
+   });
+
+   // Also check the tags input separately
+   const tagsInputCheck = document.getElementById('learningObjectivesInput');
+   tagsInputCheck.addEventListener('change', function() {
+       // Tags are handled by the updateTags function, which updates the hidden input.
+       // We can add completed-step to the container or the input itself.
+       // Let's add it to the container if there are any tags.
+       if (tags.length > 0) {
+           tagsContainer.classList.add('completed-step');
+       } else {
+           tagsContainer.classList.remove('completed-step');
+       }
+   });
+    // Initial check for tags
+    if (tags.length > 0) {
+        tagsContainer.classList.add('completed-step');
+    }
+
+
 </script>
 
 </body>
