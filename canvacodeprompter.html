@@ -1,0 +1,2075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EduCode Prompter</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="https://i.imgur.com/N0aGwdi.png" />
+  <link rel="apple-touch-icon" href="https://i.imgur.com/N0aGwdi.png" />
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="EduCode Prompter" />
+  <meta property="og:description" content="Build prompts to create interactive educational games and learning tools with modern design, engaging interactions, and effective learning patterns" />
+  <meta property="og:image" content="https://i.imgur.com/N0aGwdi.png" />
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="EduCode Prompter" />
+  <meta name="twitter:description" content="Build prompts to create interactive educational games and learning tools with modern design, engaging interactions, and effective learning patterns" />
+  <meta name="twitter:image" content="https://i.imgur.com/N0aGwdi.png" />
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/atom-one-dark.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/lib/highlight.min.js"></script>
+  <style>
+    :root {
+      --primary: #5D5CDE;
+      --primary-hover: #4949b3;
+      --secondary: #FF6B6B;
+      --secondary-hover: #ff5252;
+      --tertiary: #4ECDC4;
+      --tertiary-hover: #3dbeb6;
+      --success: #38A169;
+      --success-hover: #2F855A;
+      --warning: #F59E0B;
+      --warning-hover: #D97706;
+      --danger: #EF4444;
+      --danger-hover: #DC2626;
+      --bg-light: #FFFFFF;
+      --bg-dark: #181818;
+      --text-light: #222;
+      --text-dark: #f0f0f0;
+      --gray-100: #f7fafc;
+      --gray-200: #edf2f7;
+      --gray-300: #e2e8f0;
+      --gray-400: #cbd5e0;
+      --gray-500: #a0aec0;
+      --gray-600: #718096;
+      --gray-700: #4a5568;
+      --gray-800: #2d3748;
+      --gray-900: #1a202c;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --radius-sm: 5px;
+      --radius: 8px;
+      --radius-lg: 12px;
+      --transition: all 0.3s ease;
+    }
+
+    .light-mode {
+      --bg-color: var(--bg-light);
+      --text-color: var(--text-light);
+      --card-bg: white;
+      --card-shadow: var(--shadow);
+      --input-border: var(--gray-400);
+      --input-focus-shadow: rgba(93, 92, 222, 0.3);
+      --output-bg: var(--gray-900);
+      --output-text: var(--gray-100);
+      --section-bg: var(--gray-100);
+    }
+
+    .dark-mode {
+      --bg-color: var(--bg-dark);
+      --text-color: var(--text-dark);
+      --card-bg: var(--gray-800);
+      --card-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      --input-border: var(--gray-600);
+      --input-focus-shadow: rgba(93, 92, 222, 0.3);
+      --output-bg: var(--gray-900);
+      --output-text: var(--gray-100);
+      --section-bg: var(--gray-700);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: var(--transition);
+      line-height: 1.15;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem;
+      flex: 1;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      position: relative;
+      padding: 1rem;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    
+    .app-logo {
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+      border-radius: 12px;
+      margin-right: 15px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+      transition: var(--transition);
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--text-color);
+      transition: var(--transition);
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 0.5rem;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+      color: var(--text-color);
+      transition: var(--transition);
+    }
+
+    .header-subtitle {
+      color: var(--gray-600);
+      font-size: 1.1rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.75rem;
+      }
+      
+      .header-subtitle {
+        font-size: 1rem;
+      }
+      
+      .app-logo {
+        width: 100px;
+        height: 100px;
+      }
+    }
+
+    .theme-toggle {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .theme-toggle:hover {
+      background: rgba(93, 92, 222, 0.1);
+    }
+
+    @media (max-width: 600px) {
+      .theme-toggle {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+      }
+    }
+
+    form {
+      margin-bottom: 2rem;
+    }
+
+    .form-section {
+      background: var(--card-bg);
+      padding: 1.5rem 2rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 1.5rem;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      border-top: 4px solid var(--primary);
+    }
+
+    .form-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+
+    .section-icon {
+      margin-right: 0.5rem;
+      color: var(--primary);
+    }
+
+    .section-badge {
+      background: var(--tertiary);
+      color: white;
+      font-size: 0.7rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: var(--radius-sm);
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 768px) {
+      .form-section {
+        padding: 1.25rem 1.5rem;
+      }
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--text-color);
+      transition: var(--transition);
+    }
+
+    small {
+      color: var(--gray-600);
+      font-weight: normal;
+      margin-left: 0.25rem;
+      font-size: 0.85rem;
+    }
+
+    input[type="text"],
+    input[type="color"],
+    input[type="range"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      border: 1.5px solid var(--input-border);
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      transition: var(--transition);
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235D5CDE' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1rem;
+      padding-right: 2.5rem;
+    }
+
+    input[type="text"]:focus,
+    input[type="color"]:focus,
+    input[type="range"]:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--input-focus-shadow);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .range-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .range-container input[type="range"] {
+      flex: 1;
+      margin-bottom: 0;
+    }
+    
+    .range-value {
+      width: 2.5rem;
+      text-align: center;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .row {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .col-2 {
+      flex: 1 1 calc(50% - 0.75rem);
+      min-width: 250px;
+    }
+
+    .col-3 {
+      flex: 1 1 calc(33.333% - 1rem);
+      min-width: 200px;
+    }
+
+    .col-1 {
+      flex: 1 1 100%;
+    }
+
+    button {
+      background: var(--primary);
+      color: white;
+      font-weight: 700;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    button:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .submit-btn {
+      margin: 1rem auto 0;
+      min-width: 200px;
+    }
+
+    .output-container {
+      background: var(--output-bg);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    .output-header {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 0.75rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .output-title {
+      color: var(--gray-300);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    #output {
+      white-space: pre-wrap;
+      color: var(--output-text);
+      padding: 1.5rem;
+      font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+      font-size: 0.9rem;
+      min-height: 150px;
+      overflow-x: auto;
+      background: var(--output-bg);
+      transition: var(--transition);
+    }
+
+    #output.empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray-500);
+      font-style: italic;
+    }
+
+    #copyBtn {
+      background: transparent;
+      color: var(--gray-400);
+      font-size: 0.9rem;
+      padding: 0.4rem 0.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+
+    #copyBtn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transform: none;
+      box-shadow: none;
+    }
+
+    #copyBtn.copied {
+      background: var(--success);
+      color: white;
+      border-color: var(--success);
+    }
+
+    .error-message {
+      color: var(--danger);
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+      display: none;
+    }
+
+    .error .error-message {
+      display: block;
+    }
+
+    .error input, 
+    .error textarea,
+    .error select {
+      border-color: var(--danger);
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      margin-top: auto;
+      color: var(--gray-600);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--gray-300);
+      background: var(--card-bg);
+      transition: var(--transition);
+    }
+
+    footer a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 1.25rem;
+      height: 1.25rem;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Accessible focus styles */
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    .preset-group {
+      margin-bottom: 0.5rem;
+    }
+
+    .dark-mode .hljs {
+      background: var(--gray-900);
+    }
+
+    .completed-step {
+      position: relative;
+    }
+
+    .completed-step::after {
+      content: '✓';
+      display: inline-block;
+      position: absolute;
+      right: 0.75rem;
+      top: 0.75rem;
+      color: var(--success);
+      font-weight: bold;
+    }
+
+    /* Game Template Cards */
+    .template-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .template-card {
+      background: var(--section-bg);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+
+    .template-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary);
+    }
+
+    .template-card.selected {
+      border-color: var(--primary);
+      background-color: rgba(93, 92, 222, 0.1);
+    }
+
+    .template-img {
+      height: 150px;
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      position: relative;
+    }
+
+    .template-content {
+      padding: 1.25rem;
+    }
+
+    .template-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .template-desc {
+      font-size: 0.9rem;
+      color: var(--gray-600);
+      margin-bottom: 0.5rem;
+    }
+
+    .template-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .template-tag {
+      font-size: 0.75rem;
+      background: var(--primary);
+      color: white;
+      padding: 0.15rem 0.5rem;
+      border-radius: 50px;
+    }
+
+    /* Checkbox styles */
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      padding: 0.5rem 0.75rem;
+      background: var(--section-bg);
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+
+    .checkbox-item:hover {
+      background: rgba(93, 92, 222, 0.1);
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      width: 1.1rem;
+      height: 1.1rem;
+      cursor: pointer;
+      accent-color: var(--primary);
+    }
+
+    /* Tooltip */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      margin-left: 0.5rem;
+      color: var(--gray-500);
+    }
+
+    .tooltip .tooltip-text {
+      visibility: hidden;
+      width: 250px;
+      background-color: var(--gray-800);
+      color: var(--gray-100);
+      text-align: center;
+      border-radius: 6px;
+      padding: 10px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-weight: normal;
+      font-size: 0.8rem;
+      box-shadow: var(--shadow-md);
+    }
+
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Accordion styles */
+    .accordion-header {
+      cursor: pointer;
+      background: var(--section-bg);
+      padding: 1rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .accordion-content {
+      padding: 1rem;
+      border-radius: var(--radius-sm);
+      background: rgba(93, 92, 222, 0.05);
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .accordion-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .form-section-collapse {
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: var(--primary);
+      background: none;
+      border: none;
+      padding: 0.25rem;
+      transition: transform 0.3s ease;
+    }
+
+    .form-section-collapse.collapsed {
+      transform: rotate(180deg);
+    }
+
+    .form-section-content {
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      max-height: 2000px;
+    }
+
+    .form-section-content.collapsed {
+      max-height: 0;
+    }
+
+    .color-palette-preview {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .color-preview {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      border: 2px solid var(--gray-300);
+    }
+
+    /* Slider styles */
+    .range-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 5px;
+      background: var(--gray-300);
+      outline: none;
+    }
+
+    .range-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .range-slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+    }
+
+    .range-slider::-webkit-slider-thumb:hover {
+      background: var(--primary-hover);
+      transform: scale(1.1);
+    }
+
+    .range-slider::-moz-range-thumb:hover {
+      background: var(--primary-hover);
+      transform: scale(1.1);
+    }
+
+    /* Tags Input */
+    .tags-input-container {
+      border: 1.5px solid var(--input-border);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      min-height: 50px;
+      background: var(--card-bg);
+    }
+
+    .tag {
+      background: var(--primary);
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+
+    .tag-close {
+      margin-left: 0.5rem;
+      cursor: pointer;
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    .tags-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 0.25rem;
+      font-size: 0.9rem;
+      background: transparent;
+      color: var(--text-color);
+    }
+
+    /* Tips section */
+    .tips-section {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border-left: 4px solid var(--warning);
+    }
+
+    .tips-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--warning);
+      margin-bottom: 1rem;
+    }
+
+    .tips-content {
+      font-size: 0.95rem;
+    }
+
+    .tips-content ul {
+      margin-left: 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .tips-content li {
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body class="light-mode">
+
+<div class="container">
+  <header>
+    <div class="logo-container">
+      <img src="https://i.imgur.com/N0aGwdi.png" alt="SirPoji Logo" class="app-logo">
+      <h1>Canva Code Prompter</h1>
+    </div>
+    <p class="header-subtitle">Build prompts to create educational games and learning tools that are interactive,intuitive,and effective!</p>
+    <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
+  </header>
+
+  <div class="tips-section">
+    <div class="tips-title">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <h3>Tips for Creating Effective Educational Games</h3>
+    </div>
+    <div class="tips-content">
+      <ul>
+        <li><strong>Clear Learning Objectives:</strong> Define what skills or knowledge students should gain.</li>
+        <li><strong>Progressive Difficulty:</strong> Start simple and gradually increase complexity.</li>
+        <li><strong>Immediate Feedback:</strong> Provide instant responses to keep learners engaged.</li>
+        <li><strong>Multiple Modalities:</strong> Incorporate text, images, audio, and interactive elements.</li>
+        <li><strong>Accessibility:</strong> Ensure your game can be used by learners with different abilities.</li>
+      </ul>
+    </div>
+  </div>
+
+  <form id="promptForm" autocomplete="off" spellcheck="false">
+    <!-- Basic Information Section -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <h2>
+          <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          Basic Information
+        </h2>
+        <button type="button" class="form-section-collapse" aria-label="Collapse section">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+          </svg>
+        </button>
+      </div>
+      <div class="form-section-content">
+        <div class="col-1 form-group" id="descriptionGroup">
+          <label for="description">Educational Game Description <small>(What do you want to create?)</small></label>
+          <textarea id="description" name="description" placeholder="E.g., Create an interactive math quiz game for elementary students to practice multiplication tables with colorful visuals and immediate feedback..." required></textarea>
+          <div class="error-message">Please provide a description of the educational game you want to create</div>
+        </div>
+
+        <div class="row">
+          <div class="col-2 form-group">
+            <label for="targetAge">Target Age Group / Grade Level</label>
+            <select id="targetAge" name="targetAge">
+              <option value="">-- Select target age group --</option>
+              <option value="Early Childhood (Ages 3-5)">Early Childhood (Ages 3-5)</option>
+              <option value="Elementary School (Ages 6-10)">Elementary School (Ages 6-10)</option>
+              <option value="Middle School (Ages 11-13)">Middle School (Ages 11-13)</option>
+              <option value="High School (Ages 14-18)">High School (Ages 14-18)</option>
+              <option value="College / Adult Learners">College / Adult Learners</option>
+              <option value="All Ages">All Ages</option>
+            </select>
+          </div>
+
+          <div class="col-2 form-group">
+            <label for="subjectArea">Subject Area</label>
+            <select id="subjectArea" name="subjectArea">
+              <option value="">-- Select subject area --</option>
+              <option value="Mathematics">Mathematics</option>
+              <option value="Science">Science</option>
+              <option value="Finance">Finance</option>
+              <option value="Economics">Economics</option>
+              <option value="Financial Education">Financial Education</option>
+              <option value="Marketing">Marketing</option>
+              <option value="Entrepreneurship">Entrepreneurship</option>
+              <option value="Education">Education</option>
+              <option value="Multi-subject">Multi-subject</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="learningObjectives">Learning Objectives <small>(What should learners achieve?)</small></label>
+          <div class="tags-input-container" id="learningObjectivesContainer">
+            <input type="text" class="tags-input" id="learningObjectivesInput" placeholder="Type learning objective and press Enter..." />
+          </div>
+          <input type="hidden" id="learningObjectives" name="learningObjectives" />
+          <small>Examples: "Multiply single-digit numbers", "Identify parts of speech", "Understand the water cycle"</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Type & Templates Section -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <h2>
+          <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+          </svg>
+          Game Type & Templates
+        </h2>
+        <button type="button" class="form-section-collapse" aria-label="Collapse section">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+          </svg>
+        </button>
+      </div>
+      <div class="form-section-content">
+        <div class="form-group">
+          <label for="gameType">Game Type</label>
+          <select id="gameType" name="gameType">
+            <option value="">-- Select educational game type --</option>
+            <option value="quiz">Quiz / Multiple Choice Game</option>
+            <option value="matching">Matching / Memory Game</option>
+            <option value="flashcards">Interactive Flashcards</option>
+            <option value="puzzle">Educational Puzzle</option>
+            <option value="sorting">Sorting / Categorization Game</option>
+            <option value="simulation">Interactive Simulation</option>
+            <option value="adventure">Educational Adventure</option>
+            <option value="drawing">Drawing / Creation Tool</option>
+            <option value="storytelling">Interactive Storytelling</option>
+            <option value="word">Word Game / Vocabulary Builder</option>
+            <option value="custom">Custom Game Type</option>
+          </select>
+        </div>
+
+        <div id="templateSection" class="form-group" style="display: none;">
+          <label>Game Templates <small>(Select a template to quickly start with common game patterns)</small></label>
+          <div class="template-grid">
+            <!-- Templates will be dynamically populated based on selected game type -->
+          </div>
+        </div>
+
+        <div id="customGameTypeGroup" class="form-group" style="display: none;">
+          <label for="customGameType">Describe Your Custom Game Type</label>
+          <textarea id="customGameType" name="customGameType" placeholder="Describe the custom educational game type you'd like to create..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interactivity & Game Mechanics Section -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <h2>
+          <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+            <line x1="9" y1="9" x2="9.01" y2="9"></line>
+            <line x1="15" y1="9" x2="15.01" y2="9"></line>
+          </svg>
+          Interactivity & Game Mechanics
+        </h2>
+        <span class="section-badge">Key Features</span>
+        <button type="button" class="form-section-collapse" aria-label="Collapse section">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+          </svg>
+        </button>
+      </div>
+      <div class="form-section-content">
+        <div class="form-group">
+          <label>Interactive Elements 
+            <span class="tooltip">ⓘ
+              <span class="tooltip-text">These elements define how users interact with your educational game.</span>
+            </span>
+          </label>
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" name="interactiveElements" value="Drag and drop functionality"> Drag & Drop
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="interactiveElements" value="Click/tap interactions"> Click/Tap
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="interactiveElements" value="Typing/text input"> Text Input
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="interactiveElements" value="Swiping gestures"> Swipe Gestures
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="interactiveElements" value="Drawing/sketching capabilities"> Drawing
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="interactiveElements" value="Keyboard navigation/shortcuts"> Keyboard Controls
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="interactiveElements" value="Voice input/commands"> Voice Input
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Game Mechanics
+            <span class="tooltip">ⓘ
+              <span class="tooltip-text">These features make your game engaging and help track user progress.</span>
+            </span>
+          </label>
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" name="gameMechanics" value="Point scoring system"> Scoring
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="gameMechanics" value="Levels with progressive difficulty"> Levels
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="gameMechanics" value="Timer or countdown"> Timer
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="gameMechanics" value="Lives/attempts system"> Lives/Attempts
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="gameMechanics" value="Achievement badges/rewards"> Achievements
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="gameMechanics" value="Progress tracking dashboard"> Progress Dashboard
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="gameMechanics" value="Leaderboard functionality"> Leaderboard
+            </label>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-2 form-group">
+            <label for="difficultyLevels">Difficulty Levels</label>
+            <select id="difficultyLevels" name="difficultyLevels">
+              <option value="">-- Select difficulty structure --</option>
+              <option value="Single level - suitable for beginners">Single Level (Beginners)</option>
+              <option value="Easy and Hard modes only">Easy and Hard Modes Only</option>
+              <option value="Progressive difficulty with 3-5 levels">Progressive (3-5 Levels)</option>
+              <option value="Adaptive difficulty based on performance">Adaptive Difficulty</option>
+              <option value="User-selectable difficulty">User-Selectable Difficulty</option>
+            </select>
+          </div>
+          
+          <div class="col-2 form-group">
+            <label for="feedbackSystem">Feedback System</label>
+            <select id="feedbackSystem" name="feedbackSystem">
+              <option value="">-- Select feedback approach --</option>
+              <option value="Immediate correct/incorrect feedback">Immediate Correct/Incorrect</option>
+              <option value="Detailed explanations for each answer">Detailed Explanations</option>
+              <option value="Hints system to guide learners">Hint System</option>
+              <option value="Visual/audio cues for feedback">Visual/Audio Feedback</option>
+              <option value="Cumulative feedback at end of game/level">End-of-Level Summary</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="engagementFeatures">Additional Engagement Features</label>
+          <textarea id="engagementFeatures" name="engagementFeatures" placeholder="Describe any additional engagement features for your educational game (e.g., narrative elements, character progression, mini-games...)"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Design & Visual Elements Section -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <h2>
+          <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+            <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+            <path d="M2 2l7.586 7.586"></path>
+            <circle cx="11" cy="11" r="2"></circle>
+          </svg>
+          Design & Visual Elements
+        </h2>
+        <button type="button" class="form-section-collapse" aria-label="Collapse section">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+          </svg>
+        </button>
+      </div>
+      <div class="form-section-content">
+        <div class="row">
+          <div class="col-2 form-group">
+            <label for="colorsPreset">Visual Style / Theme</label>
+            <select id="visualStylePreset" aria-label="Select Visual Style Preset">
+              <option value="">-- Select visual style --</option>
+              <option value="Playful cartoon style with bright colors and rounded shapes">Playful Cartoon</option>
+              <option value="Clean and minimalist with focus on content">Clean Minimalist</option>
+              <option value="Isometric design with 3D elements">Isometric 3D</option>
+              <option value="Hand-drawn/sketched appearance">Hand-drawn</option>
+              <option value="Pixel art style">Pixel Art</option>
+              <option value="Material design with shadows and depth">Material Design</option>
+              <option value="Sci-fi/futuristic interface">Sci-fi/Futuristic</option>
+              <option value="Nature/organic themed visuals">Nature/Organic</option>
+            </select>
+            <input type="text" id="visualStyle" name="visualStyle" placeholder="Or describe your custom visual style" />
+          </div>
+
+          <div class="col-2 form-group">
+            <label for="colorsPreset">Color Scheme</label>
+            <select id="colorsPreset" aria-label="Select Colors Palette Preset">
+              <option value="">-- Select a color palette preset --</option>
+              <option value="Primary: #FF6B6B, Secondary: #4ECDC4, Accent: #FFE66D - Bright and playful">Bright & Playful</option>
+              <option value="Primary: #3A86FF, Secondary: #8338EC, Accent: #FF006E - Educational tech">Educational Tech</option>
+              <option value="Primary: #38B000, Secondary: #6A994E, Accent: #FFDD00 - Nature & Growth">Nature & Growth</option>
+              <option value="Primary: #FF9F1C, Secondary: #FFBF69, Accent: #2EC4B6 - Energetic & Focused">Energetic & Focused</option>
+              <option value="Primary: #5F0F40, Secondary: #9A031E, Accent: #FB8B24 - Rich & Engaging">Rich & Engaging</option>
+              <option value="Primary: #0B132B, Secondary: #3A506B, Accent: #5BC0BE - Calm & Focused">Calm & Focused</option>
+            </select>
+            <input type="text" id="colors" name="colors" placeholder="Or enter custom colors / palette (hex codes or names)" />
+            <div id="colorPalettePreview" class="color-palette-preview"></div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-2 form-group">
+            <label for="fontsPreset">Typography / Fonts</label>
+            <select id="fontsPreset" aria-label="Select Fonts Preset">
+              <option value="">-- Select a font preset --</option>
+              <option value="Headings: 'Comic Neue', cursive; Body: 'Open Sans', sans-serif - Child-friendly">Child-friendly</option>
+              <option value="Headings: 'Montserrat', sans-serif; Body: 'Nunito', sans-serif - Clean & Modern">Clean & Modern</option>
+              <option value="Headings: 'Fredoka One', cursive; Body: 'Quicksand', sans-serif - Playful">Playful</option>
+              <option value="Headings: 'Roboto Slab', serif; Body: 'Roboto', sans-serif - Academic">Academic</option>
+              <option value="System fonts with dyslexia-friendly spacing and formatting">Dyslexia-friendly</option>
+            </select>
+            <input type="text" id="fonts" name="fonts" placeholder="Or enter custom fonts / typography" />
+          </div>
+
+          <div class="col-2 form-group">
+            <label for="animationsPreset">Animations & Transitions</label>
+            <select id="animationsPreset" aria-label="Select Animations Preset">
+              <option value="">-- Select animations preset --</option>
+              <option value="Bouncy, playful animations for correct answers and transitions">Bouncy & Playful</option>
+              <option value="Subtle slide and fade transitions with minimal movement">Subtle & Professional</option>
+              <option value="Physics-based animations that follow natural movement patterns">Physics-based</option>
+              <option value="Particle effects for achievements and correct answers">Particle Effects</option>
+              <option value="3D rotating elements and perspective shifts">3D Perspective</option>
+            </select>
+            <textarea id="animations" name="animations" placeholder="Or describe custom animations & transitions"></textarea>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>UI Components & Elements</label>
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" name="uiElements" value="Progress bar/indicator"> Progress Bar
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="uiElements" value="Custom buttons with hover/active states"> Custom Buttons
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="uiElements" value="Card-based design"> Card Design
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="uiElements" value="Custom input fields"> Custom Inputs
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="uiElements" value="Modal dialogues/popups"> Modals/Popups
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="uiElements" value="Tooltip/hint elements"> Tooltips
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="uiElements" value="Icons and visual indicators"> Icons
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="uiElements" value="Avatar/character representations"> Avatars
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="visualElements">Additional Visual Elements</label>
+          <textarea id="visualElements" name="visualElements" placeholder="Describe any additional visual elements or design specifics for your educational game..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Multimedia & Technical Section -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <h2>
+          <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+          Multimedia & Technical
+        </h2>
+        <button type="button" class="form-section-collapse" aria-label="Collapse section">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+          </svg>
+        </button>
+      </div>
+      <div class="form-section-content">
+        <div class="form-group">
+          <label>Multimedia Elements</label>
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" name="multimediaElements" value="Background music"> Background Music
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="multimediaElements" value="Sound effects for interactions"> Sound Effects
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="multimediaElements" value="Voiceover narration"> Voiceover
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="multimediaElements" value="Animated illustrations/characters"> Animated Illustrations
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="multimediaElements" value="Video content"> Video Content
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="multimediaElements" value="Interactive 3D elements"> 3D Elements
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="multimediaElements" value="Data visualizations/charts"> Data Visualizations
+            </label>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-2 form-group">
+            <label for="responsiveDesign">Responsive Design Approach</label>
+            <select id="responsivenessPreset" aria-label="Select Responsive Behavior Preset">
+              <option value="">-- Select responsive approach --</option>
+              <option value="Mobile-first design with touch-optimized controls">Mobile-first</option>
+              <option value="Adaptive layout that reconfigures for different screen sizes">Adaptive Layout</option>
+              <option value="Responsive with special optimizations for tablets in educational settings">Tablet-optimized</option>
+              <option value="Desktop-focused with scalability for interactive whiteboards">Interactive Whiteboard</option>
+            </select>
+            <textarea id="responsiveness" name="responsiveness" placeholder="Or describe custom responsive approach"></textarea>
+          </div>
+
+          <div class="col-2 form-group">
+            <label for="compatibilityRequirements">Compatibility Requirements</label>
+            <textarea id="compatibilityRequirements" name="compatibilityRequirements" placeholder="Specify any browser, device, or other compatibility requirements..."></textarea>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-2 form-group">
+            <label for="codingTechniques">Preferred Coding Techniques/Libraries</label>
+            <div class="checkbox-group">
+              <label class="checkbox-item">
+                <input type="checkbox" name="codingTechniques" value="Pure HTML/CSS/JavaScript"> Vanilla JS
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" name="codingTechniques" value="Canvas API for animations and drawing"> Canvas API
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" name="codingTechniques" value="SVG for vector graphics"> SVG
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" name="codingTechniques" value="CSS Grid/Flexbox for layouts"> Grid/Flexbox
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" name="codingTechniques" value="CSS Animations and transitions"> CSS Animations
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" name="codingTechniques" value="Web Animation API"> Web Animation API
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" name="codingTechniques" value="Local storage for progress saving"> Local Storage
+              </label>
+            </div>
+          </div>
+
+          <div class="col-2 form-group">
+            <label for="otherTechnicalRequirements">Other Technical Requirements</label>
+            <textarea id="otherTechnicalRequirements" name="otherTechnicalRequirements" placeholder="Specify any additional technical requirements or preferences..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Accessibility & Inclusivity Section -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <h2>
+          <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 8v4"></path>
+            <path d="M12 16h.01"></path>
+          </svg>
+          Accessibility & Inclusivity
+        </h2>
+        <button type="button" class="form-section-collapse" aria-label="Collapse section">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+          </svg>
+        </button>
+      </div>
+      <div class="form-section-content">
+        <div class="form-group">
+          <label>Accessibility Features</label>
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" name="accessibilityFeatures" value="Screen reader compatibility with ARIA labels"> Screen Reader Support
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="accessibilityFeatures" value="Keyboard navigation and shortcuts"> Keyboard Navigation
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="accessibilityFeatures" value="High contrast mode option"> High Contrast Mode
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="accessibilityFeatures" value="Text-to-speech functionality"> Text-to-Speech
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="accessibilityFeatures" value="Customizable text size"> Adjustable Text Size
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="accessibilityFeatures" value="Alternative input methods"> Alternative Inputs
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="accessibilityFeatures" value="Captions for all audio content"> Captions
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="accessibilityFeatures" value="Color-blind friendly design"> Color-blind Friendly
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inclusivityConsiderations">Inclusivity Considerations</label>
+          <textarea id="inclusivityConsiderations" name="inclusivityConsiderations" placeholder="Describe any specific inclusivity considerations for diverse learners (language options, cultural sensitivity, etc.)..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="accessibilityStandards">Accessibility Standards to Follow</label>
+          <select id="accessibilityStandards" name="accessibilityStandards">
+            <option value="">-- Select accessibility standard --</option>
+            <option value="WCAG 2.1 AA compliance">WCAG 2.1 AA</option>
+            <option value="WCAG 2.1 AAA compliance">WCAG 2.1 AAA</option>
+            <option value="Section 508 compliance">Section 508</option>
+            <option value="Basic accessibility with essential features only">Basic Accessibility</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="submit-btn" id="generateBtn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14"></path>
+        <path d="M19 12l-7 7-7-7"></path>
+      </svg>
+      <span>Generate Game Prompt</span>
+    </button>
+  </form>
+
+  <div class="output-container" id="outputContainer">
+    <div class="output-header">
+      <span class="output-title">Generated Educational Game Prompt</span>
+      <button id="copyBtn" aria-label="Copy generated prompt to clipboard">Copy</button>
+    </div>
+    <div id="output" class="empty">Your generated educational game prompt will appear here</div>
+  </div>
+</div>
+
+<footer>
+  <p><a href="https://sirpoji.portfolio.com" target="_blank" rel="noopener noreferrer">SirPoji</a> 2025 &copy; All rights reserved</p>
+</footer>
+
+<script>
+  // Theme handling
+  const themeToggle = document.getElementById('themeToggle');
+  const body = document.body;
+  
+  // Check for preferred color scheme
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.body.classList.remove('light-mode');
+    document.body.classList.add('dark-mode');
+    updateThemeIcon('dark');
+  }
+  
+  // Listen for changes in color scheme preference
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+    if (event.matches) {
+      document.body.classList.remove('light-mode');
+      document.body.classList.add('dark-mode');
+      updateThemeIcon('dark');
+    } else {
+      document.body.classList.remove('dark-mode');
+      document.body.classList.add('light-mode');
+      updateThemeIcon('light');
+    }
+  });
+  
+  themeToggle.addEventListener('click', () => {
+    if (body.classList.contains('light-mode')) {
+      body.classList.remove('light-mode');
+      body.classList.add('dark-mode');
+      updateThemeIcon('dark');
+    } else {
+      body.classList.remove('dark-mode');
+      body.classList.add('light-mode');
+      updateThemeIcon('light');
+    }
+  });
+  
+  function updateThemeIcon(theme) {
+    if (theme === 'dark') {
+      themeToggle.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" 
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      `;
+    } else {
+      themeToggle.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" 
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      `;
+    }
+  }
+
+  // Game Templates - these will be shown based on the selected game type
+  const gameTemplates = {
+    quiz: [
+      {
+        id: 'quiz-multiple-choice',
+        title: 'Multiple Choice Quiz',
+        description: 'Classic quiz with multiple choice questions',
+        tags: ['Basic', 'Popular'],
+        image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iIzVENUNERSIgb3BhY2l0eT0iMC4yIi8+PHRleHQgeD0iMjUiIHk9IjQwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiMyNDI0MjQiPk11bHRpcGxlIENob2ljZSBRdWl6PC90ZXh0Pjx0ZXh0IHg9IjI1IiB5PSI3MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjNDI0MjQyIj5XaGF0IGlzIDIgKyAyPzwvdGV4dD48cmVjdCB4PSIyNSIgeT0iODUiIHdpZHRoPSIyMDAiIGhlaWdodD0iMjUiIHJ4PSI0IiByeT0iNCIgZmlsbD0iI2YwZjBmMCIgc3Ryb2tlPSIjZGRkIi8+PHRleHQgeD0iMzUiIHk9IjEwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjNDI0MjQyIj5BKSAzPC90ZXh0PjxyZWN0IHg9IjI1IiB5PSIxMTUiIHdpZHRoPSIyMDAiIGhlaWdodD0iMjUiIHJ4PSI0IiByeT0iNCIgZmlsbD0iIzVENUNERSIgc3Ryb2tlPSIjNTU1Ii8+PHRleHQgeD0iMzUiIHk9IjEzMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSI+QikgNDwvdGV4dD48L3N2Zz4=',
+        value: 'Standard multiple choice quiz with questions, options and immediate feedback. Includes score tracking and results summary.'
+      },
+      {
+        id: 'quiz-true-false',
+        title: 'True/False Quiz',
+        description: 'Simple true or false questions with feedback',
+        tags: ['Simple', 'Fast'],
+        image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iIzRFQ0RDNCIgb3BhY2l0eT0iMC4yIi8+PHRleHQgeD0iMjUiIHk9IjQwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiMyNDI0MjQiPlRydWUvRmFsc2UgUXVpejwvdGV4dD48dGV4dCB4PSIyNSIgeT0iNzAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzQyNDI0MiI+VGhlIEVhcnRoIGlzIGZsYXQuPC90ZXh0PjxyZWN0IHg9IjI1IiB5PSI5MCIgd2lkdGg9IjkwIiBoZWlnaHQ9IjM1IiByeD0iNCIgcnk9IjQiIGZpbGw9IiNmMGYwZjAiIHN0cm9rZT0iI2RkZCIvPjx0ZXh0IHg9IjU1IiB5PSIxMTIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzQyNDI0MiI+VHJ1ZTwvdGV4dD48cmVjdCB4PSIxMzUiIHk9IjkwIiB3aWR0aD0iOTAiIGhlaWdodD0iMzUiIHJ4PSI0IiByeT0iNCIgZmlsbD0iIzRFQ0RDNCIgc3Ryb2tlPSIjNEVDREM0Ii8+PHRleHQgeD0iMTYyIiB5PSIxMTIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0id2hpdGUiPkZhbHNlPC90ZXh0Pjwvc3ZnPg==',
+        value: 'True/False quiz format with simple binary choices. Features immediate feedback, explanations, and score tracking.'
+      },
+      {
+        id: 'quiz-timed',
+        title: 'Timed Quiz Challenge',
+        description: 'Race against the clock to answer questions',
+        tags: ['Engaging', 'Competitive'],
+        image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iI0ZGNkI2QiIgb3BhY2l0eT0iMC4yIi8+PHRleHQgeD0iMjUiIHk9IjMwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMyNDI0MjQiPlRpbWVkIFF1aXogQ2hhbGxlbmdlPC90ZXh0PjxjaXJjbGUgY3g9IjEyNSIgY3k9IjgwIiByPSIzMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRkY2QjZCIiBzdHJva2Utd2lkdGg9IjMiLz48cGF0aCBkPSJNMTI1IDU1IEwxMjUgODAgTDE0MCA5NSIgc3Ryb2tlPSIjRkY2QjZCIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjx0ZXh0IHg9IjgwIiB5PSIxMzAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzQyNDI0MiI+VGltZSBsZWZ0OiAzMHM8L3RleHQ+PC9zdmc+',
+        value: 'Timed quiz with countdown timer. Players race against the clock with bonus points for quick answers. Includes multiple difficulty levels.'
+      }
+    ],
+    matching: [
+      {
+        id: 'matching-pairs',
+        title: 'Matching Pairs',
+        description: 'Find and match related items',
+        tags: ['Memory', 'Visual'],
+        image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iIzVENUNERSIgb3BhY2l0eT0iMC4yIi8+PHRleHQgeD0iNzUiIHk9IjIwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMyNDI0MjQiPk1hdGNoaW5nIFBhaXJzPC90ZXh0PjxyZWN0IHg9IjIwIiB5PSI0MCIgd2lkdGg9IjQ1IiBoZWlnaHQ9IjQ1IiByeD0iNCIgcnk9IjQiIGZpbGw9IiM1RDVDREUiIHN0cm9rZT0iIzU1NSIvPjxyZWN0IHg9IjgwIiB5PSI0MCIgd2lkdGg9IjQ1IiBoZWlnaHQ9IjQ1IiByeD0iNCIgcnk9IjQiIGZpbGw9IiNGRjZCNkIiIHN0cm9rZT0iIzU1NSIvPjxyZWN0IHg9IjE0MCIgeT0iNDAiIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSIgcng9IjQiIHJ5PSI0IiBmaWxsPSIjNEVDREM0IiBzdHJva2U9IiM1NTUiLz48cmVjdCB4PSIyMCIgeT0iOTUiIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSIgcng9IjQiIHJ5PSI0IiBmaWxsPSIjRkY2QjZCIiBzdHJva2U9IiM1NTUiLz48cmVjdCB4PSI4MCIgeT0iOTUiIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSIgcng9IjQiIHJ5PSI0IiBmaWxsPSIjNEVDREM0IiBzdHJva2U9IiM1NTUiLz48cmVjdCB4PSIxNDAiIHk9Ijk1IiB3aWR0aD0iNDUiIGhlaWdodD0iNDUiIHJ4PSI0IiByeT0iNCIgZmlsbD0iIzVENUNERSIgc3Ryb2tlPSIjNTU1Ii8+PHBhdGggZD0iTTQyLjUgNjIuNSBMMTAyLjUgMTE3LjUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSI0IDIiLz48cGF0aCBkPSJNMTYyLjUgNjIuNSBMMTAyLjUgMTE3LjUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSI0IDIiLz48L3N2Zz4=',
+        value: 'Classic matching pairs game where players find and connect related items. Features include: flip animations, match validation, and progress tracking.'
+      },
+      {
+        id: 'sorting-categories',
+        title: 'Sorting Categories',
+        description: 'Sort items into correct categories',
+        tags: ['Drag & Drop', 'Organization'],
+        image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iIzRFQ0RDNCIgb3BhY2l0eT0iMC4yIi8+PHRleHQgeD0iNzAiIHk9IjIwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMyNDI0MjQiPlNvcnRpbmcgQ2F0ZWdvcmllczwvdGV4dD48cmVjdCB4PSIyMCIgeT0iMzUiIHdpZHRoPSI5MCIgaGVpZ2h0PSIyNSIgcng9IjQiIHJ5PSI0IiBmaWxsPSIjNUQ1Q0RFIiBzdHJva2U9IiM1NTUiLz48dGV4dCB4PSI0NSIgeT0iNTIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0id2hpdGUiPkZydWl0czwvdGV4dD48cmVjdCB4PSIxNDAiIHk9IjM1IiB3aWR0aD0iOTAiIGhlaWdodD0iMjUiIHJ4PSI0IiByeT0iNCIgZmlsbD0iI0ZGNkI2QiIgc3Ryb2tlPSIjNTU1Ii8+PHRleHQgeD0iMTYwIiB5PSI1MiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSI+VmVnZ2llczwvdGV4dD48cmVjdCB4PSI0MCIgeT0iNzUiIHdpZHRoPSI1MCIgaGVpZ2h0PSIyMCIgcng9IjEwIiByeT0iMTAiIGZpbGw9IiNmMGYwZjAiIHN0cm9rZT0iI2RkZCIvPjx0ZXh0IHg9IjQ4IiB5PSI4OCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSIjNDI0MjQyIj5BcHBsZTwvdGV4dD48cmVjdCB4PSIxMDAiIHk9Ijc1IiB3aWR0aD0iNTAiIGhlaWdodD0iMjAiIHJ4PSIxMCIgcnk9IjEwIiBmaWxsPSIjZjBmMGYwIiBzdHJva2U9IiNkZGQiLz48dGV4dCB4PSIxMDgiIHk9Ijg4IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiM0MjQyNDIiPkNhcnJvdDwvdGV4dD48cmVjdCB4PSIxNjAiIHk9Ijc1IiB3aWR0aD0iNTAiIGhlaWdodD0iMjAiIHJ4PSIxMCIgcnk9IjEwIiBmaWxsPSIjZjBmMGYwIiBzdHJva2U9IiNkZGQiLz48dGV4dCB4PSIxNzAiIHk9Ijg4IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiM0MjQyNDIiPkJhbmFuYTwvdGV4dD48cmVjdCB4PSI0MCIgeT0iMTA1IiB3aWR0aD0iNTAiIGhlaWdodD0iMjAiIHJ4PSIxMCIgcnk9IjEwIiBmaWxsPSIjZjBmMGYwIiBzdHJva2U9IiNkZGQiLz48dGV4dCB4PSI0NSIgeT0iMTE4IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiM0MjQyNDIiPkJyb2Njb2xpPC90ZXh0PjxyZWN0IHg9IjEwMCIgeT0iMTA1IiB3aWR0aD0iNTAiIGhlaWdodD0iMjAiIHJ4PSIxMCIgcnk9IjEwIiBmaWxsPSIjZjBmMGYwIiBzdHJva2U9IiNkZGQiLz48dGV4dCB4PSIxMTAiIHk9IjExOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSIjNDI0MjQyIj5QZWFjaDwvdGV4dD48cmVjdCB4PSIxNjAiIHk9IjEwNSIgd2lkdGg9IjUwIiBoZWlnaHQ9IjIwIiByeD0iMTAiIHJ5PSIxMCIgZmlsbD0iI2YwZjBmMCIgc3Ryb2tlPSIjZGRkIi8+PHRleHQgeD0iMTcyIiB5PSIxMTgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMCIgZmlsbD0iIzQyNDI0MiI+Q29ybjwvdGV4dD48L3N2Zz4=',
+        value: 'Drag and drop sorting game where players categorize items correctly. Includes multiple categories, item validation, and scoring system.'
+      },
+      {
+        id: 'matching-lines',
+        title: 'Connect with Lines',
+        description: 'Draw lines to connect matching items',
+        tags: ['Interactive', 'Intuitive'],
+        image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iI0ZGNkI2QiIgb3BhY2l0eT0iMC4yIi8+PHRleHQgeD0iNjUiIHk9IjIwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMyNDI0MjQiPkNvbm5lY3Qgd2l0aCBMaW5lczwvdGV4dD48cmVjdCB4PSIyMCIgeT0iNDAiIHdpZHRoPSI4MCIgaGVpZ2h0PSIyNSIgcng9IjQiIHJ5PSI0IiBmaWxsPSIjZjBmMGYwIiBzdHJva2U9IiNkZGQiLz48dGV4dCB4PSI0MCIgeT0iNTciIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMCIgZmlsbD0iIzQyNDI0MiI+RG9nPC90ZXh0PjxyZWN0IHg9IjIwIiB5PSI3NSIgd2lkdGg9IjgwIiBoZWlnaHQ9IjI1IiByeD0iNCIgcnk9IjQiIGZpbGw9IiNmMGYwZjAiIHN0cm9rZT0iI2RkZCIvPjx0ZXh0IHg9IjQwIiB5PSI5MiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSIjNDI0MjQyIj5DYXQ8L3RleHQ+PHJlY3QgeD0iMjAiIHk9IjExMCIgd2lkdGg9IjgwIiBoZWlnaHQ9IjI1IiByeD0iNCIgcnk9IjQiIGZpbGw9IiNmMGYwZjAiIHN0cm9rZT0iI2RkZCIvPjx0ZXh0IHg9IjQwIiB5PSIxMjciIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMCIgZmlsbD0iIzQyNDI0MiI+QmlyZDwvdGV4dD48cmVjdCB4PSIxNTAiIHk9IjQwIiB3aWR0aD0iODAiIGhlaWdodD0iMjUiIHJ4PSI0IiByeT0iNCIgZmlsbD0iI2YwZjBmMCIgc3Ryb2tlPSIjZGRkIi8+PHRleHQgeD0iMTcwIiB5PSI1NyIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSIjNDI0MjQyIj5NZW93PC90ZXh0PjxyZWN0IHg9IjE1MCIgeT0iNzUiIHdpZHRoPSI4MCIgaGVpZ2h0PSIyNSIgcng9IjQiIHJ5PSI0IiBmaWxsPSIjZjBmMGYwIiBzdHJva2U9IiNkZGQiLz48dGV4dCB4PSIxNzAiIHk9IjkyIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiM0MjQyNDIiPldvb2Y8L3RleHQ+PHJlY3QgeD0iMTUwIiB5PSIxMTAiIHdpZHRoPSI4MCIgaGVpZ2h0PSIyNSIgcng9IjQiIHJ5PSI0IiBmaWxsPSIjZjBmMGYwIiBzdHJva2U9IiNkZGQiLz48dGV4dCB4PSIxNzAiIHk9IjEyNyIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSIjNDI0MjQyIj5UdWl0PC90ZXh0PjxwYXRoIGQ9Ik0xMDAgNTIgTDE1MCA5MiIgc3Ryb2tlPSIjRkY2QjZCIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNMTAwIDg3IEwxNTAgNTIiIHN0cm9rZT0iIzVENUNERSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSI0IDIiLz48L3N2Zz4=',
+        value: 'Interactive connection game where players draw lines between related items. Features line-drawing functionality, connection validation, and visual feedback.'
+      }
+    ],
+    flashcards: [
+      {
+        id: 'flashcards-basic',
+        title: 'Basic Flashcards',
+        description: 'Simple flip cards with question and answer',
+        tags: ['Basic', 'Effective'],
+        image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iIzVENUNERSIgb3BhY2l0eT0iMC4yIi8+PHRleHQgeD0iNzUiIHk9IjIwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMyNDI0MjQiPkJhc2ljIEZsYXNoY2FyZHM8L3RleHQ+PHJlY3QgeD0iNDAiIHk9IjQwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjkwIiByeD0iOCIgcnk9IjgiIGZpbGw9IndoaXRlIiBzdHJva2U9IiM1RDVDREUiIHN0cm9rZS13aWR0aD0iMiIvPjx0ZXh0IHg9IjExMCIgeT0iODUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzI0MjQyNCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+V2hhdCBpcyA3ICsgOD88L3RleHQ+PHRleHQgeD0iMjI1IiB5PSIxMzAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMCIgZmlsbD0iIzY2NjY2NiIgdGV4dC1hbmNob3I9InJpZ2h0Ij5DbGljayB0byBmbGlwPC90ZXh0Pjwvc3ZnPg==',
+        value: 'Classic flashcard system with front (question) and back (answer) sides. Features smooth flip animation, progress tracking, and study mode.'
+      },
+      {
+        id: 'flashcards-spaced',
+        title: 'Spaced Repetition',
+        description: 'Flashcards that adapt to learning progress',
+        tags: ['Advanced', 'Effective'],
+        image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iIzRFQ0RDNCIgb3BhY2l0eT0iMC4yIi8+PHRleHQgeD0iNjciIHk9IjIwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMyNDI0MjQiPlNwYWNlZCBSZXBldGl0aW9uPC90ZXh0PjxyZWN0IHg9IjQwIiB5PSI0MCIgd2lkdGg9IjE3MCIgaGVpZ2h0PSI5MCIgcng9IjgiIHJ5PSI4IiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjNEVDREM0IiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSIxMTAiIHk9Ijg1IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiMyNDI0MjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlF1ZSBlcyAndGFibGUnPzwvdGV4dD48ZGl2IHN0eWxlPSJkaXNwbGF5OiBmbGV4OyBqdXN0aWZ5LWNvbnRlbnQ6IHNwYWNlLWJldHdlZW47IHdpZHRoOiAxNjBweDsgcG9zaXRpb246IGFic29sdXRlOyBsZWZ0OiA0NXB4OyBib3R0b206IDEwcHg7Ij48cmVjdCB4PSI0NSIgeT0iMTIwIiB3aWR0aD0iMzAiIGhlaWdodD0iMjAiIHJ4PSIzIiByeT0iMyIgZmlsbD0iI0YwNkE2QSIvPjxyZWN0IHg9Ijg1IiB5PSIxMjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSIyMCIgcng9IjMiIHJ5PSIzIiBmaWxsPSIjRkZCODAwIi8+PHJlY3QgeD0iMTI1IiB5PSIxMjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSIyMCIgcng9IjMiIHJ5PSIzIiBmaWxsPSIjODBDRTdDIi8+PHJlY3QgeD0iMTY1IiB5PSIxMjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSIyMCIgcng9IjMiIHJ5PSIzIiBmaWxsPSIjNEVDREM0Ii8+PC9kaXY+PHRleHQgeD0iNjAiIHk9IjEzMyIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjkiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5IYXJkPC90ZXh0Pjx0ZXh0IHg9IjEwMCIgeT0iMTMzIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iOSIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk9rPC90ZXh0Pjx0ZXh0IHg9IjE0MCIgeT0iMTMzIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iOSIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkVhc3k8L3RleHQ+PHRleHQgeD0iMTgwIiB5PSIxMzMiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI5IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+TmV4dDwvdGV4dD48L3N2Zz4=',
+        value: 'Advanced flashcard system using spaced repetition algorithm. Prioritizes difficult cards and spaces out reviews for effective learning.'
+      },
+      {
+        id: 'flashcards-multimedia',
+        title: 'Multimedia Flashcards',
+        description: 'Cards with images, audio, and rich content',
+        tags: ['Rich Media', 'Engaging'],
+        image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iI0ZGNkI2QiIgb3BhY2l0eT0iMC4yIi8+PHRleHQgeD0iNjAiIHk9IjIwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMyNDI0MjQiPk11bHRpbWVkaWEgQ2FyZHM8L3RleHQ+PHJlY3QgeD0iNDAiIHk9IjQwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjkwIiByeD0iOCIgcnk9IjgiIGZpbGw9IndoaXRlIiBzdHJva2U9IiNGRjZCNkIiIHN0cm9rZS13aWR0aD0iMiIvPjxyZWN0IHg9IjUwIiB5PSI1MCIgd2lkdGg9IjcwIiBoZWlnaHQ9IjYwIiByeD0iNCIgcnk9IjQiIGZpbGw9IiNmOGY4ZjgiIHN0cm9rZT0iI2RkZCIvPjxjaXJjbGUgY3g9IjgwIiBjeT0iNjUiIHI9IjEwIiBmaWxsPSIjRkY2QjZCIi8+PHBhdGggZD0iTTc1IDY1IEw4OCA3MiBMNzUgNzkgWiIgZmlsbD0id2hpdGUiLz48dGV4dCB4PSI2NCIgeT0iOTciIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMCIgZmlsbD0iIzY2NjY2NiI+UGxheSBBdWRpbzwvdGV4dD48dGV4dCB4PSIxNzAiIHk9IjY1IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiMyNDI0MjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk5hbWUgdGhpczwvdGV4dD48dGV4dCB4PSIxNzAiIHk9IjgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiMyNDI0MjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPmFuaW1hbDwvdGV4dD48L3N2Zz4=',
+        value: 'Enhanced flashcards with multimedia support including images, audio clips, and video. Great for language learning and visual subjects.'
+      }
+    ],
+    // Add templates for other game types similarly
+  };
+
+  // Handle game type selection for showing relevant templates
+  const gameTypeSelect = document.getElementById('gameType');
+  const templateSection = document.getElementById('templateSection');
+  const templateGrid = document.querySelector('.template-grid');
+  const customGameTypeGroup = document.getElementById('customGameTypeGroup');
+
+  gameTypeSelect.addEventListener('change', () => {
+    const selectedType = gameTypeSelect.value;
+    
+    // Handle custom game type
+    if (selectedType === 'custom') {
+      customGameTypeGroup.style.display = 'block';
+      templateSection.style.display = 'none';
+      return;
+    } else {
+      customGameTypeGroup.style.display = 'none';
+    }
+    
+    // Show template section if templates exist for this game type
+    if (selectedType && gameTemplates[selectedType]) {
+      templateSection.style.display = 'block';
+      
+      // Clear and populate template grid
+      templateGrid.innerHTML = '';
+      
+      // Add templates for the selected game type
+      gameTemplates[selectedType].forEach(template => {
+        const templateCard = document.createElement('div');
+        templateCard.classList.add('template-card');
+        templateCard.dataset.value = template.value;
+        templateCard.dataset.id = template.id;
+        
+        templateCard.innerHTML = `
+          <div class="template-img" style="background-image: url('${template.image}')"></div>
+          <div class="template-content">
+            <div class="template-title">${template.title}</div>
+            <div class="template-desc">${template.description}</div>
+            <div class="template-tags">
+              ${template.tags.map(tag => `<span class="template-tag">${tag}</span>`).join('')}
+            </div>
+          </div>
+        `;
+        
+        // Handle template selection
+        templateCard.addEventListener('click', () => {
+          document.querySelectorAll('.template-card').forEach(card => {
+            card.classList.remove('selected');
+          });
+          templateCard.classList.add('selected');
+          document.getElementById('selectedTemplate').value = template.value;
+        });
+        
+        templateGrid.appendChild(templateCard);
+      });
+    } else {
+      templateSection.style.display = 'none';
+    }
+  });
+
+  // Create a hidden field for the selected template value
+  const selectedTemplateField = document.createElement('input');
+  selectedTemplateField.type = 'hidden';
+  selectedTemplateField.id = 'selectedTemplate';
+  selectedTemplateField.name = 'selectedTemplate';
+  document.getElementById('promptForm').appendChild(selectedTemplateField);
+
+  // Form section collapse functionality
+  const sectionCollapseButtons = document.querySelectorAll('.form-section-collapse');
+  
+  sectionCollapseButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const section = button.closest('.form-section');
+      const content = section.querySelector('.form-section-content');
+      
+      if (content.classList.contains('collapsed')) {
+        content.classList.remove('collapsed');
+        button.classList.remove('collapsed');
+      } else {
+        content.classList.add('collapsed');
+        button.classList.add('collapsed');
+      }
+    });
+  });
+
+  // Tags input for learning objectives
+  const tagsContainer = document.getElementById('learningObjectivesContainer');
+  const tagsInput = document.getElementById('learningObjectivesInput');
+  const tagsHiddenInput = document.getElementById('learningObjectives');
+  const tags = [];
+
+  function updateTags() {
+    tagsHiddenInput.value = JSON.stringify(tags);
+    // Remove all tags from container except the input
+    Array.from(tagsContainer.children).forEach(child => {
+      if (child !== tagsInput) {
+        tagsContainer.removeChild(child);
+      }
+    });
+    
+    // Add tags back to container
+    tags.forEach((tag, index) => {
+      const tagElement = document.createElement('div');
+      tagElement.classList.add('tag');
+      tagElement.innerHTML = `
+        ${tag}
+        <span class="tag-close" data-index="${index}">&times;</span>
+      `;
+      tagsContainer.insertBefore(tagElement, tagsInput);
+    });
+    
+    // Add event listeners to close buttons
+    document.querySelectorAll('.tag-close').forEach(closeBtn => {
+      closeBtn.addEventListener('click', (e) => {
+        const index = parseInt(e.target.dataset.index);
+        tags.splice(index, 1);
+        updateTags();
+      });
+    });
+  }
+
+  tagsInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const tag = tagsInput.value.trim();
+      if (tag && !tags.includes(tag)) {
+        tags.push(tag);
+        tagsInput.value = '';
+        updateTags();
+      }
+    }
+  });
+
+  // Color palette preview functionality
+  const colorsPreset = document.getElementById('colorsPreset');
+  const colorsInput = document.getElementById('colors');
+  const colorPalettePreview = document.getElementById('colorPalettePreview');
+
+  function updateColorPalette() {
+    const colorInput = colorsInput.value;
+    colorPalettePreview.innerHTML = '';
+    
+    // Extract hex codes using regex
+    const hexCodes = colorInput.match(/#[0-9A-Fa-f]{3,6}/g) || [];
+    
+    // Create color preview elements
+    hexCodes.forEach(hex => {
+      const colorPreview = document.createElement('div');
+      colorPreview.classList.add('color-preview');
+      colorPreview.style.backgroundColor = hex;
+      colorPalettePreview.appendChild(colorPreview);
+    });
+  }
+
+  colorsInput.addEventListener('input', updateColorPalette);
+  colorsPreset.addEventListener('change', () => {
+    setTimeout(updateColorPalette, 100); // Small delay to ensure input is updated
+  });
+
+  // Sanitize function
+  function sanitize(input) {
+    return input?.trim().replace(/\s+/g, ' ') || '';
+  }
+
+  // Highlight.js initialization
+  hljs.configure({
+    languages: ['markdown'],
+    ignoreUnescapedHTML: true
+  });
+
+  // Helper to sync preset dropdown with text input
+  function handlePresetChange(presetSelectId, inputId) {
+    const presetSelect = document.getElementById(presetSelectId);
+    const input = document.getElementById(inputId);
+
+    presetSelect.addEventListener('change', () => {
+      const presetValue = presetSelect.value.trim();
+      if (presetValue) {
+        // If input is empty, just set it; else append (with separator)
+        if (input.value.trim() === '') {
+          input.value = presetValue;
+          input.classList.add('completed-step');
+        } else if (!input.value.includes(presetValue)) {
+          input.value = input.value.trim() + '; ' + presetValue;
+          input.classList.add('completed-step');
+        }
+        // Add visual feedback for selection
+        presetSelect.parentElement.classList.add('fade-in');
+        setTimeout(() => {
+          presetSelect.parentElement.classList.remove('fade-in');
+        }, 300);
+      }
+      // Reset select back to placeholder after selection
+      presetSelect.selectedIndex = 0;
+    });
+  }
+
+  // Attach preset handlers
+  handlePresetChange('visualStylePreset', 'visualStyle');
+  handlePresetChange('colorsPreset', 'colors');
+  handlePresetChange('fontsPreset', 'fonts');
+  handlePresetChange('animationsPreset', 'animations');
+  handlePresetChange('responsivenessPreset', 'responsiveness');
+
+  // Form input validation
+  document.getElementById('description').addEventListener('input', function() {
+    if (this.value.trim() !== '') {
+      descriptionGroup.classList.remove('error');
+      this.classList.add('completed-step');
+    } else {
+      this.classList.remove('completed-step');
+    }
+  });
+
+  // Helper function to get checkbox values
+  function getCheckboxValues(name) {
+    const checkboxes = document.querySelectorAll(`input[name="${name}"]:checked`);
+    return Array.from(checkboxes).map(cb => cb.value);
+  }
+
+  // Form submission
+  const form = document.getElementById('promptForm');
+  const output = document.getElementById('output');
+  const copyBtn = document.getElementById('copyBtn');
+  const generateBtn = document.getElementById('generateBtn');
+  const descriptionGroup = document.getElementById('descriptionGroup');
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const description = sanitize(form.description.value);
+    if (!description) {
+      descriptionGroup.classList.add('error');
+      output.textContent = 'Please provide a description of the educational game you want to create.';
+      output.classList.add('empty');
+      return;
+    }
+
+    // Show loading state
+    generateBtn.innerHTML = '<span class="loading"></span><span>Generating...</span>';
+    generateBtn.disabled = true;
+
+    // Gather all inputs
+    // Basic Info
+    const targetAge = sanitize(form.targetAge.value);
+    const subjectArea = sanitize(form.subjectArea.value);
+    const learningObjectives = tags.length > 0 ? tags : [];
+    
+    // Game Type & Template
+    const gameType = sanitize(form.gameType.value);
+    const customGameType = form.customGameType ? sanitize(form.customGameType.value) : '';
+    const selectedTemplate = form.selectedTemplate ? sanitize(form.selectedTemplate.value) : '';
+    
+    // Interactivity
+    const interactiveElements = getCheckboxValues('interactiveElements');
+    const gameMechanics = getCheckboxValues('gameMechanics');
+    const difficultyLevels = sanitize(form.difficultyLevels.value);
+    const feedbackSystem = sanitize(form.feedbackSystem.value);
+    const engagementFeatures = sanitize(form.engagementFeatures.value);
+    
+    // Design
+    const visualStyle = sanitize(form.visualStyle.value);
+    const colors = sanitize(form.colors.value);
+    const fonts = sanitize(form.fonts.value);
+    const animations = sanitize(form.animations.value);
+    const uiElements = getCheckboxValues('uiElements');
+    const visualElements = sanitize(form.visualElements.value);
+    
+    // Multimedia & Technical
+    const multimediaElements = getCheckboxValues('multimediaElements');
+    const responsiveness = sanitize(form.responsiveness.value);
+    const compatibilityRequirements = sanitize(form.compatibilityRequirements.value);
+    const codingTechniques = getCheckboxValues('codingTechniques');
+    const otherTechnicalRequirements = sanitize(form.otherTechnicalRequirements.value);
+    
+    // Accessibility
+    const accessibilityFeatures = getCheckboxValues('accessibilityFeatures');
+    const inclusivityConsiderations = sanitize(form.inclusivityConsiderations.value);
+    const accessibilityStandards = sanitize(form.accessibilityStandards.value);
+
+    // Build the prompt
+    let prompt = `Create an interactive educational game: ${description}`;
+
+    // Basic Information
+    prompt += `\n\n## Basic Information:`;
+    if (targetAge) prompt += `\n- Target Age Group: ${targetAge}`;
+    if (subjectArea) prompt += `\n- Subject Area: ${subjectArea}`;
+    if (learningObjectives.length > 0) {
+      prompt += `\n- Learning Objectives:`;
+      learningObjectives.forEach(objective => {
+        prompt += `\n  * ${objective}`;
+      });
+    }
+
+    // Game Type & Template
+    prompt += `\n\n## Game Type & Structure:`;
+    if (gameType === 'custom' && customGameType) {
+      prompt += `\n- Custom Game Type: ${customGameType}`;
+    } else if (gameType) {
+      const gameTypeMap = {
+        'quiz': 'Quiz / Multiple Choice Game',
+        'matching': 'Matching / Memory Game',
+        'flashcards': 'Interactive Flashcards',
+        'puzzle': 'Educational Puzzle',
+        'sorting': 'Sorting / Categorization Game',
+        'simulation': 'Interactive Simulation',
+        'adventure': 'Educational Adventure',
+        'drawing': 'Drawing / Creation Tool',
+        'storytelling': 'Interactive Storytelling',
+        'word': 'Word Game / Vocabulary Builder'
+      };
+      prompt += `\n- Game Type: ${gameTypeMap[gameType] || gameType}`;
+    }
+    if (selectedTemplate) prompt += `\n- Game Template: ${selectedTemplate}`;
+
+    // Interactivity & Game Mechanics
+    if (interactiveElements.length > 0 || gameMechanics.length > 0 || difficultyLevels || feedbackSystem || engagementFeatures) {
+      prompt += `\n\n## Interactivity & Game Mechanics:`;
+      
+      if (interactiveElements.length > 0) {
+        prompt += `\n- Interactive Elements:`;
+        interactiveElements.forEach(element => {
+          prompt += `\n  * ${element}`;
+        });
+      }
+      
+      if (gameMechanics.length > 0) {
+        prompt += `\n- Game Mechanics:`;
+        gameMechanics.forEach(mechanic => {
+          prompt += `\n  * ${mechanic}`;
+        });
+      }
+      
+      if (difficultyLevels) prompt += `\n- Difficulty Structure: ${difficultyLevels}`;
+      if (feedbackSystem) prompt += `\n- Feedback System: ${feedbackSystem}`;
+      if (engagementFeatures) prompt += `\n- Additional Engagement Features: ${engagementFeatures}`;
+    }
+
+    // Design & Visual Elements
+    if (visualStyle || colors || fonts || animations || uiElements.length > 0 || visualElements) {
+      prompt += `\n\n## Design & Visual Elements:`;
+      
+      if (visualStyle) prompt += `\n- Visual Style / Theme: ${visualStyle}`;
+      if (colors) prompt += `\n- Color Palette: ${colors}`;
+      if (fonts) prompt += `\n- Typography / Fonts: ${fonts}`;
+      if (animations) prompt += `\n- Animations & Transitions: ${animations}`;
+      
+      if (uiElements.length > 0) {
+        prompt += `\n- UI Components:`;
+        uiElements.forEach(element => {
+          prompt += `\n  * ${element}`;
+        });
+      }
+      
+      if (visualElements) prompt += `\n- Additional Visual Elements: ${visualElements}`;
+    }
+
+    // Multimedia & Technical
+    if (multimediaElements.length > 0 || responsiveness || compatibilityRequirements || codingTechniques.length > 0 || otherTechnicalRequirements) {
+      prompt += `\n\n## Multimedia & Technical Specifications:`;
+      
+      if (multimediaElements.length > 0) {
+        prompt += `\n- Multimedia Elements:`;
+        multimediaElements.forEach(element => {
+          prompt += `\n  * ${element}`;
+        });
+      }
+      
+      if (responsiveness) prompt += `\n- Responsive Design: ${responsiveness}`;
+      if (compatibilityRequirements) prompt += `\n- Compatibility Requirements: ${compatibilityRequirements}`;
+      
+      if (codingTechniques.length > 0) {
+        prompt += `\n- Preferred Coding Techniques/Libraries:`;
+        codingTechniques.forEach(technique => {
+          prompt += `\n  * ${technique}`;
+        });
+      }
+      
+      if (otherTechnicalRequirements) prompt += `\n- Other Technical Requirements: ${otherTechnicalRequirements}`;
+    }
+
+    // Accessibility & Inclusivity
+    if (accessibilityFeatures.length > 0 || inclusivityConsiderations || accessibilityStandards) {
+      prompt += `\n\n## Accessibility & Inclusivity:`;
+      
+      if (accessibilityFeatures.length > 0) {
+        prompt += `\n- Accessibility Features:`;
+        accessibilityFeatures.forEach(feature => {
+          prompt += `\n  * ${feature}`;
+        });
+      }
+      
+      if (inclusivityConsiderations) prompt += `\n- Inclusivity Considerations: ${inclusivityConsiderations}`;
+      if (accessibilityStandards) prompt += `\n- Accessibility Standards: ${accessibilityStandards}`;
+    }
+
+    // Final instructions
+    prompt += `\n\n## Output Requirements:`;
+    prompt += `\n- Provide clean, well-commented HTML, CSS, and JavaScript code`;
+    prompt += `\n- Ensure the game is responsive and works on desktop and mobile devices`;
+    prompt += `\n- Include clear instructions within the game`;
+    prompt += `\n- Use modern coding practices for optimal performance`;
+    prompt += `\n- Make sure all user interactions have appropriate feedback`;
+    prompt += `\n- Ensure the educational content is accurate and pedagogically sound`;
+
+    // Simulate a small delay for better UX
+    setTimeout(() => {
+      output.textContent = prompt;
+      output.classList.remove('empty');
+      
+      // Reset button state
+      generateBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 5v14"></path>
+          <path d="M19 12l-7 7-7-7"></path>
+        </svg>
+        <span>Generate Game Prompt</span>
+      `;
+      generateBtn.disabled = false;
+      
+      // Highlight the output with syntax highlighting
+      try {
+        output.innerHTML = hljs.highlight(prompt, {language: 'markdown'}).value;
+      } catch (err) {
+        console.error('Error applying syntax highlighting:', err);
+        // Fallback to plain text if highlighting fails
+        output.textContent = prompt;
+      }
+    }, 600);
+  });
+
+  // Copy button functionality
+  copyBtn.addEventListener('click', () => {
+    const promptText = output.innerText || output.textContent;
+    
+    if (!promptText || output.classList.contains('empty')) {
+      return;
+    }
+    
+    try {
+      navigator.clipboard.writeText(promptText).then(() => {
+        copyBtn.textContent = 'Copied!';
+        copyBtn.classList.add('copied');
+        
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy';
+          copyBtn.classList.remove('copied');
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy text:', err);
+        copyBtn.textContent = 'Error!';
+        
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy';
+        }, 2000);
+      });
+    } catch (err) {
+      console.error('Clipboard API not available:', err);
+      // Fallback for browsers that don't support clipboard API
+      const textarea = document.createElement('textarea');
+      textarea.value = promptText;
+      textarea.style.position = 'fixed';
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      
+      try {
+        const successful = document.execCommand('copy');
+        copyBtn.textContent = successful ? 'Copied!' : 'Error!';
+        copyBtn.classList.toggle('copied', successful);
+      } catch (err) {
+        console.error('Failed to copy text with execCommand:', err);
+        copyBtn.textContent = 'Error!';
+      }
+      
+      document.body.removeChild(textarea);
+      setTimeout(() => {
+        copyBtn.textContent = 'Copy';
+        copyBtn.classList.remove('copied');
+      }, 2000);
+    }
+  });
+
+  // Handle input changes for visual feedback
+  const inputs = document.querySelectorAll('input[type="text"], textarea, select');
+  inputs.forEach(input => {
+    input.addEventListener('change', function() {
+      if (this.value.trim() !== '') {
+        this.classList.add('completed-step');
+      } else {
+        this.classList.remove('completed-step');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
