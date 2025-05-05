@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini Games of Technical Indicators</title>
+    <title>Trading Education Portfolio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -30,7 +30,7 @@
         <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
             <div class="flex items-center mb-3 md:mb-0">
                 <i class="fas fa-chart-line text-primary text-3xl mr-3"></i>
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Mini Games Collection of Technical Indicators</h2>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Technical Indicators Mini Games Collection</h2>
             </div>
             <div class="flex items-center space-x-4">
                 <div class="relative">
@@ -70,23 +70,23 @@
         </div>
     </main>
 
-    <!-- Game Modal -->
+    <!-- Game Preview Modal -->
     <div id="gameModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] flex flex-col">
-            <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
-                <h2 id="modalTitle" class="text-xl font-bold text-gray-800 dark:text-white truncate"></h2>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg p-6 flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="modalTitle" class="text-xl font-bold text-gray-800 dark:text-white"></h2>
                 <button id="closeModal" class="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            <div class="flex-grow overflow-hidden p-0 relative">
-                <div id="iframeLoader" class="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-900">
-                    <div class="text-center">
-                        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto"></div>
-                        <p class="mt-3 text-gray-600 dark:text-gray-400">Loading game...</p>
-                    </div>
+            <div class="py-4 text-center">
+                <div class="bg-primary/10 p-8 rounded-lg mb-6">
+                    <i class="fas fa-external-link-alt text-5xl text-primary mb-4"></i>
+                    <p class="text-gray-700 dark:text-gray-300 mb-4">This interactive game will open in a new tab</p>
                 </div>
-                <iframe id="gameFrame" class="w-full h-full border-0" allowfullscreen></iframe>
+                <a id="gameLink" href="#" target="_blank" class="inline-block bg-primary hover:bg-primary-dark text-white font-medium py-3 px-6 rounded-lg transition-colors duration-300">
+                    <i class="fas fa-play-circle mr-2"></i>Open Interactive Game
+                </a>
             </div>
         </div>
     </div>
@@ -263,18 +263,31 @@
                         <p class="text-gray-600 dark:text-gray-400 mb-4 text-sm flex-grow">${game.description}</p>
                         <div class="flex justify-between items-center mt-auto">
                             <span class="text-xs text-gray-500 dark:text-gray-500">Interactive Game</span>
-                            <button class="text-primary hover:text-primary-dark transition">
-                                <i class="fas fa-play-circle mr-1"></i> Play Game
-                            </button>
+                            <div class="flex space-x-2">
+                                <button class="view-details text-primary hover:text-primary-dark transition">
+                                    <i class="fas fa-info-circle mr-1"></i> Details
+                                </button>
+                                <a href="${game.url}" target="_blank" class="text-primary hover:text-primary-dark transition ml-3">
+                                    <i class="fas fa-external-link-alt mr-1"></i> Open
+                                </a>
+                            </div>
                         </div>
                     </div>
                 `;
                 
                 gallery.appendChild(card);
                 
-                // Add click event to open modal
-                card.addEventListener('click', () => {
+                // Add click event to open modal for the "Details" button
+                const detailsBtn = card.querySelector('.view-details');
+                detailsBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     openGameModal(game.url, game.title);
+                });
+                
+                // Prevent card click when clicking the direct link
+                const directLink = card.querySelector('a');
+                directLink.addEventListener('click', (e) => {
+                    e.stopPropagation();
                 });
             });
             
@@ -290,19 +303,7 @@
         // Open game modal
         function openGameModal(url, title) {
             document.getElementById('modalTitle').textContent = title;
-            const iframe = document.getElementById('gameFrame');
-            const loader = document.getElementById('iframeLoader');
-            
-            // Show loader
-            loader.classList.remove('hidden');
-            
-            // Set iframe source
-            iframe.src = url;
-            
-            // Hide loader when iframe is loaded
-            iframe.onload = () => {
-                loader.classList.add('hidden');
-            };
+            document.getElementById('gameLink').href = url;
             
             // Show modal
             document.getElementById('gameModal').classList.remove('hidden');
@@ -312,7 +313,6 @@
         // Close game modal
         function closeGameModal() {
             document.getElementById('gameModal').classList.add('hidden');
-            document.getElementById('gameFrame').src = '';
             document.body.classList.remove('overflow-hidden');
         }
 
