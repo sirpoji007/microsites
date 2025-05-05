@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Games of Technical Indicators</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        'primary-dark': '#4A49B8',
+                        'primary-light': '#7978E9',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-md fixed w-full z-10">
+        <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center mb-3 md:mb-0">
+                <i class="fas fa-chart-line text-primary text-3xl mr-3"></i>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Mini Games Collection of Technical Indicators</h2>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Search games..." 
+                        class="px-4 py-2 text-base rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary w-full md:w-64"
+                    >
+                    <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <div class="flex space-x-2">
+                    <button id="allCategoryBtn" class="category-btn bg-primary text-white px-3 py-1 rounded-full text-sm hover:bg-primary-dark transition">All</button>
+                    <button id="bollinger-category" class="category-btn bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition">Bollinger</button>
+                    <button id="moving-average-category" class="category-btn bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition">Moving Avg</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 pt-28 pb-16">
+        <!-- Gallery Grid -->
+        <div id="gallery" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Cards will be inserted here by JavaScript -->
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="flex justify-center items-center py-20">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+
+        <!-- No Results Message -->
+        <div id="noResults" class="hidden text-center py-20">
+            <i class="fas fa-search text-4xl text-gray-400 mb-4"></i>
+            <p class="text-xl text-gray-500 dark:text-gray-400">No games match your search criteria</p>
+        </div>
+    </main>
+
+    <!-- Game Modal -->
+    <div id="gameModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+                <h2 id="modalTitle" class="text-xl font-bold text-gray-800 dark:text-white truncate"></h2>
+                <button id="closeModal" class="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="flex-grow overflow-hidden p-0 relative">
+                <div id="iframeLoader" class="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto"></div>
+                        <p class="mt-3 text-gray-600 dark:text-gray-400">Loading game...</p>
+                    </div>
+                </div>
+                <iframe id="gameFrame" class="w-full h-full border-0" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dark mode detection
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+        // Game data
+        const games = [
+            {
+                title: "Bollinger Bands and Trading Signals Explained",
+                url: "https://ebooqoo.my.canva.site/bollinger-bands-and-trading-signals-explained",
+                description: "Learn about Bollinger Bands and how to interpret trading signals with this interactive guide.",
+                category: "bollinger"
+            },
+            {
+                title: "Interactive Mini Games on Moving Averages and Bollinger Bands",
+                url: "https://ebooqoo.my.canva.site/interactive-mini-games-on-moving-averages-and-bollinger-bands",
+                description: "Engage with interactive games to understand how Moving Averages and Bollinger Bands work together.",
+                category: "bollinger,moving-average"
+            },
+            {
+                title: "Understanding Moving Averages and Bollinger Bands",
+                url: "https://ebooqoo.my.canva.site/dagmkppnplu",
+                description: "A comprehensive guide to understanding the relationship between Moving Averages and Bollinger Bands.",
+                category: "bollinger,moving-average"
+            },
+            {
+                title: "Understanding Moving Averages and Bollinger Bands",
+                url: "https://ebooqoo.my.canva.site/dagmklb22sc",
+                description: "Explore the fundamentals of Moving Averages and Bollinger Bands in this educational guide.",
+                category: "bollinger,moving-average"
+            },
+            {
+                title: "Understanding Moving Averages and Bollinger Bands in Technical Analysis",
+                url: "https://ebooqoo.my.canva.site/understanding-moving-averages-and-bollinger-bands-in-technical-analysis",
+                description: "Learn how these technical indicators are used by traders for market analysis.",
+                category: "bollinger,moving-average"
+            },
+            {
+                title: "Understanding Moving Averages, Bollinger Bands, and Envelopes in Trading",
+                url: "https://ebooqoo.my.canva.site/understanding-moving-averages-bollinger-bands-and-envelopes-in-trading",
+                description: "Discover how these three powerful technical indicators can be used together.",
+                category: "bollinger,moving-average"
+            },
+            {
+                title: "Interactive Mini Games on Moving Averages and Technical Analysis",
+                url: "https://ebooqoo.my.canva.site/dagmkrdlexa",
+                description: "Play games that teach you about Moving Averages and their role in technical analysis.",
+                category: "moving-average"
+            },
+            {
+                title: "Interactive Mini Games on Moving Averages and Technical Analysis",
+                url: "https://ebooqoo.my.canva.site/interactive-mini-games-on-moving-averages-and-technical-analysis",
+                description: "Learn technical analysis concepts through fun and interactive games focused on Moving Averages.",
+                category: "moving-average"
+            },
+            {
+                title: "Interactive Mini Game on Moving Averages and Bollinger Bands",
+                url: "https://ebooqoo.my.canva.site/interactive-mini-game-on-moving-averages-and-bollinger-bands",
+                description: "A single-focused game to help you understand both Moving Averages and Bollinger Bands.",
+                category: "bollinger,moving-average"
+            },
+            {
+                title: "Moving Averages, Bollinger Bands & Envelopes in Technical Analysis",
+                url: "https://ebooqoo.my.canva.site/moving-averages-bollinger-bands-envelopes-in-technical-analysis",
+                description: "Compare these three technical indicators and learn their strengths and applications.",
+                category: "bollinger,moving-average"
+            },
+            {
+                title: "Moving Average, Bollinger Bands, and Envelopes",
+                url: "https://ebooqoo.my.canva.site/moving-average-bollinger-bands-and-envelopes",
+                description: "A focused guide on these three essential trading indicators and how they complement each other.",
+                category: "bollinger,moving-average"
+            },
+            {
+                title: "Technical Trading Education",
+                url: "https://ebooqoo.my.canva.site/dagmkufgnsq",
+                description: "A comprehensive educational resource for technical trading concepts and strategies.",
+                category: "moving-average"
+            },
+            {
+                title: "Moving Averages and Technical Analysis",
+                url: "https://ebooqoo.my.canva.site/dagmkqc1zyw",
+                description: "Learn how Moving Averages form the foundation of many technical analysis strategies.",
+                category: "moving-average"
+            },
+            {
+                title: "Understanding Moving Averages, Bollinger Bands & Envelopes",
+                url: "https://ebooqoo.my.canva.site/understanding-moving-averages-bollinger-bands-envelopes",
+                description: "An educational guide covering the core concepts of these popular trading indicators.",
+                category: "bollinger,moving-average"
+            },
+            {
+                title: "Understanding Price Patterns in Trading",
+                url: "https://ebooqoo.my.canva.site/understanding-price-patterns-in-trading",
+                description: "Learn to identify and trade based on common chart patterns in financial markets.",
+                category: "moving-average"
+            },
+            {
+                title: "Technical Analysis Fundamentals",
+                url: "https://ebooqoo.my.canva.site/dagmkynb9sq",
+                description: "Master the basics of technical analysis with this interactive educational resource.",
+                category: "moving-average"
+            },
+            {
+                title: "Trading Indicators Explained",
+                url: "https://ebooqoo.my.canva.site/dagmkgjvbpc",
+                description: "A comprehensive guide to understanding various technical trading indicators.",
+                category: "moving-average"
+            }
+        ];
+
+        // Color variations for cards
+        const colorVariations = [
+            'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800',
+            'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800',
+            'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800',
+            'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800',
+            'bg-sky-50 dark:bg-sky-900/20 border-sky-200 dark:border-sky-800',
+            'bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800',
+        ];
+
+        // Get color variation based on index
+        function getColorVariation(index) {
+            return colorVariations[index % colorVariations.length];
+        }
+
+        // Generate random icon for card
+        function getRandomIcon() {
+            const icons = [
+                'fa-chart-line', 'fa-chart-simple', 'fa-chart-pie', 
+                'fa-chart-column', 'fa-chart-area', 'fa-money-bill-trend-up',
+                'fa-arrow-trend-up'
+            ];
+            return icons[Math.floor(Math.random() * icons.length)];
+        }
+
+        // Generate game cards
+        function generateCards(filteredGames = games) {
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = '';
+            
+            filteredGames.forEach((game, index) => {
+                const colorClass = getColorVariation(index);
+                const icon = getRandomIcon();
+                
+                const card = document.createElement('div');
+                card.className = `card group border rounded-xl overflow-hidden shadow-md hover:shadow-lg transition duration-300 ${colorClass} cursor-pointer`;
+                card.setAttribute('data-url', game.url);
+                card.setAttribute('data-title', game.title);
+                
+                card.innerHTML = `
+                    <div class="p-6 h-full flex flex-col">
+                        <div class="mb-4 flex justify-between items-start">
+                            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                <i class="fas ${icon} text-primary text-xl"></i>
+                            </div>
+                            <div class="text-xs font-medium px-2 py-1 rounded-full ${game.category.includes('bollinger') ? 'bg-primary/10 text-primary' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'}">
+                                ${game.category.includes('bollinger') ? 'Bollinger' : 'Moving Avg'}
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 text-gray-800 dark:text-white">${game.title}</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4 text-sm flex-grow">${game.description}</p>
+                        <div class="flex justify-between items-center mt-auto">
+                            <span class="text-xs text-gray-500 dark:text-gray-500">Interactive Game</span>
+                            <button class="text-primary hover:text-primary-dark transition">
+                                <i class="fas fa-play-circle mr-1"></i> Play Game
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                gallery.appendChild(card);
+                
+                // Add click event to open modal
+                card.addEventListener('click', () => {
+                    openGameModal(game.url, game.title);
+                });
+            });
+            
+            document.getElementById('loadingState').classList.add('hidden');
+            
+            if (filteredGames.length === 0) {
+                document.getElementById('noResults').classList.remove('hidden');
+            } else {
+                document.getElementById('noResults').classList.add('hidden');
+            }
+        }
+
+        // Open game modal
+        function openGameModal(url, title) {
+            document.getElementById('modalTitle').textContent = title;
+            const iframe = document.getElementById('gameFrame');
+            const loader = document.getElementById('iframeLoader');
+            
+            // Show loader
+            loader.classList.remove('hidden');
+            
+            // Set iframe source
+            iframe.src = url;
+            
+            // Hide loader when iframe is loaded
+            iframe.onload = () => {
+                loader.classList.add('hidden');
+            };
+            
+            // Show modal
+            document.getElementById('gameModal').classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        // Close game modal
+        function closeGameModal() {
+            document.getElementById('gameModal').classList.add('hidden');
+            document.getElementById('gameFrame').src = '';
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        // Search and filter functionality
+        function filterGames() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const activeCategory = document.querySelector('.category-btn.bg-primary')?.id || 'allCategoryBtn';
+            
+            let filteredGames = games;
+            
+            // Filter by search term
+            if (searchTerm) {
+                filteredGames = filteredGames.filter(game => 
+                    game.title.toLowerCase().includes(searchTerm) || 
+                    game.description.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // Filter by category
+            if (activeCategory === 'bollinger-category') {
+                filteredGames = filteredGames.filter(game => game.category.includes('bollinger'));
+            } else if (activeCategory === 'moving-average-category') {
+                filteredGames = filteredGames.filter(game => game.category.includes('moving-average'));
+            }
+            
+            generateCards(filteredGames);
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initial card generation
+            generateCards();
+            
+            // Close modal button
+            document.getElementById('closeModal').addEventListener('click', closeGameModal);
+            
+            // Close modal when clicking outside the content
+            document.getElementById('gameModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('gameModal')) {
+                    closeGameModal();
+                }
+            });
+            
+            // Search input event
+            document.getElementById('searchInput').addEventListener('input', filterGames);
+            
+            // Category button events
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove active class from all buttons
+                    categoryButtons.forEach(btn => {
+                        btn.classList.remove('bg-primary', 'text-white');
+                        btn.classList.add('bg-gray-200', 'dark:bg-gray-700');
+                    });
+                    
+                    // Add active class to clicked button
+                    button.classList.remove('bg-gray-200', 'dark:bg-gray-700');
+                    button.classList.add('bg-primary', 'text-white');
+                    
+                    // Filter games
+                    filterGames();
+                });
+            });
+            
+            // Keyboard events
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !document.getElementById('gameModal').classList.contains('hidden')) {
+                    closeGameModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
