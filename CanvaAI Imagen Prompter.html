@@ -1,0 +1,441 @@
+<!DOCTYPE html><html lang="en"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canva AI Prompt Builder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        primaryDark: '#4A49B5',
+                        lightBg: '#FFFFFF',
+                        darkBg: '#181818',
+                        darkText: '#E2E2E2',
+                    }
+                }
+            }
+        }
+
+        // Check for dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+    </script>
+</head>
+<body class="bg-lightBg dark:bg-darkBg text-gray-800 dark:text-darkText transition-colors duration-200">
+    <div class="container mx-auto px-4 py-8 max-w-5xl">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-primary mb-2">Canva AI Prompt Builder</h1>
+            <p class="text-gray-600 dark:text-gray-400">Create optimized image generation prompts following best practices</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Prompt Builder Form -->
+            <div class="lg:col-span-2 bg-white dark:bg-gray-900 rounded-lg shadow-md p-6">
+                <div class="flex mb-4 space-x-2 overflow-x-auto py-1">
+                    <button id="tab-basic" class="px-4 py-2 bg-primary text-white rounded-md whitespace-nowrap">Basic Elements</button>
+                    <button id="tab-advanced" class="px-4 py-2 bg-gray-200 dark:bg-gray-800 rounded-md whitespace-nowrap">Advanced</button>
+                    <button id="tab-examples" class="px-4 py-2 bg-gray-200 dark:bg-gray-800 rounded-md whitespace-nowrap">Examples</button>
+                    <button id="tab-tips" class="px-4 py-2 bg-gray-200 dark:bg-gray-800 rounded-md whitespace-nowrap">Tips &amp; Best Practices</button>
+                </div>
+
+                <div id="section-basic" class="space-y-6">
+                    <!-- Visual Style -->
+                    <div class="space-y-3">
+                        <label class="block font-medium">Visual Style</label>
+                        <select id="style" class="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-base">
+                            <option value="vibrant, colorful">Vibrant &amp; Colorful</option>
+                            <option value="minimalist, clean">Minimalist &amp; Clean</option>
+                            <option value="realistic, detailed">Realistic &amp; Detailed</option>
+                            <option value="cartoon, stylized">Cartoon &amp; Stylized</option>
+                            <option value="watercolor, artistic">Watercolor &amp; Artistic</option>
+                            <option value="isometric, 3D">Isometric &amp; 3D</option>
+                            <option value="custom">Custom Style...</option>
+                        </select>
+                        <input id="custom-style" placeholder="Enter custom style description..." class="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-base hidden">
+                    </div>
+
+                    <!-- Subject/Content -->
+                    <div class="space-y-3">
+                        <label class="block font-medium">Subject/Content</label>
+                        <textarea id="subject" rows="3" placeholder="Describe what should be in the image (e.g., people, objects, scenes)" class="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-base"></textarea>
+                    </div>
+
+                    <!-- Layout -->
+                    <div class="space-y-3">
+                        <label class="block font-medium">Layout/Composition</label>
+                        <select id="layout" class="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-base">
+                            <option value="">No specific layout</option>
+                            <option value="single panel illustration">Single Panel</option>
+                            <option value="two-panel side-by-side illustration">Two Panels</option>
+                            <option value="three-panel sequential illustration">Three Panels</option>
+                            <option value="four-panel sequential illustration">Four Panels</option>
+                            <option value="centered composition with supporting elements">Centered Composition</option>
+                            <option value="custom">Custom Layout...</option>
+                        </select>
+                        <input id="custom-layout" placeholder="Enter custom layout description..." class="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-base hidden">
+                    </div>
+
+                    <!-- Color Scheme -->
+                    <div class="space-y-3">
+                        <label class="block font-medium">Color Scheme</label>
+                        <select id="colors" class="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-base">
+                            <option value="bright, cheerful colors">Bright &amp; Cheerful</option>
+                            <option value="muted, pastel colors">Muted &amp; Pastel</option>
+                            <option value="bold, contrasting colors">Bold &amp; Contrasting</option>
+                            <option value="monochromatic blue tones">Monochromatic Blue</option>
+                            <option value="warm earthy tones">Warm &amp; Earthy</option>
+                            <option value="cool blues and greens">Cool Blues &amp; Greens</option>
+                            <option value="custom">Custom Colors...</option>
+                        </select>
+                        <input id="custom-colors" placeholder="Enter custom color description..." class="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-base hidden">
+                    </div>
+
+                    <!-- Purpose/Audience -->
+                    <div class="space-y-3">
+                        <label class="block font-medium">Purpose/Audience</label>
+                        <select id="purpose" class="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-base">
+                            <option value="">No specific purpose</option>
+                            <option value="suitable for educational purposes">Educational</option>
+                            <option value="designed for marketing materials">Marketing</option>
+                            <option value="appealing to children">Children's Content</option>
+                            <option value="professional business presentation">Business Presentation</option>
+                            <option value="social media content">Social Media</option>
+                            <option value="custom">Custom Purpose...</option>
+                        </select>
+                        <input id="custom-purpose" placeholder="Enter custom purpose description..." class="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-base hidden">
+                    </div>
+                </div>
+
+                <div id="section-advanced" class="space-y-6 hidden">
+                    <!-- Visual Metaphors -->
+                    <div class="space-y-3">
+                        <label class="block font-medium">Visual Metaphors/Symbolism</label>
+                        <textarea id="metaphors" rows="2" placeholder="Describe any metaphors or symbols to include (e.g., growing plant representing growth)" class="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-base"></textarea>
+                    </div>
+
+                    <!-- Detail Level -->
+                    <div class="space-y-3">
+                        <label class="block font-medium">Level of Detail</label>
+                        <select id="detail" class="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-base">
+                            <option value="clear, easily understandable visual style">Clear &amp; Simple</option>
+                            <option value="moderately detailed with key elements highlighted">Moderately Detailed</option>
+                            <option value="highly detailed with intricate elements">Highly Detailed</option>
+                            <option value="minimal, focusing only on essential elements">Minimal &amp; Essential</option>
+                            <option value="custom">Custom Detail Level...</option>
+                        </select>
+                        <input id="custom-detail" placeholder="Enter custom detail level description..." class="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-base hidden">
+                    </div>
+
+                    <!-- Element Relationships -->
+                    <div class="space-y-3">
+                        <label class="block font-medium">Element Relationships</label>
+                        <textarea id="relationships" rows="2" placeholder="Describe how elements relate to each other (e.g., arrows showing process flow, elements side-by-side)" class="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-base"></textarea>
+                    </div>
+
+                    <!-- Specific Instructions -->
+                    <div class="space-y-3">
+                        <label class="block font-medium">Additional Instructions</label>
+                        <textarea id="instructions" rows="2" placeholder="Any additional specific instructions or requirements" class="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-base"></textarea>
+                    </div>
+                </div>
+
+                <div id="section-examples" class="space-y-6 hidden">
+                    <h3 class="font-bold text-lg">Example Prompts</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="p-4 bg-gray-100 dark:bg-gray-800 rounded-md">
+                            <h4 class="font-semibold mb-2">Financial Contract Illustration</h4>
+                            <p class="text-sm mb-2">Creates a visual explanation of a financial concept:</p>
+                            <div class="text-sm bg-white dark:bg-gray-900 p-3 rounded border border-gray-300 dark:border-gray-700">
+                                Create a vibrant, colorful illustration depicting the mechanisms of a Musyarakah contract. The illustration shows two parties--a person and a bank--each contributing funds to a shared project, represented by a central, stylized image of a thriving business venture, perhaps a growing plant or a building under construction. Bright, cheerful colors depict the investment process, with symbolic representations of money flowing from each party into a central pool representing the shared project. A visually appealing pie chart clearly shows the pre-agreed profit-sharing ratio between the two parties. The proportional investment amounts and loss-bearing responsibilities are also clearly represented, perhaps using proportionally sized containers or bars directly adjacent to the pie chart, ensuring the illustration maintains a clear, easily understandable visual style suitable for educational purposes.
+                            </div>
+                            <button class="use-example mt-2 text-primary hover:text-primaryDark text-sm" data-index="0">Use this format</button>
+                        </div>
+                        
+                        <div class="p-4 bg-gray-100 dark:bg-gray-800 rounded-md">
+                            <h4 class="font-semibold mb-2">Process Flow Illustration</h4>
+                            <p class="text-sm mb-2">Creates a step-by-step visual explanation:</p>
+                            <div class="text-sm bg-white dark:bg-gray-900 p-3 rounded border border-gray-300 dark:border-gray-700">
+                                Create a vibrant, four-panel illustration depicting the Bai' Bithaman Ajil contract mechanism. Panel 1: A person carefully selects an asset for purchase, highlighting the item with a hand gesture. Panel 2: The person negotiates with a friendly bank representative, smiling, amidst paperwork symbolizing the Bai' Bithaman Ajil agreement. Panel 3: The bank purchases the asset from a seller, with a successful transaction indicated. Panel 4: The bank resells the asset to the initial person, clearly showing a payment plan with labeled installments. Use bright, cheerful colors and a clear, simple visual style to illustrate the step-by-step process, ensuring ease of understanding for all viewers.
+                            </div>
+                            <button class="use-example mt-2 text-primary hover:text-primaryDark text-sm" data-index="1">Use this format</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="section-tips" class="space-y-6 hidden">
+                    <h3 class="font-bold text-lg">Tips &amp; Best Practices</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="p-4 bg-gray-100 dark:bg-gray-800 rounded-md">
+                            <h4 class="font-semibold">Structure Your Prompt</h4>
+                            <ul class="list-disc ml-5 mt-2 text-sm space-y-1">
+                                <li>Start with a clear action verb (Create, Design, Illustrate)</li>
+                                <li>Specify the visual style early in the prompt</li>
+                                <li>For complex images, break down into logical sections</li>
+                                <li>End with purpose or audience information</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="p-4 bg-gray-100 dark:bg-gray-800 rounded-md">
+                            <h4 class="font-semibold">Be Specific &amp; Descriptive</h4>
+                            <ul class="list-disc ml-5 mt-2 text-sm space-y-1">
+                                <li>Use detailed adjectives for visual style (vibrant, minimalist, etc.)</li>
+                                <li>Specify colors, but don't list too many</li>
+                                <li>Describe relationships between elements clearly</li>
+                                <li>Use visual metaphors when appropriate</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="p-4 bg-gray-100 dark:bg-gray-800 rounded-md">
+                            <h4 class="font-semibold">Avoid Common Pitfalls</h4>
+                            <ul class="list-disc ml-5 mt-2 text-sm space-y-1">
+                                <li>Don't make prompts too long or too vague</li>
+                                <li>Avoid competing or contradictory instructions</li>
+                                <li>Be careful with text requests (AI may struggle with text)</li>
+                                <li>Don't request specific brands or copyrighted elements</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="p-4 bg-gray-100 dark:bg-gray-800 rounded-md">
+                            <h4 class="font-semibold">Iterative Approach</h4>
+                            <ul class="list-disc ml-5 mt-2 text-sm space-y-1">
+                                <li>Start with a basic prompt, then refine</li>
+                                <li>Use the first generation to identify what needs to be clearer</li>
+                                <li>Be consistent with style and theme across iterations</li>
+                                <li>Save successful prompts for reuse and adaptation</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prompt Preview -->
+            <div class="bg-white dark:bg-gray-900 rounded-lg shadow-md p-6 flex flex-col h-full">
+                <h2 class="text-xl font-bold mb-4 text-primary">Generated Prompt</h2>
+                
+                <div id="prompt-preview" class="flex-grow mb-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-md overflow-y-auto min-h-[200px] whitespace-pre-wrap text-sm"></div>
+                
+                <div class="flex gap-3 flex-wrap">
+                    <button id="generate-prompt" class="px-4 py-2 bg-primary hover:bg-primaryDark text-white rounded-md transition-colors duration-200">Generate Prompt</button>
+                    <button id="copy-prompt" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-md transition-colors duration-200">Copy Prompt</button>
+                    <button id="clear-fields" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-md transition-colors duration-200">Clear All</button>
+                </div>
+
+                <div id="copy-message" class="mt-2 text-green-600 text-sm hidden">Prompt copied to clipboard!</div>
+            </div>
+        </div>
+
+        <div class="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
+            <p>This tool helps you create optimized prompts for Canva AI image generation following best practices.</p>
+            <p>The default bot used for generating images is @GPT-Image-1.</p>
+        </div>
+    </div>
+
+    <script>
+        // Example prompts for reference
+        const examplePrompts = [
+            "Create a vibrant, colorful illustration depicting the mechanisms of a Musyarakah contract. The illustration shows two parties--a person and a bank--each contributing funds to a shared project, represented by a central, stylized image of a thriving business venture, perhaps a growing plant or a building under construction. Bright, cheerful colors depict the investment process, with symbolic representations of money flowing from each party into a central pool representing the shared project. A visually appealing pie chart clearly shows the pre-agreed profit-sharing ratio between the two parties. The proportional investment amounts and loss-bearing responsibilities are also clearly represented, perhaps using proportionally sized containers or bars directly adjacent to the pie chart, ensuring the illustration maintains a clear, easily understandable visual style suitable for educational purposes.",
+            
+            "Create a vibrant, four-panel illustration depicting the Bai' Bithaman Ajil contract mechanism. Panel 1: A person carefully selects an asset for purchase, highlighting the item with a hand gesture. Panel 2: The person negotiates with a friendly bank representative, smiling, amidst paperwork symbolizing the Bai' Bithaman Ajil agreement. Panel 3: The bank purchases the asset from a seller, with a successful transaction indicated. Panel 4: The bank resells the asset to the initial person, clearly showing a payment plan with labeled installments. Use bright, cheerful colors and a clear, simple visual style to illustrate the step-by-step process, ensuring ease of understanding for all viewers."
+        ];
+
+        // Tab navigation
+        document.querySelectorAll('[id^="tab-"]').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Reset all tabs and sections
+                document.querySelectorAll('[id^="tab-"]').forEach(t => {
+                    t.classList.remove('bg-primary', 'text-white');
+                    t.classList.add('bg-gray-200', 'dark:bg-gray-800');
+                });
+                document.querySelectorAll('[id^="section-"]').forEach(s => {
+                    s.classList.add('hidden');
+                });
+                
+                // Activate selected tab and section
+                tab.classList.remove('bg-gray-200', 'dark:bg-gray-800');
+                tab.classList.add('bg-primary', 'text-white');
+                
+                const sectionId = tab.id.replace('tab-', 'section-');
+                document.getElementById(sectionId).classList.remove('hidden');
+            });
+        });
+
+        // Handle custom input fields visibility
+        const customFields = [
+            { select: 'style', input: 'custom-style' },
+            { select: 'layout', input: 'custom-layout' },
+            { select: 'colors', input: 'custom-colors' },
+            { select: 'purpose', input: 'custom-purpose' },
+            { select: 'detail', input: 'custom-detail' }
+        ];
+
+        customFields.forEach(field => {
+            const selectElement = document.getElementById(field.select);
+            const customInput = document.getElementById(field.input);
+            
+            selectElement.addEventListener('change', () => {
+                if (selectElement.value === 'custom') {
+                    customInput.classList.remove('hidden');
+                } else {
+                    customInput.classList.add('hidden');
+                }
+            });
+        });
+
+        // Use example prompts
+        document.querySelectorAll('.use-example').forEach(button => {
+            button.addEventListener('click', () => {
+                const exampleIndex = parseInt(button.getAttribute('data-index'));
+                const example = examplePrompts[exampleIndex];
+                document.getElementById('prompt-preview').textContent = example;
+                
+                // Switch to basic tab
+                document.getElementById('tab-basic').click();
+            });
+        });
+
+        // Generate prompt
+        document.getElementById('generate-prompt').addEventListener('click', () => {
+            generatePrompt();
+        });
+
+        // Copy prompt
+        document.getElementById('copy-prompt').addEventListener('click', () => {
+            const promptText = document.getElementById('prompt-preview').textContent;
+            if (promptText.trim()) {
+                navigator.clipboard.writeText(promptText)
+                    .then(() => {
+                        const copyMessage = document.getElementById('copy-message');
+                        copyMessage.classList.remove('hidden');
+                        setTimeout(() => {
+                            copyMessage.classList.add('hidden');
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy: ', err);
+                    });
+            }
+        });
+
+        // Clear all fields
+        document.getElementById('clear-fields').addEventListener('click', () => {
+            // Reset all form elements
+            document.querySelectorAll('select').forEach(select => {
+                select.selectedIndex = 0;
+            });
+            
+            document.querySelectorAll('textarea, input[type="text"]').forEach(field => {
+                field.value = '';
+            });
+            
+            // Hide all custom input fields
+            document.querySelectorAll('[id^="custom-"]').forEach(customField => {
+                customField.classList.add('hidden');
+            });
+            
+            // Clear the preview
+            document.getElementById('prompt-preview').textContent = '';
+        });
+
+        function generatePrompt() {
+            // Get values from form elements
+            const getValueFromField = (elementId, customElementId = null) => {
+                const element = document.getElementById(elementId);
+                if (element.value === 'custom' && customElementId) {
+                    const customElement = document.getElementById(customElementId);
+                    return customElement.value.trim();
+                }
+                return element.value.trim();
+            };
+
+            const style = getValueFromField('style', 'custom-style');
+            const subject = document.getElementById('subject').value.trim();
+            const layout = getValueFromField('layout', 'custom-layout');
+            const colors = getValueFromField('colors', 'custom-colors');
+            const purpose = getValueFromField('purpose', 'custom-purpose');
+            const metaphors = document.getElementById('metaphors')?.value.trim() || '';
+            const detail = getValueFromField('detail', 'custom-detail');
+            const relationships = document.getElementById('relationships')?.value.trim() || '';
+            const instructions = document.getElementById('instructions')?.value.trim() || '';
+
+            // Build the prompt
+            let prompt = '';
+
+            // Start with action verb and style
+            if (style) {
+                prompt += `Create a ${style} `;
+            } else {
+                prompt += 'Create a ';
+            }
+
+            // Add layout if specified
+            if (layout) {
+                prompt += `${layout} `;
+            } else {
+                prompt += 'illustration ';
+            }
+
+            // Add main subject/content
+            if (subject) {
+                prompt += `depicting ${subject}. `;
+            } else {
+                // Default placeholder
+                prompt += 'with the following elements: ';
+            }
+
+            // Add visual metaphors if specified
+            if (metaphors) {
+                prompt += `${metaphors} `;
+            }
+
+            // Add relationship descriptions if specified
+            if (relationships) {
+                prompt += `${relationships} `;
+            }
+
+            // Add color instructions
+            if (colors) {
+                prompt += `Use ${colors} `;
+            }
+
+            // Add detail level if specified
+            if (detail) {
+                prompt += `with a ${detail} `;
+            }
+
+            // Add purpose if specified
+            if (purpose) {
+                prompt += `${purpose}. `;
+            }
+
+            // Add any additional instructions
+            if (instructions) {
+                prompt += `${instructions}`;
+            }
+
+            // Clean up extra spaces and periods
+            prompt = prompt.replace(/\s+/g, ' ').replace(/\.\s+\./g, '.').trim();
+            if (!prompt.endsWith('.')) {
+                prompt += '.';
+            }
+
+            // Update the preview
+            document.getElementById('prompt-preview').textContent = prompt;
+        }
+    </script>
+
+
+</body></html>
