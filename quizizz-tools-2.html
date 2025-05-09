@@ -532,7 +532,86 @@
                 outputText.value = '';
                 copyButton.style.display = 'none';
                 hideError();
-                extractTextFromPdf(file);
+                // (Keep the rest of your script.js code as is, only replace this function
+// and potentially update the showError function if you want more detailed error messages)
+
+async function extractTextFromPdf(file) {
+    loader.style.display = 'block';
+    outputText.placeholder = "Processing your PDF... please wait.";
+    hideError();
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        const typedarray = new Uint8Array(e.target.result);
+        try {
+            const pdf = await pdfjsLib.getDocument({ data: typedarray }).promise;
+            let fullText = '';
+            let isTextFound = false; // Flag to check if any text was extracted
+
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                if (textContent.items.length > 0) {
+                    isTextFound = true; // Found some text items
+                }
+                textContent.items.forEach(item => {
+                    fullText += item.str + ' ';
+                });
+                fullText += '\n';
+            }
+
+            if (!isTextFound && pdf.numPages > 0) {
+                // If there are pages but no text items were found, it's highly likely an image-based PDF
+                showError("No selectable text found in the PDF. It might be image-based or scanned. Please use a PDF with actual text or OCR the document first.");
+                outputText.placeholder = "PDF appears to be image-based. No text to extract.";
+                loader.style.display = 'none';
+                return; // Stop further processing
+            }
+            
+            if (fullText.trim().length === 0 && pdf.numPages > 0) {
+                 // This case might catch PDFs with "empty" text objects or unusual encoding
+                showError("Extracted text is empty. The PDF might have unusual formatting or be image-based. Ensure it contains selectable text.");
+                outputText.placeholder = "Extracted text is empty. Try another PDF.";
+                loader.style.display = 'none';
+                return;
+            }
+
+            processTextForQuizizz(fullText);
+
+        } catch (error) {
+            console.error("Error parsing PDF:", error);
+            let userErrorMessage = "Could not process the PDF. It might be corrupted or encrypted.";
+            if (error.name === 'PasswordException') {
+                userErrorMessage = "This PDF is password-protected. Please provide an unprotected PDF.";
+            } else if (error.message && error.message.toLowerCase().includes('invalid pdf structure')) {
+                userErrorMessage = "The PDF has an invalid structure or might be corrupted. Please try a different file.";
+            }
+            // The !isTextFound check above is a better indicator for image-based PDFs
+            // but we can keep a general mention here too.
+            userErrorMessage += " Also, ensure it is not an image-only PDF and contains selectable text.";
+
+            showError(userErrorMessage);
+            outputText.placeholder = "Error processing PDF. Please try another file.";
+        } finally {
+            loader.style.display = 'none';
+        }
+    };
+    reader.onerror = () => {
+        console.error("File reading error");
+        showError("Error reading the file. Please ensure the file is accessible and not corrupted.");
+        loader.style.display = 'none';
+        outputText.placeholder = "Error reading file.";
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+// You might want to make the showError function more prominent or detailed if needed
+// function showError(message) {
+//     errorMessage.textContent = message;
+//     errorMessage.style.display = 'block';
+//     // Optional: Scroll to the error message if it's out of view
+//     // errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+// }
             }
             
             function resetUI() {
