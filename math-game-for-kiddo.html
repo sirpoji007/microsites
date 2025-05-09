@@ -1,0 +1,2337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MathQuest: Adaptive Math Adventure</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    <script src="https://unpkg.com/motion@10.16.2/dist/motion.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        coral: '#FF6B6B',
+                        teal: '#4ECDC4',
+                        yellow: '#FFD166',
+                        background: {
+                            light: '#FFFFFF',
+                            dark: '#181818'
+                        }
+                    },
+                    fontFamily: {
+                        nunito: ['Nunito', 'sans-serif']
+                    },
+                    boxShadow: {
+                        card: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                        'card-hover': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease;
+        }
+        
+        .dark body {
+            background-color: #181818;
+            color: #FFFFFF;
+        }
+        
+        .math-card {
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .math-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .btn {
+            transition: all 0.2s ease;
+            transform: scale(1);
+        }
+        
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .btn:active {
+            transform: scale(0.95);
+        }
+        
+        .math-option {
+            transition: all 0.2s ease;
+        }
+        
+        .math-option:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .math-option.correct {
+            background-color: #4ECDC4 !important;
+            color: white !important;
+        }
+        
+        .math-option.incorrect {
+            background-color: #FF6B6B !important;
+            color: white !important;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            border-radius: 5px;
+            background-color: #e0e0e0;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #5D5CDE;
+            border-radius: 5px;
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .dark .progress-bar {
+            background-color: #333;
+        }
+        
+        .badge {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .badge-pulse {
+            animation: badge-pulse 2s infinite;
+        }
+        
+        @keyframes badge-pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(93, 92, 222, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(93, 92, 222, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(93, 92, 222, 0);
+            }
+        }
+        
+        .tutor-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+        
+        .tutor-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: #5D5CDE;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tutor-face {
+            font-size: 50px;
+            line-height: 1;
+        }
+        
+        .speech-bubble {
+            position: absolute;
+            top: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: white;
+            border-radius: 20px;
+            padding: 12px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 250px;
+            display: none;
+            z-index: 10;
+        }
+        
+        .dark .speech-bubble {
+            background-color: #333;
+            color: white;
+        }
+        
+        .speech-bubble:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: white transparent transparent;
+        }
+        
+        .dark .speech-bubble:after {
+            border-color: #333 transparent transparent;
+        }
+        
+        .manipulative {
+            cursor: grab;
+            user-select: none;
+        }
+        
+        .manipulative:active {
+            cursor: grabbing;
+        }
+        
+        .counter {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            margin: 5px;
+            cursor: grab;
+        }
+        
+        .counter:active {
+            cursor: grabbing;
+        }
+        
+        .number-line {
+            height: 8px;
+            background-color: #333;
+            border-radius: 4px;
+            position: relative;
+            margin: 40px 0;
+        }
+        
+        .number-marker {
+            position: absolute;
+            width: 4px;
+            height: 16px;
+            background-color: #333;
+            bottom: 0;
+            transform: translateX(-50%);
+        }
+        
+        .number-label {
+            position: absolute;
+            bottom: -25px;
+            transform: translateX(-50%);
+            font-size: 14px;
+        }
+        
+        .fraction-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px;
+        }
+        
+        .fraction-numerator, .fraction-denominator {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .fraction-line {
+            width: 100%;
+            height: 3px;
+            background-color: currentColor;
+            margin: 5px 0;
+        }
+        
+        .fraction-visual {
+            width: 150px;
+            height: 150px;
+            position: relative;
+            border: 3px solid #333;
+            margin: 10px;
+        }
+        
+        .fraction-piece {
+            position: absolute;
+            background-color: #5D5CDE;
+            opacity: 0.7;
+        }
+        
+        .level-up {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .level-up.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .level-up-content {
+            background-color: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            max-width: 400px;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+        
+        .dark .level-up-content {
+            background-color: #333;
+            color: white;
+        }
+        
+        .level-up.show .level-up-content {
+            transform: scale(1);
+        }
+        
+        .star {
+            display: inline-block;
+            margin: 0 5px;
+            color: #FFD166;
+            font-size: 40px;
+            animation: star-bounce 0.5s ease;
+            animation-fill-mode: both;
+        }
+        
+        .star:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        
+        .star:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+        
+        @keyframes star-bounce {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Game canvas styles */
+        #game-container {
+            position: relative;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        
+        canvas {
+            max-width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Loading animation */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100px;
+        }
+        
+        .loading-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #5D5CDE;
+            margin: 0 5px;
+            animation: loading-bounce 1.4s infinite ease-in-out both;
+        }
+        
+        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes loading-bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        
+        /* High contrast mode styles */
+        .high-contrast {
+            --background-light: black;
+            --text-color: white;
+            --accent-color: yellow;
+        }
+        
+        .high-contrast body {
+            background-color: var(--background-light);
+            color: var(--text-color);
+        }
+        
+        .high-contrast .btn {
+            background-color: white;
+            color: black;
+            border: 3px solid yellow;
+        }
+        
+        /* Dyslexia friendly font option */
+        .dyslexia-friendly {
+            font-family: 'OpenDyslexic', 'Comic Sans MS', sans-serif;
+            line-height: 1.5;
+            letter-spacing: 0.05em;
+            word-spacing: 0.1em;
+        }
+        
+        /* Dialog container styles */
+        .dialog-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .dialog-container.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .dialog {
+            background-color: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+        
+        .dark .dialog {
+            background-color: #333;
+            color: white;
+        }
+        
+        .dialog-container.show .dialog {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-white dark:bg-background-dark text-gray-800 dark:text-white">
+    <div class="container mx-auto px-4 py-8">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-8">
+            <div class="flex items-center mb-4 md:mb-0">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center bg-primary text-white mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838l-2.328.996.002 1.069c0 .325.061.65.184.951.341.684.997 1.192 1.748 1.192.784 0 1.44-.508 1.748-1.192.123-.301.184-.626.184-.951v-.878l3.464 1.486a1 1 0 00.788 0l7-3a1 1 0 000-1.838l-7-3zM5 14.5a1 1 0 00-1 1v2a1 1 0 001 1h14a1 1 0 001-1v-2a1 1 0 00-1-1H5z" />
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-bold">MathQuest</h1>
+            </div>
+            
+            <div class="flex space-x-2">
+                <button id="accessibility-btn" class="px-4 py-2 bg-teal text-white rounded-full font-bold hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-teal focus:ring-opacity-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                
+                <button id="sound-toggle-btn" class="px-4 py-2 bg-yellow text-gray-800 rounded-full font-bold hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-yellow focus:ring-opacity-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                
+                <button id="theme-toggle-btn" class="px-4 py-2 bg-primary text-white rounded-full font-bold hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden dark:block" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 dark:hidden" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <div id="welcome-screen" class="flex flex-col items-center">
+            <div class="text-center mb-10">
+                <h2 class="text-4xl font-bold mb-4">Welcome to MathQuest!</h2>
+                <p class="text-xl">An adaptive math adventure for children ages 5-11</p>
+            </div>
+            
+            <div class="flex flex-col md:flex-row gap-6 mb-10 w-full max-w-4xl">
+                <div class="math-card bg-teal bg-opacity-20 dark:bg-opacity-10 p-6 rounded-xl shadow-card flex-1">
+                    <h3 class="text-2xl font-bold mb-4 text-teal">Learn Math</h3>
+                    <p class="mb-4">Practice addition, subtraction, multiplication, division, fractions, and more!</p>
+                    <div class="flex justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-teal" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                        </svg>
+                    </div>
+                </div>
+                
+                <div class="math-card bg-coral bg-opacity-20 dark:bg-opacity-10 p-6 rounded-xl shadow-card flex-1">
+                    <h3 class="text-2xl font-bold mb-4 text-coral">Adaptive Difficulty</h3>
+                    <p class="mb-4">The game adjusts to your skill level, making learning fun and challenging!</p>
+                    <div class="flex justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-coral" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z" />
+                        </svg>
+                    </div>
+                </div>
+                
+                <div class="math-card bg-yellow bg-opacity-20 dark:bg-opacity-10 p-6 rounded-xl shadow-card flex-1">
+                    <h3 class="text-2xl font-bold mb-4 text-yellow-600">Earn Badges</h3>
+                    <p class="mb-4">Complete challenges and collect badges to track your progress!</p>
+                    <div class="flex justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-yellow-600" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex gap-4 mb-10">
+                <div class="tutor-container">
+                    <div class="tutor-avatar">
+                        <div class="tutor-face">😊</div>
+                    </div>
+                    <div id="tutor-speech" class="speech-bubble">
+                        Hi there! I'm Matty, your math tutor. Ready to have fun with numbers?
+                    </div>
+                </div>
+            </div>
+            
+            <div class="w-full max-w-md">
+                <label for="age-select" class="block text-lg font-medium mb-2">Select your age:</label>
+                <select id="age-select" class="w-full p-3 text-base rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:border-gray-600 mb-6">
+                    <option value="5">5 years</option>
+                    <option value="6">6 years</option>
+                    <option value="7">7 years</option>
+                    <option value="8">8 years</option>
+                    <option value="9">9 years</option>
+                    <option value="10">10 years</option>
+                    <option value="11">11 years</option>
+                </select>
+                
+                <button id="start-btn" class="btn w-full py-4 px-8 bg-primary text-white text-xl font-bold rounded-full shadow-lg hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50">
+                    Start Adventure!
+                </button>
+                
+                <p class="text-center mt-4 text-sm text-gray-600 dark:text-gray-400">
+                    No login required. Start playing right away!
+                </p>
+            </div>
+        </div>
+        
+        <div id="game-screen" class="hidden">
+            <div class="flex flex-col md:flex-row gap-6 mb-8">
+                <div class="flex-1">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-card p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-bold" id="topic-title">Addition</h2>
+                            <div class="flex items-center">
+                                <span class="text-lg font-bold mr-2" id="score-display">Score: 0</span>
+                                <div class="badge badge-pulse bg-yellow-400 text-yellow-800 font-bold px-3 py-1 rounded-full text-xs">
+                                    Level <span id="level-display">1</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                        </div>
+                        
+                        <div id="question-container" class="my-8 text-center">
+                            <h3 class="text-3xl font-bold mb-6" id="question-text">Loading question...</h3>
+                            <div id="manipulatives-container" class="flex flex-wrap justify-center gap-4 mb-6">
+                                <!-- Manipulatives will be added here dynamically -->
+                            </div>
+                        </div>
+                        
+                        <div id="options-container" class="grid grid-cols-2 gap-4 mb-6">
+                            <!-- Options will be added here dynamically -->
+                        </div>
+                        
+                        <div id="feedback-container" class="hidden text-center p-4 rounded-lg mb-6">
+                            <!-- Feedback will be displayed here -->
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <button id="hint-btn" class="btn py-2 px-6 bg-teal text-white font-bold rounded-full shadow hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-teal focus:ring-opacity-50">
+                                Hint
+                            </button>
+                            
+                            <button id="next-btn" class="btn py-2 px-6 bg-primary text-white font-bold rounded-full shadow hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 hidden">
+                                Next Question
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="md:w-1/3">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-card p-6">
+                        <h3 class="text-xl font-bold mb-4">Your Progress</h3>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-medium">Addition</span>
+                                    <span class="text-sm font-medium text-teal" id="progress-addition">0%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill bg-teal" id="progress-addition-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-medium">Subtraction</span>
+                                    <span class="text-sm font-medium text-coral" id="progress-subtraction">0%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill bg-coral" id="progress-subtraction-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-medium">Multiplication</span>
+                                    <span class="text-sm font-medium text-yellow-600" id="progress-multiplication">0%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill bg-yellow-600" id="progress-multiplication-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-medium">Division</span>
+                                    <span class="text-sm font-medium text-purple-600" id="progress-division">0%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill bg-purple-600" id="progress-division-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-medium">Fractions</span>
+                                    <span class="text-sm font-medium text-blue-600" id="progress-fractions">0%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill bg-blue-600" id="progress-fractions-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-card p-6 mt-6">
+                        <h3 class="text-xl font-bold mb-4">Math Tutor</h3>
+                        <div class="flex items-center">
+                            <div class="tutor-container">
+                                <div class="tutor-avatar">
+                                    <div class="tutor-face">😊</div>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm" id="tutor-message">I'm here to help you learn math! Click the hint button if you need help.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-card p-6 mt-6">
+                        <h3 class="text-xl font-bold mb-4">Badges</h3>
+                        <div class="flex flex-wrap gap-3" id="badges-container">
+                            <div class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-400" title="Addition Novice - Solve 5 addition problems">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                </svg>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-400" title="Subtraction Novice - Solve 5 subtraction problems">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                                </svg>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-400" title="Multiplication Novice - Solve 5 multiplication problems">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-400" title="Division Novice - Solve 5 division problems">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                </svg>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-400" title="Fraction Novice - Solve 5 fraction problems">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Level up modal -->
+        <div id="level-up-modal" class="level-up">
+            <div class="level-up-content">
+                <h2 class="text-3xl font-bold mb-4">Level Up!</h2>
+                <div class="mb-6">
+                    <span class="star">⭐</span>
+                    <span class="star">⭐</span>
+                    <span class="star">⭐</span>
+                </div>
+                <p class="text-xl mb-6">Congratulations! You've advanced to level <span id="new-level">2</span>!</p>
+                <p class="mb-8">Keep up the great work. The questions will get a bit more challenging now.</p>
+                <button id="continue-btn" class="btn py-3 px-8 bg-primary text-white font-bold rounded-full shadow-lg hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50">
+                    Continue
+                </button>
+            </div>
+        </div>
+        
+        <!-- Accessibility dialog -->
+        <div id="accessibility-dialog" class="dialog-container">
+            <div class="dialog">
+                <h2 class="text-2xl font-bold mb-4">Accessibility Options</h2>
+                
+                <div class="space-y-4 mb-6">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="high-contrast-toggle" class="w-5 h-5 rounded focus:ring-primary">
+                        <label for="high-contrast-toggle" class="ml-2 text-lg">High Contrast Mode</label>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <input type="checkbox" id="dyslexia-font-toggle" class="w-5 h-5 rounded focus:ring-primary">
+                        <label for="dyslexia-font-toggle" class="ml-2 text-lg">Dyslexia-Friendly Font</label>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <input type="checkbox" id="narration-toggle" class="w-5 h-5 rounded focus:ring-primary">
+                        <label for="narration-toggle" class="ml-2 text-lg">Voice Narration</label>
+                    </div>
+                    
+                    <div>
+                        <label for="text-size-slider" class="block text-lg mb-2">Text Size</label>
+                        <input type="range" id="text-size-slider" min="1" max="3" step="0.5" value="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button id="close-accessibility-btn" class="btn py-2 px-6 bg-primary text-white font-bold rounded-full shadow hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check for dark mode preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        
+        // Listen for changes in color scheme preference
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+        // Sound effects using Howler.js
+        const sounds = {
+            correct: new Howl({
+                src: ['data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA/+M4wAAAAAAAAAAAAEluZm8AAAAPAAAAEAAABVgANTU1NTU1Q0NDQ0NDUFBQUFBQXl5eXl5ebGxsbGxseXl5eXl5hoaGhoaGlJSUlJSUoaGhoaGhrq6urq6uurq6urq6x8fHx8fH1NTU1NTU4eHh4eHh7u7u7u7u+/v7+/v7//8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAX/+MYxAANmAKwQAQAAANhS1H///scrAGP/i+ZeWVAGP/sQRoMGP/0LpmUdShP/E3K1qLEnkh9EuanRw/PW7a4i9/3Jq1agiyGjanXc57g91qK1djrcdjoOuK3ImrpxVAEAiODyN/4U/+MYxAYSMgrm+deEAHnaBIAY/+ZfDEzMzgx/8LORfTbUcbGCZ/6amIzDJ//0rJUKIzgxNzRCGzRZNVJCoRwWIxWK4CFc4SPDxFxaDzkfVHJHhaqqqqraBERERNNNNNNMiIiIAOBwA/+MYxAQQmRKlmdcUAFvhPPD/5SCTv/9GTv8H5sJokf+H4X9ZJPgohCT5EYocKISeFH5EoTmm0M5JyUOJyh5YXGSUHEpwN9O7NfRJniUPEXrFxUQJoiJUdo8eFHaHpR2Y84P4kQft/+MYxAsQ+QK5KmJGAHLBB+QeeTCCIImYzScQg8rAIGngwzTq5q1SMS1JVXpAhQKFctS7RV9TLUgXJJP9nX1LQRfTXPVan2lKHqqlFKQNahWrVVatVKpAFRW40q0irqqkTJZIgCL/+MYxAwQyPq9SmiGAD6xVKqqkAVTrSqnWlFOvoip1IgCo9VS/Vf+JdXaIRE6qKmcYzSahSlotDLVK0nWktNN2pL7jmdyurZQi/9EXQQmq96tNRVTRYIyIJnUTKqmmQDv4UBQCQfD/+MYxBIP0P61mmhGAPGpAngiIIAgH4UZ8ViYKGHlY6EIeULC8QgUBhkTIQgKHB3QYA5upEDgjDEY6MRjJRJizYwUKFGRGORkZU47IxM5/1qv8RKzRExkaJGiEaJYqFD63SVhIGH/+MYxBYNmAK5GmBGAKFCiAgY6EcN0EgUj4ViZyHAXBRY5C1R3IPZVKRidVTtJVTMSNE2sqtqGJGiaJu8qGJW7ERIxDExOxOqqqkxBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqkxB/+MYxCUNKAK5KmBGAFNRTMuMTAwqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq'],
+                volume: 0.5
+            }),
+            incorrect: new Howl({
+                src: ['data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA/+M4wAAAAAAAAAAAAEluZm8AAAAPAAAAEAAABVgANTU1NTU1Q0NDQ0NDUFBQUFBQXl5eXl5ebGxsbGxseXl5eXl5hoaGhoaGlJSUlJSUoaGhoaGhrq6urq6uurq6urq6x8fHx8fH1NTU1NTU4eHh4eHh7u7u7u7u+/v7+/v7//8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAX/+MYxAAPGAIwQAQAAAPISKfLf7kYQnd8Z3JADv+zcQ3uQE1vizD0Ef+5P8oDu+7iBMKPcUBuuH/3JNAKfIzii3FAUQ/pAiO4fzQNAf0g/uQrjQNEPD8UWCxGvY3KSWFgDcs3nT1d3fn5G/+MYxAgPQFKy/gEYAO5absiXQ+r15e/Nfm/zbu5Q5X83O7Pdyruzuyncu5u5V3p3Ku5u5QudOHg6knJgpk9axddCtLSktIjzarZ0x1PKUGZjdAhnOkpakpgZIOphYsEYlMTSe0nK/+MYxAoOEO7NoADTMIfvOkdyY5z4uYXJsz39HdLGcnf+jDOXzH5Qif5lzQ8Ixu5O79Tu5N3Ju5d3LnM+LmPKzUvKCVAAAACA0AQiCp3mUlLHR7JoIiKSsiGhYq81moO0Cjw93z17/+MYxBEMusKqOABGMPXy8dv9QyXEOUF0nZMgxCk1KQqFI66YuJqOj/3J66YulJqXEwpNSSYmlJMTCYTCYmFJqTE0pJiaUlGIYhJ/8TCYmJv/iaaaaaYmJpppiaaamJiammmpoQEM/+MYxBcMMAa2OABGMMQmgAYhkITD4Yof/73ZZnC0MgKFYygLSzNgoDOioAGBioCuxQAOBMtCAJlPKkmea8zNuqolTd1JSTVW6bXtS1TVWjy0G7laHViaNamkTRrUoeVo1JZAOZPo/+MYxCQM0AayuABGMKCGSYEQZ5QDwJpSDA0qCFvxorF0jUGYiUSEYQpyN+z8X9X/vb1rvftOe97szTRb/33d3bu+7bu7d3d/bu/X/Z///ffu7v3d3d93R/d/+7d3bu7O2SZIUw9O/+MYxC0OYFrCWAMGPDDJGHEIUCAwSFBgYJMFBQsLEChYWLhYqFixULExYUNFBQsNCwsNC1bFixYqWFixYsWFixYsLFixasVLlixYuWqly5apUuXKlSpUqVKlSpUqVKlSpUqT/+MYxCwL2ALs+AMGHABU+2yUqVKlSpUqVKlSpUqVKlSpUt///+VSv8+DS72VlUfe5JSLykF3tSBD3KJiA9y10yQP8oCnUG87jqQHUF//7YLZB1IP7QY8/y32dPHYztH///+Fv/TU/+MYxDgOctq9QBJGTOQVqOf+aP6RZwN4GY5uw3ObI69cBNMDqB3A5gc4OoG4GYDOBYAzAZQPAGQDIA+AeAFQDEHYzh3M3/zL/nDuZfy4dwNAFQDABiBRNxVMQU1FMy4xMDBVVVVVVVVV/+MYxDULsAKdEAGPAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV'],
+                volume: 0.5
+            }),
+            levelUp: new Howl({
+                src: ['data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA/+M4wAAAAAAAAAAAAEluZm8AAAAPAAAAEAAABVgANTU1NTU1Q0NDQ0NDUFBQUFBQXl5eXl5ebGxsbGxseXl5eXl5hoaGhoaGlJSUlJSUoaGhoaGhrq6urq6uurq6urq6x8fHx8fH1NTU1NTU4eHh4eHh7u7u7u7u+/v7+/v7//8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAX/+MYxAAJFAJxGQCQAARJ9AAU0j////+0iET/gTiIkRIiJOxJxE//EYhD/8QOiRkghEEfRMhI/EQf+l//+8kIQ99EZkghECOh+/+Q/m5Q//+RImZImNCJmJIf9fmRETP8iJn9CInn//+MYxA4EgAKdGQAQAAiXmCTffcZ9MTEmE9ETGJETEmESNiRiJERJn0QiEREQfTf///6IQiEaIXRkImEQojEIiRH/+Ih+5D/0QRER+hMP0ahEIkOggQiVNqCgAwHIcjSePDU6Lz2A/+MYxDkPUALBuSMQAbLRxjA2AdgwNAMXMLQEMeAcw9AbRcxRCzHgcMIBcwpARjIDMCQBkDAGjDhKdQoSQxCODIqPmAiIGB0JmBgLmBAAmDUomOx+YzHJgQPGCAWMnl+bGZMDYzuf/+MYxCYQqsLWOVgYA5Asx4BgwmDLCQEF5QYviBAsW8LBMwCCgx2GjHBCCgpAkABFzDCQNMgiUdBJjUPGHgcY2AQQDzAIHF24yMDgQPi0DGIjIGhBgYrCgCF4WAgNMKDwvCAIC4Rl/+MYxB8P0O7NmdkQAZgWRCQrAxWKjDBgVjCYOL8FARiUVGFAOY+GIFBxhQtDBwHFQCkFmAQMYwKZg0ZA0MQwEFDBYHFAfMEixYwIDxIFQcJQaY5Jhic0mJUKYtGhg8QGARCBYfMr/+MYxB8OmO6+OVoQARgQCGAwCEwOYTCpgMgCkTGJh2YWI5jMbiA+jkxsIbGAvG4TQHAYXQLB4YhKAUNCYVGAw0CBqEwEARUYREYEBIXgEEAcLwgAwOLjCQbEYGFoQCwNEIVBUNjQ/+MYxCYNMO6yWVgYAgDMND0ZBIY5HhjMDmAwIEgAIgGYGAwICQQiwwQMzAgMMJAYGBYFA8YHBBhUHmGwoY1CQ3O13ypQtGHaGBAEASw+QWTitdzbxecQCyYJCRMMdQ6ILWXD8WL5/+MYxDEQSsrJudsQA8D8FAuYHDJ5OiOiYnJx4EicgAiRjwXGCQ6eTt/W9YslyFQLDxUt+nIcRQVHH4GBAiLj8ilmxfL/83y+NhASGbHgcJxoeCY6NkIgS9Jx8XGTR8pHZ00ey1qd/+MYxCkQoC6yWdQQA8P8FAEOHM6WTaIc+1Kzm1yMgbwmm3gZhKDQUTEAxKFAcMA4MGAYNAwECQsAAIEgcDBQLGQUYFBEAgkEAsPAKCQGBQIBgDAgBgKBAeBQMEwUBAGFQfGBQ/+MYxCcTUBbCOV0QA8XgUCQQDgOFgABANCAdEAZB4qYw/5Rf/5CPT8YJvC6AxQEDQcJBIZIQQQeOkP//8g/M6Dl0RWCKCTsGFQRQgGCgtCBNFARQTf/P////8zg5ZEEzCBBHwQH/+MYxA8TeBbCOcoQAITicT//Bw7AwAYPkD//QoIAxgMQAHSGxEFAMfn//8gfmcIAFQFwINAYeBQsExA8JA9ksv//4OHJZDCUVCglCQzEkBiCJEzAhAMIh///8gjdGUYTAURERCRE/+MYxAMOwB7CecoYAcYiRokEqGpxn+DjQSolc7Cou1Kt1uiogbJ7nIcnIQchxnV3/OIo8HMP9nER8hx7k+yqmH7kUVaupqXZU1Ld//7l2VKGpvs//n/6lXX/s5yTkUKLf5XRRSo6Y6VA/+MYxAQNgUrGcgMMANvQRYpW6XSS21vUhFUt9R1pRtqW3VEQqI1WWm+pV0UMf1Euj0UoTuoiIOlFLq5ZzD9ZFEOj9zD+//6xN06P9SzUyif//fUR+q6if/9QKh8KGfq30L94Fv+J/+MYxA4NsFrGODvQAeHFPaYqnv/n///90T37/dXf/+Mrwdnq//01nPTVmBiXkIAkgXiJlACQJ//lj45s878X/8GeTkYzmJHxlw8dDgwIc//ygQj8uHkOHI7D8SJfZdyVnrIpMJA//+MYxBYOWFayOccQAGU4QPhwcG1Yh+NlA+s68JDwcH9lw8VC0C5E/5MLl0Lw+XD0sFw89Dh6FxeHqXw8P2Xzfv6h+7oO91V031yvq7Kl+6voepb3X0vUW9F7//qPfRdUul1fFghAAhAA/+MYxBoNaFqmOcYQABgQk9+iMT3+V//5f+V+Xyh8od9+X5Q75flD6h3vCEIQhCEIQhCEREQiIREIiJmZhlVVZmczMzN/zMzMzNVXMzd3d3u7u7u7u9wANAAAAACqqqqqqvXV1/+MYxCQMaFaluBvQAYRnL/63V/+rPeu///UCAQPPjrx/qFwuFzzuuc5znve4EAggfB5wIKqrm6qaqqam5qaM74IAu6X//n9QUAu2kNBxEbYGsA0F2BtFxgawDxBQDQUGsA2gGgGsAwVB/+MYxC4MwFap+BiOBQUF20FQXbcUFFVfXVtQUYcPZ5znb4HBQYHBiw93JBiqRElpPuqFZmKC4hgZhOJiWJRMXUJDIhhKU0TIuWcGqcv1zqdIAAOW4I3r/L9fgAEAGACwOAEO22AG/+MYxDgL+BKWGTDQAdttaAIIEAIXbbbD9tt5O223tsJIZ9//2YCYJcJdIWQAFgACeNuN8kkn////+SfxOKQ9CUI2w6IQRCIEiQgg7yCBIl7xJJOggQRTuf//////O5KCSBAkSSSP/+MYxEoNcBqaUcEQAkkkmSSSSJEiJJ22SCTpO5022/7bb9ttt+2223s1XZQAVVVCqSggQIECqkgVWxAkSJO5BL5JIBV1XWXyy677/1lABYUFiqgKCNx3Gy6663HGy644447bjfGFRGI'],
+                volume: 0.5
+            }),
+            click: new Howl({
+                src: ['data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA/+M4wAAAAAAAAAAAAEluZm8AAAAPAAAAEAAABVgANTU1NTU1Q0NDQ0NDUFBQUFBQXl5eXl5ebGxsbGxseXl5eXl5hoaGhoaGlJSUlJSUoaGhoaGhrq6urq6uurq6urq6x8fHx8fH1NTU1NTU4eHh4eHh7u7u7u7u+/v7+/v7//8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAX/+MYxAAPwAKs/AUAZqamnoAoYhIIhTfBAE+2C+D+JgjDO+ZuEgT536HAIAgCYg8B/vnfg/vggHw+e/wfBP/vggGfP/g/B/5///+CAP/+D4IAgABhAlHACAhsN1/oQjFwMJgY/+MYxAQQ0k7U/gDQTDl9vBMHgyiGKouCaIjOZFyRCDJwhCPIhCEIR5EIQjyIQj//////6ERVTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/4xjEChuqjsJ+BNBNVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV'],
+                volume: 0.2
+            }),
+            hint: new Howl({
+                src: ['data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA/+M4wAAAAAAAAAAAAEluZm8AAAAPAAAAEAAABVgANTU1NTU1Q0NDQ0NDUFBQUFBQXl5eXl5ebGxsbGxseXl5eXl5hoaGhoaGlJSUlJSUoaGhoaGhrq6urq6uurq6urq6x8fHx8fH1NTU1NTU4eHh4eHh7u7u7u7u+/v7+/v7//8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAX/+MYxAASgAKw/AUAcDAwIFXgIFHA5/CEIcDgc+BAMQmNAgZYCB/gQBEB8EBAEAQBD4P/BA///8HwfB8EAQ+D/5///+CAZYsBA/BAEAQBAMuAgCAIHCmGqPXgw+4cYiN3rLOHAc+xB/+MYxAQPGk7w9lIQAD3NJr4zWR3R8GZ2gUv86T3SZnUX9Q5rrKQoP+TXV///8BBN/5ehWZG9h+gUMxcwP5hy4/P//7tI2SJSM1NilUkk9Ncn//+YUZ0rDkgQc1KTbb///5ehA0KEoP8Sav/4xjEBhu6luH4UjCaQg7g6iRKgUCj+pI5XMJLpEVTIJEeOvf///2f/1y0FIsZMzUWDTpDf////ylLyTIrLhXSEBAYcV///5UMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVf/4xjECBwSjtn+YhZRVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV'],
+                volume: 0.3
+            })
+        };
+
+        // Global game state
+        const gameState = {
+            soundEnabled: true,
+            narrationEnabled: false,
+            currentQuestion: null,
+            score: 0,
+            level: 1,
+            questionNumber: 0,
+            correctAnswers: 0,
+            wrongAnswers: 0,
+            badges: {
+                addition: false,
+                subtraction: false,
+                multiplication: false,
+                division: false,
+                fractions: false
+            },
+            topicProgress: {
+                addition: 0,
+                subtraction: 0,
+                multiplication: 0,
+                division: 0,
+                fractions: 0
+            },
+            questionsCorrectByTopic: {
+                addition: 0,
+                subtraction: 0,
+                multiplication: 0,
+                division: 0,
+                fractions: 0
+            },
+            topicDifficulty: {
+                addition: 1,
+                subtraction: 1,
+                multiplication: 1, 
+                division: 1,
+                fractions: 1
+            },
+            currentTopic: 'addition',
+            availableTopics: ['addition'],
+            age: 5
+        };
+
+        // DOM elements
+        const elements = {
+            welcomeScreen: document.getElementById('welcome-screen'),
+            gameScreen: document.getElementById('game-screen'),
+            startBtn: document.getElementById('start-btn'),
+            ageSelect: document.getElementById('age-select'),
+            themeToggleBtn: document.getElementById('theme-toggle-btn'),
+            soundToggleBtn: document.getElementById('sound-toggle-btn'),
+            accessibilityBtn: document.getElementById('accessibility-btn'),
+            accessibilityDialog: document.getElementById('accessibility-dialog'),
+            closeAccessibilityBtn: document.getElementById('close-accessibility-btn'),
+            highContrastToggle: document.getElementById('high-contrast-toggle'),
+            dyslexiaFontToggle: document.getElementById('dyslexia-font-toggle'),
+            narrationToggle: document.getElementById('narration-toggle'),
+            textSizeSlider: document.getElementById('text-size-slider'),
+            topicTitle: document.getElementById('topic-title'),
+            scoreDisplay: document.getElementById('score-display'),
+            levelDisplay: document.getElementById('level-display'),
+            progressFill: document.getElementById('progress-fill'),
+            questionText: document.getElementById('question-text'),
+            manipulativesContainer: document.getElementById('manipulatives-container'),
+            optionsContainer: document.getElementById('options-container'),
+            feedbackContainer: document.getElementById('feedback-container'),
+            hintBtn: document.getElementById('hint-btn'),
+            nextBtn: document.getElementById('next-btn'),
+            levelUpModal: document.getElementById('level-up-modal'),
+            newLevel: document.getElementById('new-level'),
+            continueBtn: document.getElementById('continue-btn'),
+            tutorSpeech: document.getElementById('tutor-speech'),
+            tutorMessage: document.getElementById('tutor-message'),
+            badgesContainer: document.getElementById('badges-container')
+        };
+
+        // Event listeners
+        elements.startBtn.addEventListener('click', startGame);
+        elements.themeToggleBtn.addEventListener('click', toggleTheme);
+        elements.soundToggleBtn.addEventListener('click', toggleSound);
+        elements.accessibilityBtn.addEventListener('click', showAccessibilityDialog);
+        elements.closeAccessibilityBtn.addEventListener('click', hideAccessibilityDialog);
+        elements.highContrastToggle.addEventListener('change', toggleHighContrast);
+        elements.dyslexiaFontToggle.addEventListener('change', toggleDyslexiaFont);
+        elements.narrationToggle.addEventListener('change', toggleNarration);
+        elements.textSizeSlider.addEventListener('input', adjustTextSize);
+        elements.hintBtn.addEventListener('click', showHint);
+        elements.nextBtn.addEventListener('click', nextQuestion);
+        elements.continueBtn.addEventListener('click', continueAfterLevelUp);
+
+        // Show tutor speech bubble on initial load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                elements.tutorSpeech.style.display = 'block';
+                if (gameState.soundEnabled) {
+                    sounds.hint.play();
+                }
+            }, 1000);
+        });
+
+        // Game initialization functions
+        function startGame() {
+            if (gameState.soundEnabled) {
+                sounds.click.play();
+            }
+            
+            gameState.age = parseInt(elements.ageSelect.value);
+            
+            // Set initial game difficulty based on age
+            setInitialDifficulty();
+            
+            // Hide welcome screen and show game screen
+            elements.welcomeScreen.classList.add('hidden');
+            elements.gameScreen.classList.remove('hidden');
+            
+            // Generate and display first question
+            generateQuestion();
+            
+            // Update UI elements
+            updateScoreDisplay();
+            updateLevelDisplay();
+            updateProgressBars();
+        }
+
+        function setInitialDifficulty() {
+            // Adjust available topics and difficulty based on age
+            if (gameState.age <= 6) {
+                gameState.availableTopics = ['addition', 'subtraction'];
+                gameState.topicDifficulty = {
+                    addition: 1,
+                    subtraction: 1,
+                    multiplication: 1,
+                    division: 1,
+                    fractions: 1
+                };
+            } else if (gameState.age <= 8) {
+                gameState.availableTopics = ['addition', 'subtraction', 'multiplication'];
+                gameState.topicDifficulty = {
+                    addition: 2,
+                    subtraction: 2,
+                    multiplication: 1,
+                    division: 1,
+                    fractions: 1
+                };
+            } else {
+                gameState.availableTopics = ['addition', 'subtraction', 'multiplication', 'division', 'fractions'];
+                gameState.topicDifficulty = {
+                    addition: 3,
+                    subtraction: 2,
+                    multiplication: 2,
+                    division: 1,
+                    fractions: 1
+                };
+            }
+            
+            gameState.currentTopic = gameState.availableTopics[0];
+        }
+
+        function generateQuestion() {
+            // Randomly select a topic from available ones, with slight preference for current topic
+            const rnd = Math.random();
+            if (rnd < 0.7 || gameState.availableTopics.length === 1) {
+                // Stick with current topic 70% of the time
+                gameState.currentTopic = gameState.currentTopic;
+            } else {
+                // Choose a different available topic 30% of the time
+                const otherTopics = gameState.availableTopics.filter(topic => topic !== gameState.currentTopic);
+                gameState.currentTopic = otherTopics[Math.floor(Math.random() * otherTopics.length)];
+            }
+            
+            // Update topic title
+            elements.topicTitle.textContent = capitalize(gameState.currentTopic);
+            
+            // Generate question based on current topic and difficulty
+            const difficulty = gameState.topicDifficulty[gameState.currentTopic];
+            let question;
+            
+            switch (gameState.currentTopic) {
+                case 'addition':
+                    question = generateAdditionQuestion(difficulty);
+                    break;
+                case 'subtraction':
+                    question = generateSubtractionQuestion(difficulty);
+                    break;
+                case 'multiplication':
+                    question = generateMultiplicationQuestion(difficulty);
+                    break;
+                case 'division':
+                    question = generateDivisionQuestion(difficulty);
+                    break;
+                case 'fractions':
+                    question = generateFractionQuestion(difficulty);
+                    break;
+            }
+            
+            gameState.currentQuestion = question;
+            
+            // Display the question
+            displayQuestion(question);
+            
+            // Update manipulatives
+            updateManipulatives(question);
+            
+            // Clear previous feedback
+            elements.feedbackContainer.classList.add('hidden');
+            
+            // Hide next button
+            elements.nextBtn.classList.add('hidden');
+            
+            // Increment question counter
+            gameState.questionNumber++;
+        }
+
+        function generateAdditionQuestion(difficulty) {
+            let num1, num2, answer, options;
+            
+            // Generate numbers based on difficulty
+            if (difficulty === 1) {
+                // Simple single-digit addition (e.g., 3 + 2)
+                num1 = Math.floor(Math.random() * 5) + 1;
+                num2 = Math.floor(Math.random() * 5) + 1;
+            } else if (difficulty === 2) {
+                // Adding to make 10 or slightly larger numbers (e.g., 7 + 3 or 8 + 5)
+                num1 = Math.floor(Math.random() * 8) + 2;
+                num2 = Math.floor(Math.random() * 8) + 2;
+            } else if (difficulty === 3) {
+                // Two-digit + one-digit addition (e.g., 23 + 5)
+                num1 = Math.floor(Math.random() * 30) + 10;
+                num2 = Math.floor(Math.random() * 9) + 1;
+            } else {
+                // Two-digit + two-digit addition (e.g., 23 + 45)
+                num1 = Math.floor(Math.random() * 40) + 10;
+                num2 = Math.floor(Math.random() * 40) + 10;
+            }
+            
+            answer = num1 + num2;
+            
+            // Generate options with the correct answer and 3 wrong answers
+            options = generateOptions(answer, difficulty);
+            
+            return {
+                text: `${num1} + ${num2} = ?`,
+                answer,
+                options,
+                difficulty,
+                topic: 'addition',
+                num1,
+                num2
+            };
+        }
+
+        function generateSubtractionQuestion(difficulty) {
+            let num1, num2, answer, options;
+            
+            // Generate numbers based on difficulty, ensuring num1 > num2
+            if (difficulty === 1) {
+                // Simple single-digit subtraction (e.g., 5 - 2)
+                num1 = Math.floor(Math.random() * 5) + 5;
+                num2 = Math.floor(Math.random() * num1);
+            } else if (difficulty === 2) {
+                // Subtraction crossing 10 (e.g., 12 - 5)
+                num1 = Math.floor(Math.random() * 10) + 10;
+                num2 = Math.floor(Math.random() * 9) + 1;
+            } else if (difficulty === 3) {
+                // Two-digit - one-digit subtraction (e.g., 25 - 8)
+                num1 = Math.floor(Math.random() * 40) + 20;
+                num2 = Math.floor(Math.random() * 9) + 1;
+            } else {
+                // Two-digit - two-digit subtraction (e.g., 45 - 23)
+                num1 = Math.floor(Math.random() * 50) + 30;
+                num2 = Math.floor(Math.random() * 20) + 10;
+            }
+            
+            answer = num1 - num2;
+            
+            // Generate options with the correct answer and 3 wrong answers
+            options = generateOptions(answer, difficulty);
+            
+            return {
+                text: `${num1} - ${num2} = ?`,
+                answer,
+                options,
+                difficulty,
+                topic: 'subtraction',
+                num1,
+                num2
+            };
+        }
+
+        function generateMultiplicationQuestion(difficulty) {
+            let num1, num2, answer, options;
+            
+            // Generate numbers based on difficulty
+            if (difficulty === 1) {
+                // Simple multiplication with small numbers (e.g., 2 × 3)
+                num1 = Math.floor(Math.random() * 5) + 1;
+                num2 = Math.floor(Math.random() * 5) + 1;
+            } else if (difficulty === 2) {
+                // Multiplication with numbers up to 10 (e.g., 7 × 6)
+                num1 = Math.floor(Math.random() * 6) + 4;
+                num2 = Math.floor(Math.random() * 6) + 4;
+            } else {
+                // Multiplication with larger numbers (e.g., 12 × 6)
+                num1 = Math.floor(Math.random() * 8) + 5;
+                num2 = Math.floor(Math.random() * 6) + 7;
+            }
+            
+            answer = num1 * num2;
+            
+            // Generate options with the correct answer and 3 wrong answers
+            options = generateOptions(answer, difficulty);
+            
+            return {
+                text: `${num1} × ${num2} = ?`,
+                answer,
+                options,
+                difficulty,
+                topic: 'multiplication',
+                num1,
+                num2
+            };
+        }
+
+        function generateDivisionQuestion(difficulty) {
+            let num1, num2, answer, options;
+            
+            // Generate numbers based on difficulty
+            if (difficulty === 1) {
+                // Simple division with no remainder (e.g., 10 ÷ 2)
+                num2 = Math.floor(Math.random() * 4) + 2; // Divisor between 2 and 5
+                answer = Math.floor(Math.random() * 5) + 1; // Quotient between 1 and 5
+                num1 = num2 * answer; // Dividend
+            } else if (difficulty === 2) {
+                // Division with larger numbers but no remainder (e.g., 36 ÷ 4)
+                num2 = Math.floor(Math.random() * 7) + 2; // Divisor between 2 and 8
+                answer = Math.floor(Math.random() * 6) + 3; // Quotient between 3 and 8
+                num1 = num2 * answer; // Dividend
+            } else {
+                // Division with larger numbers (e.g., 45 ÷ 5)
+                num2 = Math.floor(Math.random() * 8) + 3; // Divisor between 3 and 10
+                answer = Math.floor(Math.random() * 8) + 4; // Quotient between 4 and 11
+                num1 = num2 * answer; // Dividend
+            }
+            
+            // Generate options with the correct answer and 3 wrong answers
+            options = generateOptions(answer, difficulty);
+            
+            return {
+                text: `${num1} ÷ ${num2} = ?`,
+                answer,
+                options,
+                difficulty,
+                topic: 'division',
+                num1,
+                num2
+            };
+        }
+
+        function generateFractionQuestion(difficulty) {
+            let question, answer, options;
+            
+            // Generate a fraction question based on difficulty
+            if (difficulty === 1) {
+                // Simple fraction identification (e.g., "What fraction is shaded?")
+                const denominator = [2, 4, 3, 6, 8][Math.floor(Math.random() * 5)];
+                const numerator = Math.floor(Math.random() * (denominator - 1)) + 1;
+                const gcd = getGCD(numerator, denominator);
+                
+                answer = `${numerator}/${denominator}`;
+                
+                // For display purposes
+                question = {
+                    text: `What fraction is shaded?`,
+                    answer,
+                    options: generateFractionOptions(numerator, denominator),
+                    difficulty,
+                    topic: 'fractions',
+                    numerator,
+                    denominator,
+                    gcd,
+                    type: 'identification'
+                };
+            } else if (difficulty === 2) {
+                // Comparing fractions (e.g., "Which fraction is larger?")
+                const denominator1 = [2, 3, 4, 6, 8][Math.floor(Math.random() * 5)];
+                const numerator1 = Math.floor(Math.random() * (denominator1 - 1)) + 1;
+                const fraction1 = numerator1 / denominator1;
+                
+                const denominator2 = [2, 3, 4, 6, 8][Math.floor(Math.random() * 5)];
+                const numerator2 = Math.floor(Math.random() * (denominator2 - 1)) + 1;
+                const fraction2 = numerator2 / denominator2;
+                
+                if (fraction1 > fraction2) {
+                    answer = `${numerator1}/${denominator1}`;
+                } else {
+                    answer = `${numerator2}/${denominator2}`;
+                }
+                
+                options = [
+                    `${numerator1}/${denominator1}`,
+                    `${numerator2}/${denominator2}`
+                ];
+                
+                while (options.length < 4) {
+                    const d = [2, 3, 4, 6, 8][Math.floor(Math.random() * 5)];
+                    const n = Math.floor(Math.random() * (d - 1)) + 1;
+                    const newOption = `${n}/${d}`;
+                    
+                    if (!options.includes(newOption)) {
+                        options.push(newOption);
+                    }
+                }
+                
+                // Shuffle options
+                options = shuffleArray(options);
+                
+                question = {
+                    text: `Which fraction is larger?`,
+                    answer,
+                    options,
+                    difficulty,
+                    topic: 'fractions',
+                    type: 'comparison',
+                    fraction1: `${numerator1}/${denominator1}`,
+                    fraction2: `${numerator2}/${denominator2}`
+                };
+            } else {
+                // Adding or subtracting fractions with common denominator
+                const denominator = [4, 6, 8, 10, 12][Math.floor(Math.random() * 5)];
+                const numerator1 = Math.floor(Math.random() * (denominator - 2)) + 1;
+                const numerator2 = Math.floor(Math.random() * (denominator - numerator1 - 1)) + 1;
+                
+                // 50% chance of addition or subtraction
+                let operation, resultNumerator;
+                if (Math.random() < 0.5) {
+                    operation = '+';
+                    resultNumerator = numerator1 + numerator2;
+                } else {
+                    operation = '-';
+                    resultNumerator = numerator1 - numerator2;
+                }
+                
+                const gcd = getGCD(resultNumerator, denominator);
+                const simplifiedNumerator = resultNumerator / gcd;
+                const simplifiedDenominator = denominator / gcd;
+                
+                answer = `${simplifiedNumerator}/${simplifiedDenominator}`;
+                
+                if (simplifiedDenominator === 1) {
+                    answer = `${simplifiedNumerator}`;
+                }
+                
+                options = generateFractionOptions(resultNumerator, denominator);
+                
+                question = {
+                    text: `${numerator1}/${denominator} ${operation} ${numerator2}/${denominator} = ?`,
+                    answer,
+                    options,
+                    difficulty,
+                    topic: 'fractions',
+                    numerator1,
+                    numerator2,
+                    denominator,
+                    operation,
+                    type: 'calculation'
+                };
+            }
+            
+            return question;
+        }
+
+        function generateOptions(answer, difficulty) {
+            const options = [answer];
+            
+            // Generate 3 wrong answers that are close to the correct answer
+            while (options.length < 4) {
+                let wrongAnswer;
+                const randomType = Math.floor(Math.random() * 3);
+                
+                if (randomType === 0) {
+                    // Off by 1-2
+                    wrongAnswer = answer + (Math.random() < 0.5 ? 1 : 2) * (Math.random() < 0.5 ? 1 : -1);
+                } else if (randomType === 1) {
+                    // Off by addition/subtraction mistake
+                    const offset = Math.floor(Math.random() * 3) + 1;
+                    wrongAnswer = answer + offset * (Math.random() < 0.5 ? 1 : -1);
+                } else {
+                    // More significant error
+                    const factor = Math.floor(Math.random() * 5) + 3;
+                    wrongAnswer = answer + factor * (Math.random() < 0.5 ? 1 : -1);
+                }
+                
+                // Ensure the wrong answer is positive and not already in options
+                if (wrongAnswer > 0 && !options.includes(wrongAnswer)) {
+                    options.push(wrongAnswer);
+                }
+            }
+            
+            // Shuffle the options
+            return shuffleArray(options);
+        }
+
+        function generateFractionOptions(numerator, denominator) {
+            const correctAnswer = `${numerator}/${denominator}`;
+            const options = [correctAnswer];
+            
+            // Simplify the fraction if possible
+            const gcd = getGCD(numerator, denominator);
+            if (gcd > 1) {
+                const simplifiedOption = `${numerator/gcd}/${denominator/gcd}`;
+                if (!options.includes(simplifiedOption)) {
+                    options.push(simplifiedOption);
+                }
+            }
+            
+            // Generate wrong options
+            while (options.length < 4) {
+                const randomType = Math.floor(Math.random() * 3);
+                let wrongOption;
+                
+                if (randomType === 0) {
+                    // Flip numerator and denominator
+                    wrongOption = `${denominator}/${numerator}`;
+                } else if (randomType === 1) {
+                    // Wrong simplification
+                    const wrongNum = Math.floor(Math.random() * 10) + 1;
+                    const wrongDen = Math.floor(Math.random() * 10) + 1;
+                    wrongOption = `${wrongNum}/${wrongDen}`;
+                } else {
+                    // Modify numerator or denominator slightly
+                    const newNum = Math.max(1, numerator + (Math.random() < 0.5 ? 1 : -1));
+                    const newDen = Math.max(2, denominator + (Math.random() < 0.5 ? 2 : -2));
+                    wrongOption = `${newNum}/${newDen}`;
+                }
+                
+                if (!options.includes(wrongOption)) {
+                    options.push(wrongOption);
+                }
+            }
+            
+            // If we have more than 4 options, trim
+            if (options.length > 4) {
+                options.splice(4);
+            }
+            
+            // Shuffle the options
+            return shuffleArray(options);
+        }
+
+        function displayQuestion(question) {
+            // Update question text
+            elements.questionText.textContent = question.text;
+            
+            // Clear previous options
+            elements.optionsContainer.innerHTML = '';
+            
+            // Add new options
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('button');
+                optionElement.className = 'math-option bg-white dark:bg-gray-700 p-6 rounded-xl shadow text-2xl font-bold hover:shadow-card-hover';
+                optionElement.textContent = option;
+                optionElement.dataset.value = option;
+                
+                optionElement.addEventListener('click', () => {
+                    if (gameState.soundEnabled) {
+                        sounds.click.play();
+                    }
+                    checkAnswer(option);
+                });
+                
+                elements.optionsContainer.appendChild(optionElement);
+            });
+            
+            // Update tutor message
+            updateTutorMessage(question);
+        }
+
+        function updateManipulatives(question) {
+            // Clear previous manipulatives
+            elements.manipulativesContainer.innerHTML = '';
+            
+            // Add appropriate manipulatives based on topic and difficulty
+            switch (question.topic) {
+                case 'addition':
+                    createAdditionManipulatives(question);
+                    break;
+                case 'subtraction':
+                    createSubtractionManipulatives(question);
+                    break;
+                case 'multiplication':
+                    createMultiplicationManipulatives(question);
+                    break;
+                case 'division':
+                    createDivisionManipulatives(question);
+                    break;
+                case 'fractions':
+                    createFractionManipulatives(question);
+                    break;
+            }
+        }
+
+        function createAdditionManipulatives(question) {
+            const container = document.createElement('div');
+            container.className = 'flex flex-wrap justify-center gap-2 mb-4 w-full';
+            
+            // Create counters for first number
+            const group1 = document.createElement('div');
+            group1.className = 'flex flex-wrap justify-center gap-2 p-3 bg-teal bg-opacity-20 dark:bg-opacity-10 rounded-xl mb-4';
+            
+            for (let i = 0; i < question.num1; i++) {
+                const counter = document.createElement('div');
+                counter.className = 'counter bg-teal text-white';
+                counter.textContent = '1';
+                group1.appendChild(counter);
+            }
+            
+            // Create plus sign
+            const plusSign = document.createElement('div');
+            plusSign.className = 'flex items-center justify-center font-bold text-3xl mx-4';
+            plusSign.textContent = '+';
+            
+            // Create counters for second number
+            const group2 = document.createElement('div');
+            group2.className = 'flex flex-wrap justify-center gap-2 p-3 bg-coral bg-opacity-20 dark:bg-opacity-10 rounded-xl mb-4';
+            
+            for (let i = 0; i < question.num2; i++) {
+                const counter = document.createElement('div');
+                counter.className = 'counter bg-coral text-white';
+                counter.textContent = '1';
+                group2.appendChild(counter);
+            }
+            
+            container.appendChild(group1);
+            container.appendChild(plusSign);
+            container.appendChild(group2);
+            
+            elements.manipulativesContainer.appendChild(container);
+        }
+
+        function createSubtractionManipulatives(question) {
+            const container = document.createElement('div');
+            container.className = 'flex flex-col items-center gap-4 mb-4 w-full';
+            
+            // Create initial counters
+            const initialGroup = document.createElement('div');
+            initialGroup.className = 'flex flex-wrap justify-center gap-2 p-3 bg-teal bg-opacity-20 dark:bg-opacity-10 rounded-xl mb-2';
+            
+            for (let i = 0; i < question.num1; i++) {
+                const counter = document.createElement('div');
+                counter.className = 'counter bg-teal text-white';
+                counter.textContent = '1';
+                
+                // If this counter is part of what will be subtracted, mark it
+                if (i >= question.num1 - question.num2) {
+                    counter.classList.add('to-subtract');
+                    counter.style.border = '2px dashed #FF6B6B';
+                }
+                
+                initialGroup.appendChild(counter);
+            }
+            
+            // Create minus sign and explanation
+            const explanation = document.createElement('div');
+            explanation.className = 'text-lg mb-2';
+            explanation.textContent = `Take away ${question.num2}`;
+            
+            // Create result section
+            const resultGroup = document.createElement('div');
+            resultGroup.className = 'flex flex-wrap justify-center gap-2 p-3 bg-yellow bg-opacity-20 dark:bg-opacity-10 rounded-xl';
+            
+            for (let i = 0; i < (question.num1 - question.num2); i++) {
+                const counter = document.createElement('div');
+                counter.className = 'counter bg-yellow-500 text-white';
+                counter.textContent = '1';
+                resultGroup.appendChild(counter);
+            }
+            
+            container.appendChild(initialGroup);
+            container.appendChild(explanation);
+            container.appendChild(resultGroup);
+            
+            elements.manipulativesContainer.appendChild(container);
+        }
+
+        function createMultiplicationManipulatives(question) {
+            const container = document.createElement('div');
+            container.className = 'flex flex-col items-center gap-2 mb-4 w-full';
+            
+            // Create grid visualization
+            const grid = document.createElement('div');
+            grid.className = 'grid gap-1 bg-primary bg-opacity-10 dark:bg-opacity-5 p-3 rounded-xl';
+            grid.style.gridTemplateColumns = `repeat(${question.num2}, minmax(0, 1fr))`;
+            
+            // Create explanation
+            const explanation = document.createElement('div');
+            explanation.className = 'text-lg mb-2';
+            explanation.textContent = `${question.num1} rows × ${question.num2} columns = ?`;
+            
+            // Fill grid with cells
+            for (let i = 0; i < question.num1; i++) {
+                for (let j = 0; j < question.num2; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'w-8 h-8 bg-primary rounded-md flex items-center justify-center text-white font-bold';
+                    cell.textContent = '1';
+                    grid.appendChild(cell);
+                }
+            }
+            
+            container.appendChild(explanation);
+            container.appendChild(grid);
+            
+            elements.manipulativesContainer.appendChild(container);
+        }
+
+        function createDivisionManipulatives(question) {
+            const container = document.createElement('div');
+            container.className = 'flex flex-col items-center gap-2 mb-4 w-full';
+            
+            // Create explanation
+            const explanation = document.createElement('div');
+            explanation.className = 'text-lg mb-2';
+            explanation.textContent = `Share ${question.num1} items into ${question.num2} equal groups`;
+            
+            // Create groups
+            const groupsContainer = document.createElement('div');
+            groupsContainer.className = 'flex flex-wrap justify-center gap-4';
+            
+            const itemsPerGroup = Math.floor(question.num1 / question.num2);
+            const remainder = question.num1 % question.num2;
+            
+            for (let i = 0; i < question.num2; i++) {
+                const group = document.createElement('div');
+                group.className = 'p-2 bg-teal bg-opacity-20 dark:bg-opacity-10 rounded-lg flex flex-wrap justify-center gap-1 min-w-[80px]';
+                
+                // Group label
+                const label = document.createElement('div');
+                label.className = 'w-full text-center font-bold mb-1';
+                label.textContent = `Group ${i + 1}`;
+                group.appendChild(label);
+                
+                // Add items to group
+                for (let j = 0; j < itemsPerGroup; j++) {
+                    const item = document.createElement('div');
+                    item.className = 'w-6 h-6 bg-teal rounded-full flex items-center justify-center text-white font-bold text-xs';
+                    item.textContent = '1';
+                    group.appendChild(item);
+                }
+                
+                // Add one from remainder if any
+                if (i < remainder) {
+                    const item = document.createElement('div');
+                    item.className = 'w-6 h-6 bg-coral rounded-full flex items-center justify-center text-white font-bold text-xs';
+                    item.textContent = '1';
+                    group.appendChild(item);
+                }
+                
+                groupsContainer.appendChild(group);
+            }
+            
+            container.appendChild(explanation);
+            container.appendChild(groupsContainer);
+            
+            elements.manipulativesContainer.appendChild(container);
+        }
+
+        function createFractionManipulatives(question) {
+            const container = document.createElement('div');
+            container.className = 'flex flex-col items-center gap-2 mb-4 w-full';
+            
+            if (question.type === 'identification') {
+                // Create fraction visual
+                const visual = document.createElement('div');
+                visual.className = 'fraction-visual rounded-lg';
+                
+                // Create pieces based on denominator
+                const size = 100 / Math.sqrt(question.denominator);
+                const cols = Math.ceil(Math.sqrt(question.denominator));
+                const rows = Math.ceil(question.denominator / cols);
+                
+                for (let i = 0; i < question.denominator; i++) {
+                    const piece = document.createElement('div');
+                    piece.className = 'fraction-piece border border-gray-800 dark:border-gray-200';
+                    
+                    // Calculate position
+                    const row = Math.floor(i / cols);
+                    const col = i % cols;
+                    
+                    piece.style.width = `${size}%`;
+                    piece.style.height = `${100 / rows}%`;
+                    piece.style.left = `${col * size}%`;
+                    piece.style.top = `${row * (100 / rows)}%`;
+                    
+                    // Color pieces for numerator
+                    if (i < question.numerator) {
+                        piece.style.opacity = '1';
+                    } else {
+                        piece.style.backgroundColor = 'transparent';
+                    }
+                    
+                    visual.appendChild(piece);
+                }
+                
+                container.appendChild(visual);
+                
+                // Create fraction representation
+                const fraction = document.createElement('div');
+                fraction.className = 'fraction-bar flex flex-col items-center mt-4';
+                
+                const numerator = document.createElement('div');
+                numerator.className = 'fraction-numerator';
+                numerator.textContent = '?';
+                
+                const line = document.createElement('div');
+                line.className = 'fraction-line';
+                
+                const denominator = document.createElement('div');
+                denominator.className = 'fraction-denominator';
+                denominator.textContent = question.denominator;
+                
+                fraction.appendChild(numerator);
+                fraction.appendChild(line);
+                fraction.appendChild(denominator);
+                
+                container.appendChild(fraction);
+            } 
+            else if (question.type === 'comparison') {
+                // Create comparison visuals
+                const comparisonContainer = document.createElement('div');
+                comparisonContainer.className = 'flex flex-row justify-center items-center gap-8';
+                
+                // Parse fractions
+                const [num1, den1] = question.fraction1.split('/').map(Number);
+                const [num2, den2] = question.fraction2.split('/').map(Number);
+                
+                // Create first fraction
+                const fraction1Container = document.createElement('div');
+                fraction1Container.className = 'flex flex-col items-center';
+                
+                const visual1 = createFractionVisual(num1, den1);
+                visual1.className += ' mb-2';
+                
+                const fraction1 = document.createElement('div');
+                fraction1.className = 'fraction-bar flex flex-col items-center';
+                
+                const numerator1 = document.createElement('div');
+                numerator1.className = 'fraction-numerator';
+                numerator1.textContent = num1;
+                
+                const line1 = document.createElement('div');
+                line1.className = 'fraction-line';
+                
+                const denominator1 = document.createElement('div');
+                denominator1.className = 'fraction-denominator';
+                denominator1.textContent = den1;
+                
+                fraction1.appendChild(numerator1);
+                fraction1.appendChild(line1);
+                fraction1.appendChild(denominator1);
+                
+                fraction1Container.appendChild(visual1);
+                fraction1Container.appendChild(fraction1);
+                
+                // Question mark in the middle
+                const questionMark = document.createElement('div');
+                questionMark.className = 'text-4xl font-bold';
+                questionMark.textContent = '?';
+                
+                // Create second fraction
+                const fraction2Container = document.createElement('div');
+                fraction2Container.className = 'flex flex-col items-center';
+                
+                const visual2 = createFractionVisual(num2, den2);
+                visual2.className += ' mb-2';
+                
+                const fraction2 = document.createElement('div');
+                fraction2.className = 'fraction-bar flex flex-col items-center';
+                
+                const numerator2 = document.createElement('div');
+                numerator2.className = 'fraction-numerator';
+                numerator2.textContent = num2;
+                
+                const line2 = document.createElement('div');
+                line2.className = 'fraction-line';
+                
+                const denominator2 = document.createElement('div');
+                denominator2.className = 'fraction-denominator';
+                denominator2.textContent = den2;
+                
+                fraction2.appendChild(numerator2);
+                fraction2.appendChild(line2);
+                fraction2.appendChild(denominator2);
+                
+                fraction2Container.appendChild(visual2);
+                fraction2Container.appendChild(fraction2);
+                
+                comparisonContainer.appendChild(fraction1Container);
+                comparisonContainer.appendChild(questionMark);
+                comparisonContainer.appendChild(fraction2Container);
+                
+                container.appendChild(comparisonContainer);
+            }
+            else if (question.type === 'calculation') {
+                // Create calculation visuals
+                const calculationContainer = document.createElement('div');
+                calculationContainer.className = 'flex flex-row justify-center items-center gap-4';
+                
+                // Create first fraction
+                const fraction1Container = document.createElement('div');
+                fraction1Container.className = 'flex flex-col items-center';
+                
+                const visual1 = createFractionVisual(question.numerator1, question.denominator);
+                visual1.className += ' mb-2';
+                
+                const fraction1 = document.createElement('div');
+                fraction1.className = 'fraction-bar flex flex-col items-center';
+                
+                const numerator1 = document.createElement('div');
+                numerator1.className = 'fraction-numerator';
+                numerator1.textContent = question.numerator1;
+                
+                const line1 = document.createElement('div');
+                line1.className = 'fraction-line';
+                
+                const denominator1 = document.createElement('div');
+                denominator1.className = 'fraction-denominator';
+                denominator1.textContent = question.denominator;
+                
+                fraction1.appendChild(numerator1);
+                fraction1.appendChild(line1);
+                fraction1.appendChild(denominator1);
+                
+                fraction1Container.appendChild(visual1);
+                fraction1Container.appendChild(fraction1);
+                
+                // Operation
+                const operation = document.createElement('div');
+                operation.className = 'text-2xl font-bold';
+                operation.textContent = question.operation;
+                
+                // Create second fraction
+                const fraction2Container = document.createElement('div');
+                fraction2Container.className = 'flex flex-col items-center';
+                
+                const visual2 = createFractionVisual(question.numerator2, question.denominator);
+                visual2.className += ' mb-2';
+                
+                const fraction2 = document.createElement('div');
+                fraction2.className = 'fraction-bar flex flex-col items-center';
+                
+                const numerator2 = document.createElement('div');
+                numerator2.className = 'fraction-numerator';
+                numerator2.textContent = question.numerator2;
+                
+                const line2 = document.createElement('div');
+                line2.className = 'fraction-line';
+                
+                const denominator2 = document.createElement('div');
+                denominator2.className = 'fraction-denominator';
+                denominator2.textContent = question.denominator;
+                
+                fraction2.appendChild(numerator2);
+                fraction2.appendChild(line2);
+                fraction2.appendChild(denominator2);
+                
+                fraction2Container.appendChild(visual2);
+                fraction2Container.appendChild(fraction2);
+                
+                // Equals sign
+                const equals = document.createElement('div');
+                equals.className = 'text-2xl font-bold';
+                equals.textContent = '=';
+                
+                // Result fraction placeholder
+                const resultContainer = document.createElement('div');
+                resultContainer.className = 'flex flex-col items-center';
+                
+                const fraction3 = document.createElement('div');
+                fraction3.className = 'fraction-bar flex flex-col items-center';
+                
+                const numerator3 = document.createElement('div');
+                numerator3.className = 'fraction-numerator';
+                numerator3.textContent = '?';
+                
+                const line3 = document.createElement('div');
+                line3.className = 'fraction-line';
+                
+                const denominator3 = document.createElement('div');
+                denominator3.className = 'fraction-denominator';
+                denominator3.textContent = '?';
+                
+                fraction3.appendChild(numerator3);
+                fraction3.appendChild(line3);
+                fraction3.appendChild(denominator3);
+                
+                resultContainer.appendChild(fraction3);
+                
+                calculationContainer.appendChild(fraction1Container);
+                calculationContainer.appendChild(operation);
+                calculationContainer.appendChild(fraction2Container);
+                calculationContainer.appendChild(equals);
+                calculationContainer.appendChild(resultContainer);
+                
+                container.appendChild(calculationContainer);
+            }
+            
+            elements.manipulativesContainer.appendChild(container);
+        }
+
+        function createFractionVisual(numerator, denominator) {
+            const visual = document.createElement('div');
+            visual.className = 'fraction-visual rounded-lg w-[100px] h-[100px]';
+            
+            // Create pieces based on denominator
+            const size = 100 / Math.sqrt(denominator);
+            const cols = Math.ceil(Math.sqrt(denominator));
+            const rows = Math.ceil(denominator / cols);
+            
+            for (let i = 0; i < denominator; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'fraction-piece border border-gray-800 dark:border-gray-200';
+                
+                // Calculate position
+                const row = Math.floor(i / cols);
+                const col = i % cols;
+                
+                piece.style.width = `${size}%`;
+                piece.style.height = `${100 / rows}%`;
+                piece.style.left = `${col * size}%`;
+                piece.style.top = `${row * (100 / rows)}%`;
+                
+                // Color pieces for numerator
+                if (i < numerator) {
+                    piece.style.opacity = '1';
+                } else {
+                    piece.style.backgroundColor = 'transparent';
+                }
+                
+                visual.appendChild(piece);
+            }
+            
+            return visual;
+        }
+
+        function checkAnswer(selectedOption) {
+            const question = gameState.currentQuestion;
+            const isCorrect = selectedOption.toString() === question.answer.toString();
+            
+            // Find the option element that was clicked
+            const optionElements = elements.optionsContainer.querySelectorAll('.math-option');
+            let selectedElement;
+            let correctElement;
+            
+            optionElements.forEach(element => {
+                if (element.dataset.value === selectedOption.toString()) {
+                    selectedElement = element;
+                }
+                if (element.dataset.value === question.answer.toString()) {
+                    correctElement = element;
+                }
+            });
+            
+            // Disable all options
+            optionElements.forEach(element => {
+                element.disabled = true;
+            });
+            
+            // Show feedback
+            elements.feedbackContainer.classList.remove('hidden');
+            elements.feedbackContainer.innerHTML = '';
+            
+            if (isCorrect) {
+                // Play correct sound
+                if (gameState.soundEnabled) {
+                    sounds.correct.play();
+                }
+                
+                // Update selected option style
+                selectedElement.classList.add('correct');
+                
+                // Show feedback
+                const feedback = document.createElement('div');
+                feedback.className = 'bg-teal bg-opacity-20 dark:bg-opacity-10 text-teal dark:text-teal-300 p-4 rounded-lg font-bold text-xl';
+                feedback.textContent = getCorrectFeedback();
+                elements.feedbackContainer.appendChild(feedback);
+                
+                // Update game state
+                gameState.score += 10 + (question.difficulty * 5);
+                gameState.correctAnswers++;
+                gameState.questionsCorrectByTopic[question.topic]++;
+                
+                // Check for level up
+                const levelThreshold = gameState.level * 5;
+                if (gameState.correctAnswers >= levelThreshold) {
+                    levelUp();
+                } else {
+                    // Show next button
+                    elements.nextBtn.classList.remove('hidden');
+                }
+                
+                // Check for new badge
+                checkForBadge(question.topic);
+                
+                // Update tutor message
+                elements.tutorMessage.textContent = getCorrectTutorMessage();
+                
+                // Update progress
+                updateProgress(question.topic, true);
+            } else {
+                // Play incorrect sound
+                if (gameState.soundEnabled) {
+                    sounds.incorrect.play();
+                }
+                
+                // Update selected option style
+                selectedElement.classList.add('incorrect');
+                correctElement.classList.add('correct');
+                
+                // Show feedback
+                const feedback = document.createElement('div');
+                feedback.className = 'bg-coral bg-opacity-20 dark:bg-opacity-10 text-coral dark:text-coral-300 p-4 rounded-lg font-bold text-xl';
+                
+                const wrongText = document.createElement('p');
+                wrongText.textContent = getIncorrectFeedback();
+                feedback.appendChild(wrongText);
+                
+                const correctText = document.createElement('p');
+                correctText.className = 'mt-2';
+                correctText.textContent = `The correct answer is ${question.answer}.`;
+                feedback.appendChild(correctText);
+                
+                elements.feedbackContainer.appendChild(feedback);
+                
+                // Update game state
+                gameState.wrongAnswers++;
+                
+                // Show next button
+                elements.nextBtn.classList.remove('hidden');
+                
+                // Update tutor message with explanation
+                elements.tutorMessage.textContent = getIncorrectTutorMessage(question);
+                
+                // Update progress
+                updateProgress(question.topic, false);
+            }
+            
+            // Update displays
+            updateScoreDisplay();
+        }
+
+        function getCorrectFeedback() {
+            const feedbacks = [
+                "Great job! That's correct!",
+                "Excellent work! You got it right!",
+                "Perfect! Keep up the good work!",
+                "You've got it! Well done!",
+                "Fantastic! That's the right answer!",
+                "Amazing! You're doing great!",
+                "Correct! You're a math star!"
+            ];
+            
+            return feedbacks[Math.floor(Math.random() * feedbacks.length)];
+        }
+
+        function getIncorrectFeedback() {
+            const feedbacks = [
+                "Not quite right, but that's okay!",
+                "Let's try again. Everyone makes mistakes!",
+                "That's not correct, but keep trying!",
+                "Not the right answer, but you're learning!",
+                "That's not it, but don't worry!",
+                "Almost there, but not quite right."
+            ];
+            
+            return feedbacks[Math.floor(Math.random() * feedbacks.length)];
+        }
+
+        function getCorrectTutorMessage() {
+            const messages = [
+                "Excellent job! You're understanding this concept really well!",
+                "That's right! Do you see the pattern in how we solve these problems?",
+                "Great work! You're making wonderful progress!",
+                "Fantastic! Your math skills are improving with every problem!",
+                "You got it! I'm really proud of how you're working through these problems!",
+                "Perfect! You're understanding the key concepts here!"
+            ];
+            
+            return messages[Math.floor(Math.random() * messages.length)];
+        }
+
+        function getIncorrectTutorMessage(question) {
+            let explanation = "";
+            
+            // Provide specific explanations based on topic
+            switch (question.topic) {
+                case 'addition':
+                    explanation = `When adding ${question.num1} and ${question.num2}, count all the objects together. ${question.num1} + ${question.num2} = ${question.answer}.`;
+                    break;
+                case 'subtraction':
+                    explanation = `When subtracting ${question.num2} from ${question.num1}, you start with ${question.num1} and take away ${question.num2}. ${question.num1} - ${question.num2} = ${question.answer}.`;
+                    break;
+                case 'multiplication':
+                    explanation = `Multiplication is like repeated addition. ${question.num1} × ${question.num2} means ${question.num1} groups of ${question.num2}, which equals ${question.answer}.`;
+                    break;
+                case 'division':
+                    explanation = `Division is sharing equally. ${question.num1} ÷ ${question.num2} means sharing ${question.num1} into ${question.num2} equal groups, which gives ${question.answer} in each group.`;
+                    break;
+                case 'fractions':
+                    if (question.type === 'identification') {
+                        explanation = `The fraction shows ${question.numerator} parts shaded out of ${question.denominator} total parts, so the fraction is ${question.numerator}/${question.denominator}.`;
+                    } else if (question.type === 'comparison') {
+                        const [num1, den1] = question.fraction1.split('/').map(Number);
+                        const [num2, den2] = question.fraction2.split('/').map(Number);
+                        const val1 = num1 / den1;
+                        const val2 = num2 / den2;
+                        explanation = `To compare fractions, we can convert them to decimals. ${num1}/${den1} = ${val1.toFixed(2)} and ${num2}/${den2} = ${val2.toFixed(2)}. ${val1 > val2 ? question.fraction1 : question.fraction2} is larger.`;
+                    } else if (question.type === 'calculation') {
+                        const operation = question.operation === '+' ? 'add' : 'subtract';
+                        explanation = `To ${operation} fractions with the same denominator, we ${operation} the numerators and keep the same denominator. ${question.numerator1}/${question.denominator} ${question.operation} ${question.numerator2}/${question.denominator} = ${question.answer}.`;
+                    }
+                    break;
+            }
+            
+            return `Let's work through this together. ${explanation} Try the next problem with this in mind!`;
+        }
+
+        function updateTutorMessage(question) {
+            // Update tutor message based on topic and difficulty
+            switch (question.topic) {
+                case 'addition':
+                    elements.tutorMessage.textContent = "Adding means combining two groups. Count all the objects to find the total!";
+                    break;
+                case 'subtraction':
+                    elements.tutorMessage.textContent = "Subtraction means taking away. Start with the first number and count backwards!";
+                    break;
+                case 'multiplication':
+                    elements.tutorMessage.textContent = "Multiplication is like repeated addition. Think of it as equal groups!";
+                    break;
+                case 'division':
+                    elements.tutorMessage.textContent = "Division means sharing equally. How many can go in each group?";
+                    break;
+                case 'fractions':
+                    if (question.type === 'identification') {
+                        elements.tutorMessage.textContent = "Fractions show parts of a whole. The top number (numerator) shows how many parts are shaded, and the bottom number (denominator) shows the total parts.";
+                    } else if (question.type === 'comparison') {
+                        elements.tutorMessage.textContent = "When comparing fractions, think about how much of the whole each fraction represents. Which one is larger?";
+                    } else if (question.type === 'calculation') {
+                        elements.tutorMessage.textContent = `When ${question.operation === '+' ? 'adding' : 'subtracting'} fractions with the same denominator, ${question.operation === '+' ? 'add' : 'subtract'} the numerators and keep the same denominator.`;
+                    }
+                    break;
+            }
+        }
+
+        function showHint() {
+            if (gameState.soundEnabled) {
+                sounds.hint.play();
+            }
+            
+            const question = gameState.currentQuestion;
+            let hintMessage = "";
+            
+            // Generate hint based on topic
+            switch (question.topic) {
+                case 'addition':
+                    hintMessage = `Count all the objects. ${question.num1} objects plus ${question.num2} objects equals how many in total?`;
+                    break;
+                case 'subtraction':
+                    hintMessage = `Start with ${question.num1} and count backwards ${question.num2} times.`;
+                    break;
+                case 'multiplication':
+                    hintMessage = `Think of ${question.num1} groups with ${question.num2} in each group. Or you can count by ${question.num2}s, ${question.num1} times.`;
+                    break;
+                case 'division':
+                    hintMessage = `If you share ${question.num1} items equally among ${question.num2} groups, how many will be in each group?`;
+                    break;
+                case 'fractions':
+                    if (question.type === 'identification') {
+                        hintMessage = `Count how many parts are shaded, then count the total number of parts.`;
+                    } else if (question.type === 'comparison') {
+                        hintMessage = `Think about which fraction represents a larger part of the whole. You can also compare them as decimals.`;
+                    } else if (question.type === 'calculation') {
+                        hintMessage = `When ${question.operation === '+' ? 'adding' : 'subtracting'} fractions with the same denominator, ${question.operation === '+' ? 'add' : 'subtract'} the top numbers (numerators) and keep the bottom number (denominator) the same.`;
+                    }
+                    break;
+            }
+            
+            // Display hint in tutor speech bubble
+            elements.tutorSpeech.textContent = hintMessage;
+            elements.tutorSpeech.style.display = 'block';
+            
+            // Hide speech bubble after a few seconds
+            setTimeout(() => {
+                elements.tutorSpeech.style.display = 'none';
+            }, 5000);
+        }
+
+        function nextQuestion() {
+            if (gameState.soundEnabled) {
+                sounds.click.play();
+            }
+            
+            // Generate new question
+            generateQuestion();
+        }
+
+        function levelUp() {
+            // Update level
+            gameState.level++;
+            
+            // Play level up sound
+            if (gameState.soundEnabled) {
+                sounds.levelUp.play();
+            }
+            
+            // Update difficulty based on performance
+            updateDifficulties();
+            
+            // Update UI
+            elements.newLevel.textContent = gameState.level;
+            elements.levelUpModal.classList.add('show');
+            
+            // Update display
+            updateLevelDisplay();
+        }
+
+        function updateDifficulties() {
+            // For each topic, increase difficulty if doing well
+            Object.keys(gameState.topicDifficulty).forEach(topic => {
+                const questionsCorrect = gameState.questionsCorrectByTopic[topic];
+                const currentDifficulty = gameState.topicDifficulty[topic];
+                
+                // If we've answered at least 3 questions correctly at the current difficulty, increase it (up to max 4)
+                if (questionsCorrect >= 3 && currentDifficulty < 4) {
+                    gameState.topicDifficulty[topic] = currentDifficulty + 1;
+                    
+                    // Reset count of correct answers for this topic
+                    gameState.questionsCorrectByTopic[topic] = 0;
+                }
+            });
+            
+            // Unlock new topics based on level
+            if (gameState.level === 2 && !gameState.availableTopics.includes('subtraction')) {
+                gameState.availableTopics.push('subtraction');
+            } else if (gameState.level === 3 && !gameState.availableTopics.includes('multiplication')) {
+                gameState.availableTopics.push('multiplication');
+            } else if (gameState.level === 4 && !gameState.availableTopics.includes('division')) {
+                gameState.availableTopics.push('division');
+            } else if (gameState.level === 5 && !gameState.availableTopics.includes('fractions')) {
+                gameState.availableTopics.push('fractions');
+            }
+        }
+
+        function continueAfterLevelUp() {
+            if (gameState.soundEnabled) {
+                sounds.click.play();
+            }
+            
+            // Hide level up modal
+            elements.levelUpModal.classList.remove('show');
+            
+            // Generate new question
+            generateQuestion();
+        }
+
+        function checkForBadge(topic) {
+            // Check if we've earned a badge for this topic
+            const correctAnswers = gameState.questionsCorrectByTopic[topic];
+            
+            if (correctAnswers >= 5 && !gameState.badges[topic]) {
+                // Unlock badge
+                gameState.badges[topic] = true;
+                
+                // Update badge display
+                updateBadges();
+                
+                // Could show a badge earned notification here
+            }
+        }
+
+        function updateBadges() {
+            // Update the badges display in the UI
+            const badgesContainer = elements.badgesContainer;
+            badgesContainer.innerHTML = '';
+            
+            // Add badges for each topic
+            const topics = ['addition', 'subtraction', 'multiplication', 'division', 'fractions'];
+            const icons = {
+                'addition': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />',
+                'subtraction': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />',
+                'multiplication': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />',
+                'division': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />',
+                'fractions': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14" />'
+            };
+            const colors = {
+                'addition': 'bg-teal text-white',
+                'subtraction': 'bg-coral text-white',
+                'multiplication': 'bg-yellow-600 text-white',
+                'division': 'bg-purple-600 text-white',
+                'fractions': 'bg-blue-600 text-white'
+            };
+            
+            topics.forEach(topic => {
+                const badge = document.createElement('div');
+                badge.className = `w-12 h-12 rounded-full flex items-center justify-center ${gameState.badges[topic] ? colors[topic] : 'bg-gray-200 dark:bg-gray-700 text-gray-400'}`;
+                badge.title = `${capitalize(topic)} Novice - Solve 5 ${topic} problems`;
+                
+                badge.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        ${icons[topic]}
+                    </svg>
+                `;
+                
+                badgesContainer.appendChild(badge);
+            });
+        }
+
+        function updateProgress(topic, isCorrect) {
+            // Update progress for the topic
+            const progressValue = gameState.topicProgress[topic];
+            const newValue = isCorrect 
+                ? Math.min(100, progressValue + 10) 
+                : Math.max(0, progressValue - 5);
+            
+            gameState.topicProgress[topic] = newValue;
+            
+            // Update UI
+            updateProgressBars();
+            
+            // Update overall progress bar
+            const overallProgress = Object.values(gameState.topicProgress).reduce((sum, val) => sum + val, 0) / Object.keys(gameState.topicProgress).length;
+            elements.progressFill.style.width = `${overallProgress}%`;
+        }
+
+        function updateProgressBars() {
+            // Update progress bars for each topic
+            Object.keys(gameState.topicProgress).forEach(topic => {
+                const progressValue = gameState.topicProgress[topic];
+                const progressElement = document.getElementById(`progress-${topic}`);
+                const fillElement = document.getElementById(`progress-${topic}-fill`);
+                
+                if (progressElement && fillElement) {
+                    progressElement.textContent = `${progressValue}%`;
+                    fillElement.style.width = `${progressValue}%`;
+                }
+            });
+        }
+
+        function updateScoreDisplay() {
+            elements.scoreDisplay.textContent = `Score: ${gameState.score}`;
+        }
+
+        function updateLevelDisplay() {
+            elements.levelDisplay.textContent = gameState.level;
+        }
+
+        // UI and accessibility functions
+        function toggleTheme() {
+            if (gameState.soundEnabled) {
+                sounds.click.play();
+            }
+            
+            document.documentElement.classList.toggle('dark');
+        }
+
+        function toggleSound() {
+            gameState.soundEnabled = !gameState.soundEnabled;
+            elements.soundToggleBtn.innerHTML = gameState.soundEnabled 
+                ? '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd" /></svg>'
+                : '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>';
+            
+            // Play a sound to confirm
+            if (gameState.soundEnabled) {
+                sounds.click.play();
+            }
+        }
+
+        function showAccessibilityDialog() {
+            if (gameState.soundEnabled) {
+                sounds.click.play();
+            }
+            
+            elements.accessibilityDialog.classList.add('show');
+        }
+
+        function hideAccessibilityDialog() {
+            if (gameState.soundEnabled) {
+                sounds.click.play();
+            }
+            
+            elements.accessibilityDialog.classList.remove('show');
+        }
+
+        function toggleHighContrast() {
+            if (gameState.soundEnabled) {
+                sounds.click.play();
+            }
+            
+            document.documentElement.classList.toggle('high-contrast');
+        }
+
+        function toggleDyslexiaFont() {
+            if (gameState.soundEnabled) {
+                sounds.click.play();
+            }
+            
+            document.documentElement.classList.toggle('dyslexia-friendly');
+        }
+
+        function toggleNarration() {
+            if (gameState.soundEnabled) {
+                sounds.click.play();
+            }
+            
+            gameState.narrationEnabled = !gameState.narrationEnabled;
+        }
+
+        function adjustTextSize() {
+            if (gameState.soundEnabled) {
+                sounds.click.play();
+            }
+            
+            const sizeValue = elements.textSizeSlider.value;
+            document.documentElement.style.fontSize = `${sizeValue}rem`;
+        }
+
+        // Utility functions
+        function shuffleArray(array) {
+            // Fisher-Yates shuffle
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function capitalize(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        function getGCD(a, b) {
+            return b ? getGCD(b, a % b) : a;
+        }
+    </script>
+</body>
+</html>
