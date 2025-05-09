@@ -3,26 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuizPoint Extractor - PDF to Quizizz Points</title>
+    <title>QuizPoint Extractor & AI Toolkit</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="https://sirpoji007.github.io/microsites/SPQuizizzTool2_20250510_045954_0000.png">
 
     <!-- Social Media Meta Tags (Open Graph for Facebook, WhatsApp, etc.) -->
-    <meta property="og:title" content="QuizPoint Extractor - PDF to Quizizz Points">
-    <meta property="og:description" content="Upload PDF learning materials and get Quizizz-ready points, optimized for AI!">
+    <meta property="og:title" content="QuizPoint Extractor & AI Toolkit">
+    <meta property="og:description" content="Upload PDF learning materials, get Quizizz-ready points, and explore the Quizizz AI Toolkit!">
     <meta property="og:image" content="https://sirpoji007.github.io/microsites/SPQuizizzTool2_20250510_045954_0000.png">
-    <meta property="og:image:width" content="1200"> <!-- Optional: Specify image dimensions -->
-    <meta property="og:image:height" content="630">  <!-- Optional: Specify image dimensions -->
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta property="og:url" content="https://sirpoji007.github.io/microsites/quizizz-tools-2.html"> <!-- IMPORTANT: Replace with actual URL when hosted -->
     <meta property="og:type" content="website">
 
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="QuizPoint Extractor - PDF to Quizizz Points">
-    <meta name="twitter:description" content="Upload PDF learning materials and get Quizizz-ready points, optimized for AI!">
+    <meta name="twitter:title" content="QuizPoint Extractor & AI Toolkit">
+    <meta name="twitter:description" content="Upload PDF learning materials, get Quizizz-ready points, and explore the Quizizz AI Toolkit!">
     <meta name="twitter:image" content="https://sirpoji007.github.io/microsites/SPQuizizzTool2_20250510_045954_0000.png">
-    <!-- <meta name="twitter:site" content="@YourTwitterHandle"> --> <!-- Optional: Your Twitter handle -->
 
     <!-- PDF.js library from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
@@ -43,6 +42,7 @@
             --card-bg: #ffffff;
             --border-radius: 12px;
             --box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --toolkit-card-hover-shadow: 0 10px 25px rgba(110, 142, 251, 0.3);
         }
 
         * {
@@ -70,10 +70,10 @@
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
             width: 100%;
-            max-width: 800px;
+            max-width: 900px; /* Increased max-width for toolkit */
             text-align: center;
-            margin-top: 20px; /* Space from top */
-            margin-bottom: 20px; /* Space from bottom */
+            margin-top: 20px;
+            margin-bottom: 20px;
         }
 
         header {
@@ -90,7 +90,7 @@
             border-radius: 50%;
             width: 80px;
             height: 80px;
-            line-height: 60px; /* Adjust for vertical centering */
+            line-height: 60px;
             box-shadow: 0 4px 15px rgba(255, 126, 95, 0.4);
         }
 
@@ -184,13 +184,13 @@
         }
 
         .button-style:hover, .file-input-label:hover {
-            background-position: right center; /* change the direction of the change here */
+            background-position: right center;
             box-shadow: 0 6px 15px rgba(255, 126, 95, 0.5);
             transform: translateY(-2px);
         }
 
         .file-input-label span, .copy-button span {
-            margin-left: 5px; /* Space for icon if added */
+            margin-left: 5px;
         }
 
         .copy-button {
@@ -213,10 +213,9 @@
             margin-top: 10px;
         }
 
-        /* Loader styles */
         .loader {
-            border: 5px solid #f3f3f3; /* Light grey */
-            border-top: 5px solid var(--primary-color); /* Blue */
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -230,8 +229,8 @@
         }
 
         .error-message {
-            color: #D8000C; /* Error red */
-            background-color: #FFD2D2; /* Light red background */
+            color: #D8000C;
+            background-color: #FFD2D2;
             border: 1px solid #D8000C;
             padding: 10px;
             border-radius: var(--border-radius);
@@ -239,18 +238,117 @@
             text-align: center;
         }
 
+        /* --- Quizizz AI Toolkit Section Styles --- */
+        .toolkit-section {
+            background-color: #e6eafc; /* Light, friendly blue */
+            padding: 30px;
+            margin-top: 40px; /* Space above this section */
+            margin-bottom: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+            text-align: center;
+        }
+
+        .toolkit-section h2 {
+            font-size: 2rem;
+            color: var(--primary-color); /* Use primary color for consistency */
+            margin-bottom: 10px;
+            border-bottom: none; /* Remove individual border, section is distinct */
+            text-align: center;
+            width: 100%;
+        }
+
+        .toolkit-section > p { /* Direct child p for the subtitle */
+            font-size: 1rem;
+            color: #4a5568; /* Softer text color */
+            margin-bottom: 30px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .toolkit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Min card width 200px */
+            gap: 25px; /* Increased gap */
+            text-align: left;
+        }
+
+        .toolkit-card-link {
+            text-decoration: none; /* Remove underline from link */
+            color: inherit; /* Inherit text color */
+            display: block; /* Make the link fill the grid cell */
+        }
+
+        .toolkit-card {
+            background: var(--card-bg);
+            padding: 25px 20px;
+            border-radius: var(--border-radius);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(110, 142, 251, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            height: 100%; /* Ensure cards in a row have same height */
+            cursor: pointer;
+        }
+
+        .toolkit-card:hover {
+            transform: translateY(-6px) scale(1.04);
+            box-shadow: var(--toolkit-card-hover-shadow);
+            border-color: var(--primary-color);
+        }
+
+        .toolkit-card-icon {
+            font-size: 2.8rem; /* Larger icons */
+            margin-bottom: 18px;
+            width: 70px;  /* Fixed width for icon container */
+            height: 70px; /* Fixed height for icon container */
+            border-radius: 50%;
+            display: flex; /* Use flex to center icon inside */
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: background 0.3s ease;
+        }
+
+        /* Vibrant icon backgrounds using nth-child for variety */
+        .toolkit-card:nth-child(6n+1) .toolkit-card-icon { background: linear-gradient(135deg, #ff7e5f, #feb47b); } /* Coral to Peach */
+        .toolkit-card:nth-child(6n+2) .toolkit-card-icon { background: linear-gradient(135deg, #6e8efb, #a777e3); } /* Blue to Purple */
+        .toolkit-card:nth-child(6n+3) .toolkit-card-icon { background: linear-gradient(135deg, #29b6f6, #00e5ff); } /* Light Blue to Cyan */
+        .toolkit-card:nth-child(6n+4) .toolkit-card-icon { background: linear-gradient(135deg, #ff5f6d, #ffc371); } /* Red to Orange */
+        .toolkit-card:nth-child(6n+5) .toolkit-card-icon { background: linear-gradient(135deg, #84fab0, #8fd3f4); } /* Green to Light Blue */
+        .toolkit-card:nth-child(6n+6) .toolkit-card-icon { background: linear-gradient(135deg, #ab47bc, #f48fb1); } /* Purple to Pink */
+
+
+        .toolkit-card-name {
+            font-size: 1rem; /* Slightly larger name */
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--text-color);
+        }
+
+        .toolkit-card:hover .toolkit-card-name {
+            color: var(--primary-color);
+        }
+        /* --- End Toolkit Section Styles --- */
+
         footer {
             margin-top: 40px;
             padding-top: 20px;
             border-top: 1px solid #eee;
             font-size: 0.9rem;
             color: #777;
+            text-align: center;
         }
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .container {
                 padding: 20px;
+                max-width: 100%;
             }
             header h1 {
                 font-size: 2rem;
@@ -258,12 +356,31 @@
             section h2 {
                 font-size: 1.5rem;
             }
+            .toolkit-section h2 {
+                font-size: 1.75rem;
+            }
             .button-style, .file-input-label {
                 padding: 10px 20px;
                 font-size: 0.9rem;
             }
             .file-drop-area {
                 padding: 20px;
+            }
+            .toolkit-grid {
+                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); /* Adjust for smaller screens */
+                gap: 15px;
+            }
+            .toolkit-card {
+                padding: 20px 15px;
+            }
+            .toolkit-card-icon {
+                font-size: 2.2rem;
+                width: 60px;
+                height: 60px;
+                margin-bottom: 12px;
+            }
+            .toolkit-card-name {
+                font-size: 0.9rem;
             }
         }
 
@@ -283,6 +400,14 @@
             .guidelines li {
                 font-size: 0.9rem;
             }
+            .toolkit-grid {
+                 grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); /* Smaller cards for very small screens */
+            }
+             .toolkit-card-icon {
+                font-size: 2rem;
+                width: 50px;
+                height: 50px;
+            }
         }
     </style>
 </head>
@@ -296,7 +421,7 @@
 
         <main>
             <section class="guidelines">
-                <h2>💡 How to Use:</h2>
+                <h2>💡 How to Use (PDF Extractor):</h2>
                 <ol>
                     <li><strong>Prepare Your PDF:</strong> Ensure your PDF contains selectable text (not just images of text).</li>
                     <li><strong>Upload:</strong> Click "Choose PDF" or drag & drop your file onto the area below.</li>
@@ -327,6 +452,17 @@
                     <span>📋 Copy Points</span>
                 </button>
             </section>
+
+            <!-- Quizizz AI Toolkit Section -->
+            <section class="toolkit-section">
+                <h2>🚀 Explore the Quizizz AI Toolkit</h2>
+                <p>Click any tool below to open it in a new window and supercharge your teaching & learning!</p>
+                <div class="toolkit-grid" id="quizizzToolkitGrid">
+                    <!-- Toolkit items will be dynamically inserted here by JavaScript -->
+                </div>
+            </section>
+            <!-- End Quizizz AI Toolkit Section -->
+
         </main>
 
         <footer>
@@ -360,7 +496,7 @@
                 const files = event.dataTransfer.files;
                 if (files.length > 0) {
                     if (files[0].type === "application/pdf") {
-                        pdfFileInput.files = files; // Assign dropped file to input
+                        pdfFileInput.files = files;
                         handleFile(files[0]);
                     } else {
                         showError("Please drop a PDF file.");
@@ -369,11 +505,10 @@
                 }
             });
             
-            // Trigger file input click when label is clicked
             fileDropArea.addEventListener('click', (event) => {
                 if (event.target.classList.contains('file-input-label') || event.target.parentElement.classList.contains('file-input-label')) {
-                    // Let the label's default action trigger the input
-                } else if (event.target !== pdfFileInput) { // Avoid re-triggering if input itself is somehow clicked
+                    // Default action
+                } else if (event.target !== pdfFileInput) {
                      pdfFileInput.click();
                 }
             });
@@ -394,7 +529,7 @@
                     return;
                 }
                 fileNameDisplay.textContent = `Selected: ${file.name}`;
-                outputText.value = ''; // Clear previous output
+                outputText.value = '';
                 copyButton.style.display = 'none';
                 hideError();
                 extractTextFromPdf(file);
@@ -402,7 +537,7 @@
             
             function resetUI() {
                 fileNameDisplay.textContent = "No file selected";
-                pdfFileInput.value = ''; // Clear the file input
+                pdfFileInput.value = '';
                 outputText.value = '';
                 copyButton.style.display = 'none';
                 hideError();
@@ -428,22 +563,19 @@
                     try {
                         const pdf = await pdfjsLib.getDocument({ data: typedarray }).promise;
                         let fullText = '';
-
                         for (let i = 1; i <= pdf.numPages; i++) {
                             const page = await pdf.getPage(i);
                             const textContent = await page.getTextContent();
                             textContent.items.forEach(item => {
-                                fullText += item.str + ' '; // Add space between text items
+                                fullText += item.str + ' ';
                             });
-                            fullText += '\n'; // Newline after each page's content
+                            fullText += '\n';
                         }
-                        
                         processTextForQuizizz(fullText);
-
                     } catch (error) {
                         console.error("Error parsing PDF:", error);
-                        showError("Could not process the PDF. It might be corrupted, encrypted, or image-based. Ensure it has selectable text.");
-                        outputText.placeholder = "Error processing PDF. Please try another file.";
+                        showError("Could not process the PDF. It might be corrupted, encrypted, or image-based.");
+                        outputText.placeholder = "Error processing PDF.";
                     } finally {
                         loader.style.display = 'none';
                     }
@@ -458,23 +590,13 @@
             }
 
             function processTextForQuizizz(rawText) {
-                // 1. Remove symbols: *, #, _
                 let cleanedText = rawText.replace(/[*#_]/g, '');
-
-                // 2. Normalize whitespace (multiple spaces/newlines to one)
                 cleanedText = cleanedText.replace(/\s\s+/g, ' ').trim();
-                
-                // 3. Split into potential points (sentences or lines)
                 const potentialPoints = cleanedText.split(/(?<=[.?!])\s+|\n+/);
-
                 let quizizzPoints = [];
                 potentialPoints.forEach(point => {
                     let trimmedPoint = point.trim();
-                    
-                    // Remove leading list-like markers (e.g., "1.", "a)", "- ")
                     trimmedPoint = trimmedPoint.replace(/^(\d+\.|[a-zA-Z]\)|\-\s*)/, '').trim();
-
-                    // Basic filter: not too short, not too long.
                     if (trimmedPoint.length > 5 && trimmedPoint.length < 200) { 
                         trimmedPoint = trimmedPoint.replace(/[^\w\s,.?!'"()-]/g, ''); 
                         quizizzPoints.push(trimmedPoint);
@@ -482,21 +604,20 @@
                 });
 
                 if (quizizzPoints.length > 0) {
-                    outputText.value = quizizzPoints.join('\n'); // Each point on a new line
+                    outputText.value = quizizzPoints.join('\n');
                     copyButton.style.display = 'block';
                     outputText.placeholder = "Your extracted points will appear here...";
                 } else {
                     outputText.value = '';
-                    outputText.placeholder = "No suitable points found. Try a different PDF or check its content.";
-                    showError("No suitable points extracted. The PDF might have very short text, non-standard formatting, or mostly images.");
+                    outputText.placeholder = "No suitable points found.";
+                    showError("No suitable points extracted. Check PDF content or formatting.");
                     copyButton.style.display = 'none';
                 }
             }
 
             copyButton.addEventListener('click', () => {
                 outputText.select();
-                outputText.setSelectionRange(0, 99999); // For mobile devices
-
+                outputText.setSelectionRange(0, 99999);
                 try {
                     document.execCommand('copy');
                     const originalText = copyButton.textContent;
@@ -506,9 +627,59 @@
                     }, 1500);
                 } catch (err) {
                     console.error('Failed to copy text: ', err);
-                    alert('Failed to copy. Please manually select and copy the text.');
+                    alert('Failed to copy. Please manually select and copy.');
                 }
             });
+
+            // --- Quizizz AI Toolkit Population ---
+            const quizizzTools = [
+                { name: "Multiple Choice Quiz Generator", url: "https://quizizz.com/ai-toolkit/multiple-choice-quiz-generator", icon: "❓" },
+                { name: "Practice Worksheet Generator", url: "https://quizizz.com/ai-toolkit/practice-worksheet-generator", icon: "📝" },
+                { name: "Reading Passage Generator", url: "https://quizizz.com/ai-toolkit/reading-passage-generator", icon: "📖" },
+                { name: "Math Word Problems Generator", url: "https://quizizz.com/ai-toolkit/math-word-problems-generator", icon: "📐" },
+                { name: "Story Based Problems Quiz Generator", url: "https://quizizz.com/ai-toolkit/story-based-problems-quiz-generator", icon: "📚" },
+                { name: "Bloom's Taxonomy Aligned Quiz", url: "https://quizizz.com/ai-toolkit/blooms-taxonomy-aligned-quiz-generator", icon: "🧠" },
+                { name: "Real World Scenario Quiz Generator", url: "https://quizizz.com/ai-toolkit/real-world-scenario-quiz-generator", icon: "🌍" },
+                { name: "Lesson Plan Generator", url: "https://quizizz.com/ai-toolkit/lesson-plan-generator", icon: "📅" },
+                { name: "Classroom Activity Plan Generator", url: "https://quizizz.com/ai-toolkit/classroom-activity-plan-generator", icon: "🎉" },
+                { name: "Evaluation Rubric Generator", url: "https://quizizz.com/ai-toolkit/evaluation-rubric-generator", icon: "✔️" },
+                { name: "Grade Level Adjuster", url: "https://quizizz.com/ai-toolkit/grade-level-adjuster", icon: "📊" },
+                { name: "Content Translator", url: "https://quizizz.com/ai-toolkit/content-translator", icon: "🌐" },
+                { name: "Email Generator for Teachers", url: "https://quizizz.com/ai-toolkit/email-generator-for-teachers", icon: "📧" },
+                { name: "Student Feedback Report Generator", url: "https://quizizz.com/ai-toolkit/student-feedback-report-generator", icon: "🗣️" },
+                { name: "AI Assignment Grader", url: "https://quizizz.com/ai-toolkit/ai-assignment-grader", icon: "💯" }
+            ];
+
+            function populateToolkitGrid() {
+                const gridContainer = document.getElementById('quizizzToolkitGrid');
+                if (!gridContainer) return;
+
+                quizizzTools.forEach(tool => {
+                    const cardLink = document.createElement('a');
+                    cardLink.href = tool.url;
+                    cardLink.target = "_blank";
+                    cardLink.rel = "noopener noreferrer";
+                    cardLink.classList.add('toolkit-card-link');
+
+                    const cardDiv = document.createElement('div');
+                    cardDiv.classList.add('toolkit-card');
+
+                    const iconSpan = document.createElement('span');
+                    iconSpan.classList.add('toolkit-card-icon');
+                    iconSpan.textContent = tool.icon;
+
+                    const nameParagraph = document.createElement('p');
+                    nameParagraph.classList.add('toolkit-card-name');
+                    nameParagraph.textContent = tool.name;
+
+                    cardDiv.appendChild(iconSpan);
+                    cardDiv.appendChild(nameParagraph);
+                    cardLink.appendChild(cardDiv);
+                    gridContainer.appendChild(cardLink);
+                });
+            }
+
+            populateToolkitGrid(); // Call the function to build the toolkit grid
         });
     </script>
 </body>
