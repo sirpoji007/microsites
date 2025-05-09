@@ -3,268 +3,287 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF to Quizizz Points Converter</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- PDF.js -->
+    <title>QuizPoint Extractor - PDF to Quizizz Points</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://sirpoji007.github.io/microsites/SPQuizizzTool2_20250510_045954_0000.png">
+
+    <!-- Social Media Meta Tags (Open Graph for Facebook, WhatsApp, etc.) -->
+    <meta property="og:title" content="QuizPoint Extractor - PDF to Quizizz Points">
+    <meta property="og:description" content="Upload PDF learning materials and get Quizizz-ready points, optimized for AI!">
+    <meta property="og:image" content="https://sirpoji007.github.io/microsites/SPQuizizzTool2_20250510_045954_0000.png">
+    <meta property="og:image:width" content="1200"> <!-- Optional: Specify image dimensions -->
+    <meta property="og:image:height" content="630">  <!-- Optional: Specify image dimensions -->
+    <meta property="og:url" content="https://sirpoji007.github.io/microsites/quizizz-tools-2.html"> <!-- IMPORTANT: Replace with actual URL when hosted -->
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="QuizPoint Extractor - PDF to Quizizz Points">
+    <meta name="twitter:description" content="Upload PDF learning materials and get Quizizz-ready points, optimized for AI!">
+    <meta name="twitter:image" content="https://sirpoji007.github.io/microsites/SPQuizizzTool2_20250510_045954_0000.png">
+    <!-- <meta name="twitter:site" content="@YourTwitterHandle"> --> <!-- Optional: Your Twitter handle -->
+
+    <!-- PDF.js library from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
     <script>
+        // Required by PDF.js
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
     </script>
+
     <style>
-        /* quizizz-helper.css content inlined */
-        /* quizizz-helper.css content inlined */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
-:root {
-    --primary-color: #6e8efb;
-    --secondary-color: #a777e3;
-    --accent-color: #ff7e5f;
-    --text-color: #333;
-    --bg-color: #f4f7f6;
-    --card-bg: #ffffff;
-    --border-radius: 12px;
-    --box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-}
+        :root {
+            --primary-color: #6e8efb;
+            --secondary-color: #a777e3;
+            --accent-color: #ff7e5f;
+            --text-color: #333;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-body {
-    font-family: 'Poppins', sans-serif;
-    background-color: var(--bg-color);
-    background-image: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    color: var(--text-color);
-    line-height: 1.6;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    padding: 20px;
-}
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            background-image: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top for scroll */
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-.container {
-    background-color: var(--card-bg);
-    padding: 30px 40px;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    width: 100%;
-    max-width: 800px;
-    text-align: center;
-    margin-top: 20px;
-    margin-bottom: 20px;
-}
+        .container {
+            background-color: var(--card-bg);
+            padding: 30px 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            margin-top: 20px; /* Space from top */
+            margin-bottom: 20px; /* Space from bottom */
+        }
 
-header {
-    margin-bottom: 30px;
-}
+        header {
+            margin-bottom: 30px;
+        }
 
-.logo-avatar {
-    font-size: 3rem;
-    margin-bottom: 10px;
-    display: inline-block;
-    padding: 10px;
-    background: linear-gradient(45deg, var(--accent-color), #feca57);
-    color: white;
-    border-radius: 50%;
-    width: 80px;
-    height: 80px;
-    line-height: 60px;
-    box-shadow: 0 4px 15px rgba(255, 126, 95, 0.4);
-}
+        .logo-avatar {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            display: inline-block;
+            padding: 10px;
+            background: linear-gradient(45deg, var(--accent-color), #feca57);
+            color: white;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            line-height: 60px; /* Adjust for vertical centering */
+            box-shadow: 0 4px 15px rgba(255, 126, 95, 0.4);
+        }
 
-header h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    margin-bottom: 5px;
-}
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
 
-header p {
-    font-size: 1.1rem;
-    color: #555;
-}
+        header p {
+            font-size: 1.1rem;
+            color: #555;
+        }
 
-section {
-    background-color: #f9f9f9;
-    padding: 25px;
-    margin-bottom: 30px;
-    border-radius: var(--border-radius);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    text-align: left;
-}
+        section {
+            background-color: #f9f9f9;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: left;
+        }
 
-section h2 {
-    font-size: 1.8rem;
-    color: var(--secondary-color);
-    margin-bottom: 15px;
-    border-bottom: 2px solid var(--primary-color);
-    padding-bottom: 8px;
-    display: inline-block;
-}
+        section h2 {
+            font-size: 1.8rem;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 8px;
+            display: inline-block;
+        }
 
-.guidelines ol {
-    list-style-position: inside;
-    padding-left: 0;
-}
+        .guidelines ol {
+            list-style-position: inside;
+            padding-left: 0;
+        }
 
-.guidelines li {
-    margin-bottom: 8px;
-    font-size: 0.95rem;
-}
+        .guidelines li {
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
 
-.guidelines strong {
-    color: var(--primary-color);
-}
+        .guidelines strong {
+            color: var(--primary-color);
+        }
 
-.file-drop-area {
-    border: 3px dashed var(--primary-color);
-    border-radius: var(--border-radius);
-    padding: 30px;
-    text-align: center;
-    transition: background-color 0.3s ease;
-    background-color: #eef2f7;
-}
+        .file-drop-area {
+            border: 3px dashed var(--primary-color);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            text-align: center;
+            transition: background-color 0.3s ease;
+            background-color: #eef2f7;
+        }
 
-.file-drop-area.dragover {
-    background-color: #d9e4f1;
-    border-style: solid;
-}
+        .file-drop-area.dragover {
+            background-color: #d9e4f1;
+            border-style: solid;
+        }
 
-.file-msg {
-    display: block;
-    margin-bottom: 15px;
-    font-size: 1rem;
-    color: #666;
-}
+        .file-msg {
+            display: block;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            color: #666;
+        }
 
-.file-name-display {
-    margin-top: 15px;
-    font-style: italic;
-    color: #555;
-    font-size: 0.9rem;
-}
+        .file-name-display {
+            margin-top: 15px;
+            font-style: italic;
+            color: #555;
+            font-size: 0.9rem;
+        }
 
-.button-style, .file-input-label {
-    display: inline-block;
-    background-image: linear-gradient(to right, var(--accent-color) 0%, #feca57 51%, var(--accent-color) 100%);
-    background-size: 200% auto;
-    color: white;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.4s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    box-shadow: 0 4px 10px rgba(255, 126, 95, 0.3);
-}
+        .button-style, .file-input-label {
+            display: inline-block;
+            background-image: linear-gradient(to right, var(--accent-color) 0%, #feca57 51%, var(--accent-color) 100%);
+            background-size: 200% auto;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 10px rgba(255, 126, 95, 0.3);
+        }
 
-.button-style:hover, .file-input-label:hover {
-    background-position: right center;
-    box-shadow: 0 6px 15px rgba(255, 126, 95, 0.5);
-    transform: translateY(-2px);
-}
+        .button-style:hover, .file-input-label:hover {
+            background-position: right center; /* change the direction of the change here */
+            box-shadow: 0 6px 15px rgba(255, 126, 95, 0.5);
+            transform: translateY(-2px);
+        }
 
-.file-input-label span, .copy-button span {
-    margin-left: 5px;
-}
+        .file-input-label span, .copy-button span {
+            margin-left: 5px; /* Space for icon if added */
+        }
 
-.copy-button {
-    margin-top: 15px;
-    display: block;
-    width: auto;
-    margin-left: auto;
-    margin-right: auto;
-}
+        .copy-button {
+            margin-top: 15px;
+            display: block;
+            width: auto;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
-#outputText {
-    width: 100%;
-    padding: 15px;
-    border-radius: var(--border-radius);
-    border: 1px solid #ddd;
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.95rem;
-    background-color: #fff;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
-    margin-top: 10px;
-}
+        #outputText {
+            width: 100%;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            border: 1px solid #ddd;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            background-color: #fff;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+            margin-top: 10px;
+        }
 
-.loader {
-    border: 5px solid #f3f3f3;
-    border-top: 5px solid var(--primary-color);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-    margin: 20px auto;
-}
+        /* Loader styles */
+        .loader {
+            border: 5px solid #f3f3f3; /* Light grey */
+            border-top: 5px solid var(--primary-color); /* Blue */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-.error-message {
-    color: #D8000C;
-    background-color: #FFD2D2;
-    border: 1px solid #D8000C;
-    padding: 10px;
-    border-radius: var(--border-radius);
-    margin-top: 15px;
-    text-align: center;
-}
+        .error-message {
+            color: #D8000C; /* Error red */
+            background-color: #FFD2D2; /* Light red background */
+            border: 1px solid #D8000C;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            margin-top: 15px;
+            text-align: center;
+        }
 
-footer {
-    margin-top: 40px;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
-    font-size: 0.9rem;
-    color: #777;
-}
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 0.9rem;
+            color: #777;
+        }
 
-@media (max-width: 768px) {
-    .container {
-        padding: 20px;
-    }
-    header h1 {
-        font-size: 2rem;
-    }
-    section h2 {
-        font-size: 1.5rem;
-    }
-    .button-style, .file-input-label {
-        padding: 10px 20px;
-        font-size: 0.9rem;
-    }
-    .file-drop-area {
-        padding: 20px;
-    }
-}
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            header h1 {
+                font-size: 2rem;
+            }
+            section h2 {
+                font-size: 1.5rem;
+            }
+            .button-style, .file-input-label {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            .file-drop-area {
+                padding: 20px;
+            }
+        }
 
-@media (max-width: 480px) {
-    header h1 {
-        font-size: 1.8rem;
-    }
-    .logo-avatar {
-        font-size: 2.5rem;
-        width: 60px;
-        height: 60px;
-        line-height: 40px;
-    }
-    section {
-        padding: 15px;
-    }
-    .guidelines li {
-        font-size: 0.9rem;
-    }
-}
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+            .logo-avatar {
+                font-size: 2.5rem;
+                width: 60px;
+                height: 60px;
+                line-height: 40px;
+            }
+            section {
+                padding: 15px;
+            }
+            .guidelines li {
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -311,197 +330,186 @@ footer {
         </main>
 
         <footer>
-            <p>SirPoji 2025 &copy; All rights reserved</p>
+            <p>SirPoji 2025 © All rights reserved</p>
         </footer>
     </div>
 
     <script>
-        // quizizz-helper.js content inlined
         document.addEventListener('DOMContentLoaded', () => {
-    const pdfFileInput = document.getElementById('pdfFile');
-    const fileDropArea = document.querySelector('.file-drop-area');
-    const fileNameDisplay = document.getElementById('fileNameDisplay');
-    const outputText = document.getElementById('outputText');
-    const copyButton = document.getElementById('copyButton');
-    const loader = document.getElementById('loader');
-    const errorMessage = document.getElementById('error-message');
+            const pdfFileInput = document.getElementById('pdfFile');
+            const fileDropArea = document.querySelector('.file-drop-area');
+            const fileNameDisplay = document.getElementById('fileNameDisplay');
+            const outputText = document.getElementById('outputText');
+            const copyButton = document.getElementById('copyButton');
+            const loader = document.getElementById('loader');
+            const errorMessage = document.getElementById('error-message');
 
-    // --- File Drop Area Logic ---
-    fileDropArea.addEventListener('dragover', (event) => {
-        event.preventDefault();
-        fileDropArea.classList.add('dragover');
-    });
+            // --- File Drop Area Logic ---
+            fileDropArea.addEventListener('dragover', (event) => {
+                event.preventDefault();
+                fileDropArea.classList.add('dragover');
+            });
 
-    fileDropArea.addEventListener('dragleave', () => {
-        fileDropArea.classList.remove('dragover');
-    });
+            fileDropArea.addEventListener('dragleave', () => {
+                fileDropArea.classList.remove('dragover');
+            });
 
-    fileDropArea.addEventListener('drop', (event) => {
-        event.preventDefault();
-        fileDropArea.classList.remove('dragover');
-        const files = event.dataTransfer.files;
-        if (files.length > 0) {
-            if (files[0].type === "application/pdf") {
-                pdfFileInput.files = files; // Assign dropped file to input
-                handleFile(files[0]);
-            } else {
-                showError("Please drop a PDF file.");
-                resetUI();
-            }
-        }
-    });
-    
-    // Trigger file input click when label is clicked
-    fileDropArea.addEventListener('click', (event) => {
-        if (event.target.classList.contains('file-input-label') || event.target.parentElement.classList.contains('file-input-label')) {
-            // Let the label's default action trigger the input
-        } else if (event.target !== pdfFileInput) { // Avoid re-triggering if input itself is somehow clicked
-             pdfFileInput.click();
-        }
-    });
-
-    pdfFileInput.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            handleFile(file);
-        } else {
-            resetUI();
-        }
-    });
-
-    function handleFile(file) {
-        if (file.type !== "application/pdf") {
-            showError("Invalid file type. Please upload a PDF.");
-            resetUI();
-            return;
-        }
-        fileNameDisplay.textContent = `Selected: ${file.name}`;
-        outputText.value = ''; // Clear previous output
-        copyButton.style.display = 'none';
-        hideError();
-        extractTextFromPdf(file);
-    }
-    
-    function resetUI() {
-        fileNameDisplay.textContent = "No file selected";
-        pdfFileInput.value = ''; // Clear the file input
-        outputText.value = '';
-        copyButton.style.display = 'none';
-        hideError();
-    }
-
-    function showError(message) {
-        errorMessage.textContent = message;
-        errorMessage.style.display = 'block';
-    }
-
-    function hideError() {
-        errorMessage.style.display = 'none';
-    }
-
-    async function extractTextFromPdf(file) {
-        loader.style.display = 'block';
-        outputText.placeholder = "Processing your PDF... please wait.";
-        hideError();
-
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            const typedarray = new Uint8Array(e.target.result);
-            try {
-                const pdf = await pdfjsLib.getDocument({ data: typedarray }).promise;
-                let fullText = '';
-
-                for (let i = 1; i <= pdf.numPages; i++) {
-                    const page = await pdf.getPage(i);
-                    const textContent = await page.getTextContent();
-                    textContent.items.forEach(item => {
-                        fullText += item.str + ' '; // Add space between text items
-                    });
-                    fullText += '\n'; // Newline after each page's content
+            fileDropArea.addEventListener('drop', (event) => {
+                event.preventDefault();
+                fileDropArea.classList.remove('dragover');
+                const files = event.dataTransfer.files;
+                if (files.length > 0) {
+                    if (files[0].type === "application/pdf") {
+                        pdfFileInput.files = files; // Assign dropped file to input
+                        handleFile(files[0]);
+                    } else {
+                        showError("Please drop a PDF file.");
+                        resetUI();
+                    }
                 }
-                
-                processTextForQuizizz(fullText);
-
-            } catch (error) {
-                console.error("Error parsing PDF:", error);
-                showError("Could not process the PDF. It might be corrupted, encrypted, or image-based. Ensure it has selectable text.");
-                outputText.placeholder = "Error processing PDF. Please try another file.";
-            } finally {
-                loader.style.display = 'none';
-            }
-        };
-        reader.onerror = () => {
-            console.error("File reading error");
-            showError("Error reading the file.");
-            loader.style.display = 'none';
-            outputText.placeholder = "Error reading file.";
-        };
-        reader.readAsArrayBuffer(file);
-    }
-
-    function processTextForQuizizz(rawText) {
-        // 1. Remove symbols: *, #, _
-        let cleanedText = rawText.replace(/[*#_]/g, '');
-
-        // 2. Normalize whitespace (multiple spaces/newlines to one)
-        cleanedText = cleanedText.replace(/\s\s+/g, ' ').trim();
-        
-        // 3. Split into potential points (sentences or lines)
-        //    This is a heuristic. Might need refinement based on typical PDF structures.
-        //    Let's try splitting by periods followed by a space or newline,
-        //    question marks, exclamation marks, and newlines if they seem significant.
-        const potentialPoints = cleanedText.split(/(?<=[.?!])\s+|\n+/);
-
-        let quizizzPoints = [];
-        potentialPoints.forEach(point => {
-            let trimmedPoint = point.trim();
+            });
             
-            // Remove leading list-like markers (e.g., "1.", "a)", "- ")
-            trimmedPoint = trimmedPoint.replace(/^(\d+\.|[a-zA-Z]\)|\-\s*)/, '').trim();
+            // Trigger file input click when label is clicked
+            fileDropArea.addEventListener('click', (event) => {
+                if (event.target.classList.contains('file-input-label') || event.target.parentElement.classList.contains('file-input-label')) {
+                    // Let the label's default action trigger the input
+                } else if (event.target !== pdfFileInput) { // Avoid re-triggering if input itself is somehow clicked
+                     pdfFileInput.click();
+                }
+            });
 
-            // Basic filter: not too short, not too long.
-            // Quizizz AI works best with concise statements.
-            // Max length for a Quizizz question/answer is typically around 100-200 chars.
-            // Let's aim for points under ~150 characters.
-            if (trimmedPoint.length > 5 && trimmedPoint.length < 200) { 
-                // Further ensure no unwanted characters remain if any slip through.
-                // This regex removes any character that is NOT a letter, number, common punctuation (,.?!'-), or space.
-                // It helps ensure plain text.
-                trimmedPoint = trimmedPoint.replace(/[^\w\s,.?!'"()-]/g, ''); 
-                quizizzPoints.push(trimmedPoint);
+            pdfFileInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    handleFile(file);
+                } else {
+                    resetUI();
+                }
+            });
+
+            function handleFile(file) {
+                if (file.type !== "application/pdf") {
+                    showError("Invalid file type. Please upload a PDF.");
+                    resetUI();
+                    return;
+                }
+                fileNameDisplay.textContent = `Selected: ${file.name}`;
+                outputText.value = ''; // Clear previous output
+                copyButton.style.display = 'none';
+                hideError();
+                extractTextFromPdf(file);
             }
+            
+            function resetUI() {
+                fileNameDisplay.textContent = "No file selected";
+                pdfFileInput.value = ''; // Clear the file input
+                outputText.value = '';
+                copyButton.style.display = 'none';
+                hideError();
+            }
+
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+            }
+
+            function hideError() {
+                errorMessage.style.display = 'none';
+            }
+
+            async function extractTextFromPdf(file) {
+                loader.style.display = 'block';
+                outputText.placeholder = "Processing your PDF... please wait.";
+                hideError();
+
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const typedarray = new Uint8Array(e.target.result);
+                    try {
+                        const pdf = await pdfjsLib.getDocument({ data: typedarray }).promise;
+                        let fullText = '';
+
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const textContent = await page.getTextContent();
+                            textContent.items.forEach(item => {
+                                fullText += item.str + ' '; // Add space between text items
+                            });
+                            fullText += '\n'; // Newline after each page's content
+                        }
+                        
+                        processTextForQuizizz(fullText);
+
+                    } catch (error) {
+                        console.error("Error parsing PDF:", error);
+                        showError("Could not process the PDF. It might be corrupted, encrypted, or image-based. Ensure it has selectable text.");
+                        outputText.placeholder = "Error processing PDF. Please try another file.";
+                    } finally {
+                        loader.style.display = 'none';
+                    }
+                };
+                reader.onerror = () => {
+                    console.error("File reading error");
+                    showError("Error reading the file.");
+                    loader.style.display = 'none';
+                    outputText.placeholder = "Error reading file.";
+                };
+                reader.readAsArrayBuffer(file);
+            }
+
+            function processTextForQuizizz(rawText) {
+                // 1. Remove symbols: *, #, _
+                let cleanedText = rawText.replace(/[*#_]/g, '');
+
+                // 2. Normalize whitespace (multiple spaces/newlines to one)
+                cleanedText = cleanedText.replace(/\s\s+/g, ' ').trim();
+                
+                // 3. Split into potential points (sentences or lines)
+                const potentialPoints = cleanedText.split(/(?<=[.?!])\s+|\n+/);
+
+                let quizizzPoints = [];
+                potentialPoints.forEach(point => {
+                    let trimmedPoint = point.trim();
+                    
+                    // Remove leading list-like markers (e.g., "1.", "a)", "- ")
+                    trimmedPoint = trimmedPoint.replace(/^(\d+\.|[a-zA-Z]\)|\-\s*)/, '').trim();
+
+                    // Basic filter: not too short, not too long.
+                    if (trimmedPoint.length > 5 && trimmedPoint.length < 200) { 
+                        trimmedPoint = trimmedPoint.replace(/[^\w\s,.?!'"()-]/g, ''); 
+                        quizizzPoints.push(trimmedPoint);
+                    }
+                });
+
+                if (quizizzPoints.length > 0) {
+                    outputText.value = quizizzPoints.join('\n'); // Each point on a new line
+                    copyButton.style.display = 'block';
+                    outputText.placeholder = "Your extracted points will appear here...";
+                } else {
+                    outputText.value = '';
+                    outputText.placeholder = "No suitable points found. Try a different PDF or check its content.";
+                    showError("No suitable points extracted. The PDF might have very short text, non-standard formatting, or mostly images.");
+                    copyButton.style.display = 'none';
+                }
+            }
+
+            copyButton.addEventListener('click', () => {
+                outputText.select();
+                outputText.setSelectionRange(0, 99999); // For mobile devices
+
+                try {
+                    document.execCommand('copy');
+                    const originalText = copyButton.textContent;
+                    copyButton.textContent = 'Copied!';
+                    setTimeout(() => {
+                        copyButton.textContent = originalText;
+                    }, 1500);
+                } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                    alert('Failed to copy. Please manually select and copy the text.');
+                }
+            });
         });
-
-        if (quizizzPoints.length > 0) {
-            outputText.value = quizizzPoints.join('\n'); // Each point on a new line
-            copyButton.style.display = 'block';
-            outputText.placeholder = "Your extracted points will appear here...";
-        } else {
-            outputText.value = '';
-            outputText.placeholder = "No suitable points found. Try a different PDF or check its content.";
-            showError("No suitable points extracted. The PDF might have very short text, non-standard formatting, or mostly images.");
-            copyButton.style.display = 'none';
-        }
-    }
-
-    copyButton.addEventListener('click', () => {
-        outputText.select();
-        outputText.setSelectionRange(0, 99999); // For mobile devices
-
-        try {
-            document.execCommand('copy');
-            // Give feedback (optional, could be a small toast message)
-            const originalText = copyButton.textContent;
-            copyButton.textContent = 'Copied!';
-            setTimeout(() => {
-                copyButton.textContent = originalText;
-            }, 1500);
-        } catch (err) {
-            console.error('Failed to copy text: ', err);
-            alert('Failed to copy. Please manually select and copy the text.');
-        }
-    });
-});
     </script>
 </body>
 </html>
