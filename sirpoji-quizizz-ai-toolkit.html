@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizizz AI Toolkit with PDF Extraction</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script>
+        // Set PDF.js worker source
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+        
+        // Configure Tailwind with dark mode
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for the extracted text */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: rgba(93, 92, 222, 0.5);
+            border-radius: 8px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(93, 92, 222, 0.7);
+        }
+        
+        /* Dark mode scrollbar */
+        .dark .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+    <!-- Check for dark mode preference -->
+    <script>
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+    </script>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-primary mb-2">Quizizz AI Quiz Generator</h1>
+            <p class="text-gray-600 dark:text-gray-400">Upload your learning materials to extract content and generate quizzes</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- PDF Upload and Text Extraction Section -->
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4 text-primary">Upload Learning Materials</h2>
+                
+                <!-- File Upload -->
+                <div class="mb-6">
+                    <label for="pdfFile" class="block text-gray-700 dark:text-gray-300 mb-2">Select a PDF document</label>
+                    <input 
+                        type="file" 
+                        id="pdfFile" 
+                        accept=".pdf" 
+                        class="block w-full text-base file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-white file:bg-primary hover:file:bg-primary/90 dark:text-gray-300"
+                    >
+                </div>
+                
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium">Extracted Content</h3>
+                    <div class="space-x-2">
+                        <button 
+                            id="copyBtn" 
+                            disabled 
+                            class="px-3 py-1 text-sm bg-primary/10 text-primary rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Copy to clipboard"
+                        >
+                            Copy
+                        </button>
+                        <button 
+                            id="extractBtn" 
+                            disabled 
+                            class="px-3 py-1 text-sm bg-primary text-white rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Extract Text
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Loading Indicator -->
+                <div id="loadingIndicator" class="hidden mb-4 flex justify-center items-center space-x-2">
+                    <div class="w-4 h-4 rounded-full bg-primary animate-pulse"></div>
+                    <div class="w-4 h-4 rounded-full bg-primary animate-pulse" style="animation-delay: 0.2s"></div>
+                    <div class="w-4 h-4 rounded-full bg-primary animate-pulse" style="animation-delay: 0.4s"></div>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Processing PDF...</span>
+                </div>
+                
+                <!-- Text Display Area -->
+                <div 
+                    id="extractedTextContainer" 
+                    class="h-96 p-4 rounded-md bg-gray-100 dark:bg-gray-700 overflow-y-auto custom-scrollbar mb-4"
+                >
+                    <div id="extractedText" class="whitespace-pre-wrap text-gray-800 dark:text-gray-200">
+                        No content extracted yet. Upload a PDF and click "Extract Text".
+                    </div>
+                </div>
+                
+                <div class="flex justify-between">
+                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                        <span id="pageInfo">-</span>
+                    </div>
+                    <button 
+                        id="useInQuizizz" 
+                        disabled 
+                        class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Use in Quizizz
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Quizizz Embed Section -->
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4 text-primary">Quizizz AI Toolkit</h2>
+                <div id="quizizzContainer" class="w-full h-[600px] bg-gray-100 dark:bg-gray-700 rounded-md overflow-hidden">
+                    <iframe 
+                        id="quizizzFrame"
+                        src="https://quizizz.com/ai-toolkit/blooms-taxonomy-aligned-quiz-generator" 
+                        class="w-full h-full border-0"
+                        allowfullscreen
+                    ></iframe>
+                </div>
+                <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                    Use the extracted content from your PDF to generate quizzes aligned with Bloom's Taxonomy.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const pdfFileInput = document.getElementById('pdfFile');
+        const extractBtn = document.getElementById('extractBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const useInQuizizzBtn = document.getElementById('useInQuizizz');
+        const extractedText = document.getElementById('extractedText');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const pageInfo = document.getElementById('pageInfo');
+        const quizizzFrame = document.getElementById('quizizzFrame');
+        
+        // Variables to store PDF data
+        let extractedContent = '';
+        let optimizedContent = '';
+        let currentPdf = null;
+        
+        // Enable/disable extract button based on file selection
+        pdfFileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file && file.type === 'application/pdf') {
+                extractBtn.disabled = false;
+                currentPdf = file;
+            } else {
+                extractBtn.disabled = true;
+                if (file && file.type !== 'application/pdf') {
+                    alert('Please select a valid PDF file.');
+                    pdfFileInput.value = '';
+                }
+            }
+        });
+        
+        // Extract text from PDF
+        extractBtn.addEventListener('click', async function() {
+            if (!currentPdf) return;
+            
+            extractedText.textContent = 'Extracting content...';
+            loadingIndicator.classList.remove('hidden');
+            extractBtn.disabled = true;
+            
+            try {
+                const arrayBuffer = await readFileAsArrayBuffer(currentPdf);
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                
+                const numPages = pdf.numPages;
+                pageInfo.textContent = `PDF contains ${numPages} pages`;
+                
+                let fullText = '';
+                
+                // Extract text from each page
+                for (let i = 1; i <= numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    const pageText = textContent.items.map(item => item.str).join(' ');
+                    fullText += pageText + '\n\n';
+                }
+                
+                // Optimize the extracted text
+                optimizedContent = optimizeTextForQuizizz(fullText);
+                extractedContent = fullText;
+                
+                // Display the optimized content
+                extractedText.textContent = optimizedContent;
+                
+                // Enable buttons
+                copyBtn.disabled = false;
+                useInQuizizzBtn.disabled = false;
+            } catch (error) {
+                console.error('Error extracting PDF text:', error);
+                extractedText.textContent = 'Error extracting text from PDF. Please try a different file.';
+            } finally {
+                loadingIndicator.classList.add('hidden');
+                extractBtn.disabled = false;
+            }
+        });
+        
+        // Copy extracted text to clipboard
+        copyBtn.addEventListener('click', function() {
+            if (!optimizedContent) return;
+            
+            navigator.clipboard.writeText(optimizedContent)
+                .then(() => {
+                    const originalText = copyBtn.textContent;
+                    copyBtn.textContent = 'Copied!';
+                    setTimeout(() => {
+                        copyBtn.textContent = originalText;
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Failed to copy:', err);
+                });
+        });
+        
+        // Use extracted content in Quizizz
+        useInQuizizzBtn.addEventListener('click', function() {
+            if (!optimizedContent) return;
+            
+            // Focus the iframe to prepare for interaction
+            quizizzFrame.focus();
+            
+            // Alert the user to manually paste the content
+            alert('The optimized content has been copied to your clipboard. Please click in the Quizizz input field and paste the content (Ctrl+V or Command+V).');
+            
+            // Copy the content to clipboard
+            navigator.clipboard.writeText(optimizedContent)
+                .catch(err => {
+                    console.error('Failed to copy:', err);
+                });
+        });
+        
+        // Helper function to read file as ArrayBuffer
+        function readFileAsArrayBuffer(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    resolve(event.target.result);
+                };
+                reader.onerror = function(error) {
+                    reject(error);
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        }
+        
+        // Function to optimize extracted text for Quizizz
+        function optimizeTextForQuizizz(text) {
+            // Remove excess whitespace and newlines
+            let optimized = text.replace(/\s+/g, ' ').trim();
+            
+            // Split into paragraphs for better readability
+            optimized = optimized.replace(/\.\s+/g, '.\n\n');
+            
+            // Limit length (Quizizz might have input limits)
+            const maxLength = 5000;
+            if (optimized.length > maxLength) {
+                optimized = optimized.substring(0, maxLength) + '...';
+                optimized += '\n\n[Note: Content truncated due to length. Consider uploading a smaller document or selecting specific sections.]';
+            }
+            
+            // Add a small prefix to guide the AI
+            optimized = 'Create quiz questions based on the following educational content:\n\n' + optimized;
+            
+            return optimized;
+        }
+    </script>
+</body>
+</html>
