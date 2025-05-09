@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizizz AI Summary Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Custom styles if needed, though Tailwind should cover most */
+        body {
+            font-family: 'Inter', sans-serif; /* Using Inter font */
+        }
+        /* Style for the simple message box */
+        #messageBox {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        #messageBox.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 text-gray-800 p-6">
+
+    <div class="container mx-auto bg-white rounded-xl shadow-lg p-8 max-w-3xl">
+
+        <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">
+            <i class="fas fa-book-open text-blue-600 mr-3"></i>
+            Quizizz AI Summary Generator
+        </h1>
+
+        <div class="mb-8 p-6 bg-blue-100 rounded-lg border border-blue-300">
+            <h2 class="text-2xl font-semibold text-blue-700 mb-4">
+                <i class="fas fa-lightbulb mr-2"></i>
+                How to Use
+            </h2>
+            <ul class="list-disc list-inside text-blue-800 space-y-2">
+                <li>Click "Choose PDF File" to select your PDF learning material.</li>
+                <li>Ensure the file is in PDF format (.pdf).</li>
+                <li>Click "Generate Summary" to process the file.</li>
+                <li>The concise summary will appear below, optimized for Quizizz AI.</li>
+                <li>Copy the generated text and paste it directly into Quizizz AI.</li>
+                <li>The output is plain text, free of symbols like *, #, or _.</li>
+            </ul>
+        </div>
+
+        <div class="mb-8 text-center">
+            <label
+                for="file-upload"
+                class="inline-flex items-center px-6 py-3 bg-green-500 text-white font-semibold rounded-lg shadow-md cursor-pointer hover:bg-green-600 transition duration-300 ease-in-out"
+            >
+                <i class="fas fa-file-upload mr-3"></i>
+                Choose PDF File
+            </label>
+            <input
+                id="file-upload"
+                type="file"
+                accept=".pdf"
+                class="hidden"
+            />
+            <p id="selected-file-name" class="mt-4 text-gray-700 hidden">Selected file: <span class="font-semibold"></span></p>
+            <p id="error-message" class="mt-4 text-red-600 font-semibold hidden"></p>
+        </div>
+
+        <div class="text-center mb-8">
+            <button
+                id="process-button"
+                class="px-8 py-4 text-xl font-bold text-white rounded-lg shadow-lg transition duration-300 ease-in-out bg-gray-400 cursor-not-allowed"
+                disabled
+            >
+                Generate Summary
+            </button>
+        </div>
+
+        <div id="loading-indicator" class="text-center text-gray-600 font-semibold mb-4 hidden">
+            <i class="fas fa-spinner fa-spin mr-2"></i> Processing...
+        </div>
+
+        <div id="summary-output-section" class="mb-8 p-6 bg-gray-100 rounded-lg border border-gray-300 hidden">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">
+                <i class="fas fa-list-check mr-2"></i>
+                Generated Summary (for Quizizz AI)
+            </h2>
+            <pre id="summary-text" class="whitespace-pre-wrap break-words text-gray-800 bg-white p-4 rounded border border-gray-400 text-sm leading-relaxed"></pre>
+            <div class="text-center mt-4">
+                <button
+                    id="copy-summary-button"
+                    class="px-6 py-3 bg-teal-500 text-white font-semibold rounded-lg shadow-md hover:bg-teal-600 transition duration-300 ease-in-out"
+                >
+                    Copy Summary
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="messageBox"></div>
+
+    <script>
+        // Get references to HTML elements
+        const fileUpload = document.getElementById('file-upload');
+        const selectedFileName = document.getElementById('selected-file-name').querySelector('span');
+        const selectedFileNameContainer = document.getElementById('selected-file-name');
+        const errorMessage = document.getElementById('error-message');
+        const processButton = document.getElementById('process-button');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const summaryOutputSection = document.getElementById('summary-output-section');
+        const summaryText = document.getElementById('summary-text');
+        const copySummaryButton = document.getElementById('copy-summary-button');
+        const messageBox = document.getElementById('messageBox');
+
+        let selectedFile = null; // Variable to store the selected file
+
+        // Function to show a simple message box
+        function showMessage(message, duration = 3000) {
+            messageBox.textContent = message;
+            messageBox.classList.add('show');
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, duration);
+        }
+
+        // Handle file selection
+        fileUpload.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+
+            // Reset previous states
+            selectedFile = null;
+            selectedFileNameContainer.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+            processButton.disabled = true;
+            processButton.classList.remove('bg-indigo-600', 'hover:bg-indigo-700', 'cursor-pointer');
+            processButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+            summaryOutputSection.classList.add('hidden');
+            summaryText.textContent = '';
+
+            if (file) {
+                if (file.type === 'application/pdf') {
+                    selectedFile = file;
+                    selectedFileName.textContent = file.name;
+                    selectedFileNameContainer.classList.remove('hidden');
+                    processButton.disabled = false;
+                    processButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                    processButton.classList.add('bg-indigo-600', 'hover:bg-indigo-700', 'cursor-pointer');
+                } else {
+                    errorMessage.textContent = 'Please select a valid PDF file.';
+                    errorMessage.classList.remove('hidden');
+                }
+            }
+        });
+
+        // Handle the process button click
+        processButton.addEventListener('click', async () => {
+            if (!selectedFile) {
+                errorMessage.textContent = 'Please upload a PDF file first.';
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+
+            // Hide error message and previous summary
+            errorMessage.classList.add('hidden');
+            summaryOutputSection.classList.add('hidden');
+            summaryText.textContent = '';
+
+            // Show loading indicator
+            loadingIndicator.classList.remove('hidden');
+            processButton.disabled = true; // Disable button during processing
+
+            // --- Placeholder for backend processing ---
+            // In a real application, you would send the 'selectedFile'
+            // to a backend server here for processing (parsing PDF, summarizing, etc.).
+            // The backend would return the plain text summary.
+            //
+            // Example of sending file to a hypothetical API endpoint:
+            /*
+            const formData = new FormData();
+            formData.append('pdfFile', selectedFile);
+
+            try {
+              const response = await fetch('/api/summarize-pdf', { // Replace with your backend endpoint
+                method: 'POST',
+                body: formData,
+              });
+
+              if (!response.ok) {
+                throw new Error('Failed to process PDF.');
+              }
+
+              const data = await response.json(); // Assuming backend returns JSON with a 'summary' field
+              displaySummary(data.summary); // Call a function to display the summary
+
+            } catch (err) {
+              errorMessage.textContent = 'Error processing file: ' + err.message;
+              errorMessage.classList.remove('hidden');
+            } finally {
+              loadingIndicator.classList.add('hidden');
+              processButton.disabled = false; // Re-enable button
+            }
+            */
+
+            // --- Simulate processing for demonstration ---
+            // Remove this simulation code when integrating with a backend
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate network delay
+
+            const simulatedSummary = `Key Points from ${selectedFile.name}:
+
+Learning materials cover Topic 1.
+Important concept is Concept A explained on page X.
+Another key area is Topic 2.
+Detail about Detail B found in section Y.
+Quizizz AI optimization notes Note 1.
+Summary points are designed for brevity Note 2.
+No special characters used for compatibility Note 3.
+Focus on core information Note 4.
+Review Section Z for key definitions.
+Final point on Topic 3.
+`;
+            displaySummary(simulatedSummary.trim());
+            loadingIndicator.classList.add('hidden');
+            processButton.disabled = false; // Re-enable button
+            // --- End Simulation ---
+        });
+
+        // Function to display the generated summary
+        function displaySummary(summary) {
+            summaryText.textContent = summary;
+            summaryOutputSection.classList.remove('hidden');
+        }
+
+        // Handle copying summary to clipboard
+        copySummaryButton.addEventListener('click', () => {
+            if (summaryText.textContent) {
+                navigator.clipboard.writeText(summaryText.textContent).then(() => {
+                    showMessage('Summary copied to clipboard!');
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                    showMessage('Failed to copy summary.');
+                });
+            }
+        });
+
+    </script>
+
+</body>
+</html>
+
