@@ -559,7 +559,7 @@
 
                 const reader = new FileReader();
                 reader.onload = async (e) => {
-                    const typedarray = new Uint8Array(e.target.result);
+                    const typedarra7y = new Uint8Array(e.target.result);
                     try {
                         const pdf = await pdfjsLib.getDocument({ data: typedarray }).promise;
                         let fullText = '';
@@ -589,47 +589,116 @@
                 reader.readAsArrayBuffer(file);
             }
 
-            function processTextForQuizizz(rawText) {
-                let cleanedText = rawText.replace(/[*#_]/g, '');
-                cleanedText = cleanedText.replace(/\s\s+/g, ' ').trim();
-                const potentialPoints = cleanedText.split(/(?<=[.?!])\s+|\n+/);
-                let quizizzPoints = [];
-                potentialPoints.forEach(point => {
-                    let trimmedPoint = point.trim();
-                    trimmedPoint = trimmedPoint.replace(/^(\d+\.|[a-zA-Z]\)|\-\s*)/, '').trim();
-                    if (trimmedPoint.length > 5 && trimmedPoint.length < 200) { 
-                        trimmedPoint = trimmedPoint.replace(/[^\w\s,.?!'"()-]/g, ''); 
-                        quizizzPoints.push(trimmedPoint);
+            // (Keep the rest of your script.js code as is, only replace this function)
+
+function processTextForQuizizz(rawText) {
+    const MAX_POINT_LENGTH = 140; // Max chars per point (Quizizz AI likes concise points)
+    const MIN_POINT_LENGTH = 10;  // Min chars per point to be useful
+
+    // 1. Initial Cleaning: Remove specified symbols and normalize basic whitespace
+    let cleanedText = rawText.replace(/[*#_]/g, '');
+    cleanedText = cleanedText.replace(/(\r\n|\r|\n){2,}/g, '\n'); // Normalize multiple newlines to one
+    cleanedText = cleanedText.replace(/\s\s+/g, ' ').trim(); // Normalize multiple spaces to one
+
+    // 2. Primary Split: By sentence terminators and newlines
+    //    Regex: (?<=[.?!])\s+ looks for a space after a period, question mark, or exclamation mark.
+    //    |\n+ splits by one or more newlines.
+    const primarySegments = cleanedText.split(/(?<=[.?!])\s+(?=[A-ZÀ-ÖØ-Þ])|\n+/);
+    // The positive lookahead (?=[A-ZÀ-ÖØ-Þ]) ensures we only split if the next char is uppercase (likely new sentence)
+    // This helps prevent splitting on e.g. "Mr. Smith" or "i.e. example".
+
+    let quizizzPoints = [];
+
+    primarySegments.forEach(segment => {
+        let currentPoint = segment.trim();
+
+        // Remove common leading list markers (numbers, letters, bullets, hyphens)
+        // Handles: 1. text, 1) text, a. text, a) text, - text, • text
+        currentPoint = currentPoint.replace(/^(\d+[\.\)]|[a-zA-Z][\.\)]|\u2022|\-|\*)\s*/, '').trim();
+
+        // Remove any remaining non-alphanumeric/non-punctuation characters that we don't want
+        // Allows letters, numbers, spaces, and common punctuation: . , ? ! ' " ( ) -
+        // \u2019 is the right single quotation mark (apostrophe)
+        currentPoint = currentPoint.replace(/[^\w\s,.?!'"()\u2019-]/g, '').trim();
+
+        if (currentPoint.length === 0) return;
+
+        // If the point is already a good length
+        if (currentPoint.length >= MIN_POINT_LENGTH && currentPoint.length <= MAX_POINT_LENGTH) {
+            // Capitalize the first letter if it's not already (often helpful for Quizizz)
+            currentPoint = currentPoint.charAt(0).toUpperCase() + currentPoint.slice(1);
+            quizizzPoints.push(currentPoint);
+        }
+        // If the point is too long, try to split it more granularly
+        else if (currentPoint.length > MAX_POINT_LENGTH) {
+            // Attempt to split by commas or semicolons if they exist
+            // This is a heuristic and might sometimes split where it's not ideal, but often helps.
+            const subSegments = currentPoint.split(/[,;]\s+/);
+            let reassembledChunk = "";
+
+            subSegments.forEach(sub => {
+                let cleanedSub = sub.trim();
+                if (cleanedSub.length === 0) return;
+
+                // If adding the next sub-segment would make the chunk too long
+                if ((reassembledChunk + (reassembledChunk ? ", " : "") + cleanedSub).length > MAX_POINT_LENGTH && reassembledChunk) {
+                    if (reassembledChunk.length >= MIN_POINT_LENGTH) {
+                        reassembledChunk = reassembledChunk.charAt(0).toUpperCase() + reassembledChunk.slice(1);
+                        quizizzPoints.push(reassembledChunk + (/[.?!]$/.test(reassembledChunk) ? "" : ".")); // Add period if missing
                     }
-                });
-
-                if (quizizzPoints.length > 0) {
-                    outputText.value = quizizzPoints.join('\n');
-                    copyButton.style.display = 'block';
-                    outputText.placeholder = "Your extracted points will appear here...";
+                    reassembledChunk = cleanedSub; // Start a new chunk
                 } else {
-                    outputText.value = '';
-                    outputText.placeholder = "No suitable points found.";
-                    showError("No suitable points extracted. Check PDF content or formatting.");
-                    copyButton.style.display = 'none';
-                }
-            }
-
-            copyButton.addEventListener('click', () => {
-                outputText.select();
-                outputText.setSelectionRange(0, 99999);
-                try {
-                    document.execCommand('copy');
-                    const originalText = copyButton.textContent;
-                    copyButton.textContent = 'Copied!';
-                    setTimeout(() => {
-                        copyButton.textContent = originalText;
-                    }, 1500);
-                } catch (err) {
-                    console.error('Failed to copy text: ', err);
-                    alert('Failed to copy. Please manually select and copy.');
+                    // Append to the current chunk
+                    reassembledChunk = reassembledChunk ? reassembledChunk + ", " + cleanedSub : cleanedSub;
                 }
             });
+
+            // Add the last reassembled chunk if it's valid
+            if (reassembledChunk.length >= MIN_POINT_LENGTH && reassembledChunk.length <= MAX_POINT_LENGTH) {
+                reassembledChunk = reassembledChunk.charAt(0).toUpperCase() + reassembledChunk.slice(1);
+                quizizzPoints.push(reassembledChunk + (/[.?!]$/.test(reassembledChunk) ? "" : "."));
+            }
+            // If still too long after comma/semicolon split, try a hard split at last space
+            else if (reassembledChunk.length > MAX_POINT_LENGTH) {
+                let tempChunk = reassembledChunk;
+                while (tempChunk.length > MAX_POINT_LENGTH) {
+                    let cutPoint = tempChunk.lastIndexOf(' ', MAX_POINT_LENGTH - 10); // Cut a bit shorter to allow for "..."
+                    if (cutPoint <= MIN_POINT_LENGTH/2) cutPoint = MAX_POINT_LENGTH -10; // If no good space, just cut
+                    if (cutPoint <= 0) break; // Safety break
+
+                    let part = tempChunk.substring(0, cutPoint).trim();
+                    if (part.length >= MIN_POINT_LENGTH) {
+                         part = part.charAt(0).toUpperCase() + part.slice(1);
+                        quizizzPoints.push(part + "..."); // Indicate continuation
+                    }
+                    tempChunk = tempChunk.substring(cutPoint).trim();
+                    if (tempChunk.length <= MAX_POINT_LENGTH && tempChunk.length >= MIN_POINT_LENGTH) break; // if remainder is good, stop
+                }
+                if (tempChunk.length >= MIN_POINT_LENGTH && tempChunk.length <= MAX_POINT_LENGTH) {
+                     tempChunk = tempChunk.charAt(0).toUpperCase() + tempChunk.slice(1);
+                    quizizzPoints.push(tempChunk + (/[.?!]$/.test(tempChunk) ? "" : "."));
+                }
+            }
+        }
+    });
+
+    // Post-processing:
+    // 1. Remove duplicates
+    quizizzPoints = [...new Set(quizizzPoints)];
+    // 2. Final filter for length and ensure no empty strings slipped through
+    quizizzPoints = quizizzPoints.filter(p => p.length >= MIN_POINT_LENGTH && p.length <= MAX_POINT_LENGTH + 3); // +3 for potential "..."
+
+    if (quizizzPoints.length > 0) {
+        outputText.value = quizizzPoints.join('\n\n'); // Double newline for better separation in Quizizz AI? Test this.
+        copyButton.style.display = 'block';
+        outputText.placeholder = "Your extracted points will appear here...";
+    } else {
+        outputText.value = '';
+        outputText.placeholder = "No suitable points found. Try a different PDF or check its content for clarity and length.";
+        showError("No suitable points extracted. The PDF content might be too complex, too short, or not easily segmentable into concise points.");
+        copyButton.style.display = 'none';
+    }
+}
 
             // --- Quizizz AI Toolkit Population ---
             const quizizzTools = [
