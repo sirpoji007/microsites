@@ -3,19 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quizizz Question Generator</title>
+    <title>Quizizz CSV Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PDF.js library for extracting PDF text -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
-        /* Optional: Add custom styles here if needed, but try to use Tailwind */
         body {
-            font-family: 'Inter', sans-serif; /* Using Inter font */
+            font-family: 'Inter', sans-serif;
         }
         input[type="file"] {
-            /* Hide the default file input */
             display: none;
+        }
+        .dark {
+            color-scheme: dark;
+        }
+        .dark .bg-white {
+            background-color: #181818;
+        }
+        .dark .text-gray-800 {
+            color: #e0e0e0;
+        }
+        .dark .text-gray-600, .dark .text-gray-500 {
+            color: #a0a0a0;
+        }
+        .dark .border-gray-300 {
+            border-color: #404040;
+        }
+        .dark .text-gray-700 {
+            color: #d0d0d0;
+        }
+        .dark .bg-green-100 {
+            background-color: rgba(74, 222, 128, 0.2);
+        }
+        .dark .border-green-400 {
+            border-color: rgba(74, 222, 128, 0.5);
+        }
+        .dark .text-green-700 {
+            color: rgb(74, 222, 128);
+        }
+        .dark .bg-red-100 {
+            background-color: rgba(248, 113, 113, 0.2);
+        }
+        .dark .border-red-400 {
+            border-color: rgba(248, 113, 113, 0.5);
+        }
+        .dark .text-red-700 {
+            color: rgb(248, 113, 113);
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script>
+        // Check for dark mode preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+        
+        // Set PDF.js worker path
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 flex items-center justify-center p-4">
 
@@ -23,18 +75,18 @@
 
         <div class="flex justify-center mb-6">
             <div class="bg-blue-500 p-4 rounded-full shadow-lg">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
-                     <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                     <polyline points="14 2 14 8 20 8"/>
-                     <line x1="16" y1="13" x2="8" y2="13"/>
-                     <line x1="16" y1="17" x2="8" y2="17"/>
-                     <line x1="10" y1="9" x2="8" y2="9"/>
-                 </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                    <line x1="10" y1="9" x2="8" y2="9"/>
+                </svg>
             </div>
         </div>
 
-        <h1 class="text-3xl font-bold text-gray-800 mb-4">Quizizz Question Generator</h1>
-        <p class="text-gray-600 mb-8">Upload your PDF material and convert it into a Quizizz-ready spreadsheet!</p>
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">Quizizz CSV Generator</h1>
+        <p class="text-gray-600 mb-8">Upload your PDF material and extract content into a Quizizz-friendly CSV spreadsheet!</p>
 
         <div id="upload-area" class="mb-6 border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 transition duration-300 ease-in-out cursor-pointer">
             <input type="file" accept=".pdf" id="pdfUpload">
@@ -44,38 +96,93 @@
                     <polyline points="17 8 12 3 7 8"/>
                     <line x1="12" y1="3" x2="12" y2="15"/>
                 </svg>
-                 <svg id="upload-icon-selected" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 mb-3 hidden">
+                <svg id="upload-icon-selected" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 mb-3 hidden">
                     <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
                     <polyline points="14 2 14 8 20 8"/>
                     <line x1="16" y1="13" x2="8" y2="13"/>
                     <line x1="16" y1="17" x2="8" y2="17"/>
                     <line x1="10" y1="9" x2="8" y2="9"/>
-                 </svg>
+                </svg>
 
                 <span id="upload-text-default" class="text-lg font-semibold text-gray-700">Drag & Drop or Click to Upload PDF</span>
                 <span id="upload-text-selected" class="text-lg font-semibold text-green-700 hidden"></span>
-                <span class="text-sm text-gray-500 mt-1">(Max file size: 10MB)</span> </label>
+                <span class="text-sm text-gray-500 mt-1">(Max file size: 10MB)</span>
+            </label>
+        </div>
+
+        <div id="csv-settings" class="mb-6 hidden">
+            <div class="flex flex-col gap-4">
+                <div class="border rounded-md p-4 bg-gray-50 dark:bg-gray-800">
+                    <h3 class="text-left text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">CSV Format Options</h3>
+                    
+                    <div class="mb-3">
+                        <label for="content-format" class="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left mb-1">Content Format:</label>
+                        <select id="content-format" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <option value="paragraph">Extract paragraphs</option>
+                            <option value="sentence">Extract sentences</option>
+                            <option value="key-points">Extract key points</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="csv-columns" class="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left mb-1">CSV Columns:</label>
+                        <select id="csv-columns" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <option value="quizizz">Quizizz Format (Question, Options, Answer, Explanation)</option>
+                            <option value="basic">Basic Format (Content, Page Number)</option>
+                            <option value="detailed">Detailed Format (Title, Content, Keywords, Source)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex items-center mt-3">
+                        <input type="checkbox" id="include-header" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4" checked>
+                        <label for="include-header" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Include header row</label>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div id="error-message" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6 items-center justify-center hidden" role="alert">
-             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2">
-                 <circle cx="12" cy="12" r="10"/>
-                 <line x1="12" y1="8" x2="12" y2="12"/>
-                 <line x1="12" y1="16" x2="12.01" y2="16"/>
-             </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
             <span id="error-text" class="block sm:inline"></span>
         </div>
 
         <button id="process-button" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gray-400 cursor-not-allowed md:py-4 md:text-lg md:px-10 transition duration-300 ease-in-out" disabled>
-             <svg id="button-icon-send" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
-                 <line x1="22" y1="2" x2="11" y2="13"/>
-                 <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-             </svg>
-             <svg id="button-icon-loader" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin mr-3 hidden">
-                 <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-             </svg>
-            <span id="button-text">Process PDF</span>
+            <svg id="button-icon-send" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+            <svg id="button-icon-loader" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin mr-3 hidden">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+            </svg>
+            <span id="button-text">Generate CSV</span>
         </button>
+
+        <div id="processing-status" class="mt-4 hidden">
+            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+            </div>
+            <p id="status-text" class="text-sm text-gray-600 mt-1">Preparing to process your PDF...</p>
+        </div>
+
+        <div id="preview-container" class="mt-6 hidden">
+            <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2 text-left">Preview (first 5 rows):</h3>
+            <div class="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-900">
+                        <tr id="preview-header">
+                            <!-- Headers will be inserted here -->
+                        </tr>
+                    </thead>
+                    <tbody id="preview-body" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        <!-- Rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
         <div id="output-area" class="mt-8 p-6 bg-green-100 border border-green-400 text-green-700 rounded-lg flex flex-col items-center justify-center hidden">
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 mb-4">
@@ -85,19 +192,28 @@
                 <line x1="16" y1="17" x2="8" y2="17"/>
                 <line x1="10" y1="9" x2="8" y2="9"/>
             </svg>
-            <p class="text-lg font-semibold mb-4">Processing Complete!</p>
-            <a id="download-link" href="#" download="quizizz_questions.xlsx" class="flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-300 ease-in-out">
+            <p class="text-lg font-semibold mb-4">CSV Generation Complete!</p>
+            <p id="csv-info" class="mb-4"></p>
+            <a id="download-link" href="#" download="quizizz_content.csv" class="flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-300 ease-in-out">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                     <polyline points="7 10 12 15 17 10"/>
                     <line x1="12" y1="15" x2="12" y2="3"/>
                 </svg>
-                Download Quizizz Spreadsheet
+                Download CSV
             </a>
+            <div class="mt-4 text-left">
+                <p class="text-sm mb-2">Next steps:</p>
+                <ol class="list-decimal list-inside text-sm">
+                    <li class="mb-1">Download the CSV file</li>
+                    <li class="mb-1">Upload it to your GitHub repository</li>
+                    <li class="mb-1">In Quizizz, import the CSV when creating a new quiz</li>
+                </ol>
+            </div>
         </div>
 
         <p class="text-xs text-gray-500 mt-8">
-            Note: The accuracy of the generated questions depends heavily on the structure and formatting of the uploaded PDF. Complex layouts or unconventional question formats may result in errors.
+            Note: This tool extracts text content from your PDF and formats it for Quizizz. You may need to edit the CSV to create proper questions before uploading to Quizizz.
         </p>
 
     </div>
@@ -110,155 +226,641 @@
         const uploadIconSelected = document.getElementById('upload-icon-selected');
         const uploadTextDefault = document.getElementById('upload-text-default');
         const uploadTextSelected = document.getElementById('upload-text-selected');
+        const csvSettings = document.getElementById('csv-settings');
+        const contentFormatSelect = document.getElementById('content-format');
+        const csvColumnsSelect = document.getElementById('csv-columns');
+        const includeHeaderCheckbox = document.getElementById('include-header');
         const errorMessage = document.getElementById('error-message');
         const errorText = document.getElementById('error-text');
         const processButton = document.getElementById('process-button');
         const buttonIconSend = document.getElementById('button-icon-send');
         const buttonIconLoader = document.getElementById('button-icon-loader');
         const buttonText = document.getElementById('button-text');
+        const processingStatus = document.getElementById('processing-status');
+        const progressBar = document.getElementById('progress-bar');
+        const statusText = document.getElementById('status-text');
+        const previewContainer = document.getElementById('preview-container');
+        const previewHeader = document.getElementById('preview-header');
+        const previewBody = document.getElementById('preview-body');
         const outputArea = document.getElementById('output-area');
+        const csvInfo = document.getElementById('csv-info');
         const downloadLink = document.getElementById('download-link');
 
         let selectedFile = null;
+        let extractedText = '';
+        let extractedPages = [];
+        let csvData = [];
+        let csvHeaders = [];
+        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
         // Handle file selection
         fileInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
-            if (file && file.type === 'application/pdf') {
-                selectedFile = file;
-                // Update UI to show selected file
-                uploadIconDefault.classList.add('hidden');
-                uploadIconSelected.classList.remove('hidden');
-                uploadTextDefault.classList.add('hidden');
-                uploadTextSelected.classList.remove('hidden');
-                uploadTextSelected.textContent = file.name;
-                errorMessage.classList.add('hidden'); // Hide error message
-                outputArea.classList.add('hidden'); // Hide output area
-                processButton.disabled = false; // Enable process button
-                processButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
-                processButton.classList.add('bg-blue-600', 'hover:bg-blue-700', 'focus:outline-none', 'focus:ring-2', 'focus:ring-offset-2', 'focus:ring-blue-500');
-
-            } else {
-                selectedFile = null;
-                // Show error for invalid file type
-                errorMessage.classList.remove('hidden');
-                errorText.textContent = 'Please select a valid PDF file.';
-                // Reset UI to default state
-                uploadIconDefault.classList.remove('hidden');
-                uploadIconSelected.classList.add('hidden');
-                uploadTextDefault.classList.remove('hidden');
-                uploadTextSelected.classList.add('hidden');
-                uploadTextSelected.textContent = '';
-                processButton.disabled = true; // Disable process button
-                 processButton.classList.add('bg-gray-400', 'cursor-not-allowed');
-                 processButton.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'focus:outline-none', 'focus:ring-2', 'focus:ring-offset-2', 'focus:ring-blue-500');
-                 outputArea.classList.add('hidden'); // Hide output area
+            
+            // Check if file is selected
+            if (!file) {
+                return;
             }
+            
+            // Check file type
+            if (file.type !== 'application/pdf') {
+                showError('Please select a valid PDF file.');
+                resetFileInput();
+                return;
+            }
+            
+            // Check file size
+            if (file.size > MAX_FILE_SIZE) {
+                showError(`File is too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)}MB.`);
+                resetFileInput();
+                return;
+            }
+            
+            selectedFile = file;
+            
+            // Update UI to show selected file
+            uploadIconDefault.classList.add('hidden');
+            uploadIconSelected.classList.remove('hidden');
+            uploadTextDefault.classList.add('hidden');
+            uploadTextSelected.classList.remove('hidden');
+            uploadTextSelected.textContent = file.name;
+            errorMessage.classList.add('hidden'); // Hide error message
+            outputArea.classList.add('hidden'); // Hide output area
+            previewContainer.classList.add('hidden'); // Hide preview
+            csvSettings.classList.remove('hidden'); // Show CSV settings
+            
+            // Enable process button
+            processButton.disabled = false;
+            processButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+            processButton.classList.add('bg-blue-600', 'hover:bg-blue-700', 'focus:outline-none', 'focus:ring-2', 'focus:ring-offset-2', 'focus:ring-blue-500');
         });
 
         // Handle Process Button Click
-        processButton.addEventListener('click', function() {
+        processButton.addEventListener('click', async function() {
             if (!selectedFile) {
-                errorMessage.classList.remove('hidden');
-                errorText.textContent = 'Please select a PDF file first.';
+                showError('Please select a PDF file first.');
                 return;
             }
-
-            // Simulate processing state
-            processButton.disabled = true;
-            buttonIconSend.classList.add('hidden');
-            buttonIconLoader.classList.remove('hidden');
-            buttonText.textContent = 'Processing...';
-            errorMessage.classList.add('hidden'); // Hide any previous errors
-            outputArea.classList.add('hidden'); // Hide output area
-
-            // --- Placeholder for Backend API Call ---
-            // In a real application, you would send 'selectedFile' to your backend here
-            // using Fetch API or XMLHttpRequest.
-            // Example (conceptual):
-            /*
-            const formData = new FormData();
-            formData.append('pdfFile', selectedFile);
-
-            fetch('/api/process-pdf', { // Replace with your backend endpoint
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Backend processing failed.');
+            
+            // Start processing
+            setProcessingState(true);
+            updateStatus("Reading PDF file...", 10);
+            
+            try {
+                // Extract text from PDF
+                const result = await extractContentFromPDF(selectedFile);
+                extractedText = result.text;
+                extractedPages = result.pages;
+                
+                if (!extractedText || extractedText.trim().length === 0) {
+                    throw new Error("Could not extract text from PDF. The file might be empty, corrupted, or password-protected.");
                 }
-                return response.blob(); // Or response.json() if backend returns a URL
-            })
-            .then(blob => {
-                // Assuming backend returns the file blob
+                
+                updateStatus("Processing content and generating CSV...", 70);
+                
+                // Get settings
+                const contentFormat = contentFormatSelect.value;
+                const csvFormat = csvColumnsSelect.value;
+                const includeHeader = includeHeaderCheckbox.checked;
+                
+                // Generate CSV based on settings
+                generateCSV(extractedText, extractedPages, contentFormat, csvFormat, includeHeader);
+                
+                // Show preview of the CSV
+                updatePreview(csvData, csvHeaders);
+                previewContainer.classList.remove('hidden');
+                
+                // Create downloadable CSV
+                const csvContent = generateCSVContent(csvData, csvHeaders, includeHeader);
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                 const url = URL.createObjectURL(blob);
+                
+                // Set download link
                 downloadLink.href = url;
-                outputArea.classList.remove('hidden'); // Show output area
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                errorMessage.classList.remove('hidden');
-                errorText.textContent = 'An error occurred during processing. Please try again.';
-            })
-            .finally(() => {
-                // Reset button state
-                processButton.disabled = false;
-                buttonIconSend.classList.remove('hidden');
-                buttonIconLoader.classList.add('hidden');
-                buttonText.textContent = 'Process PDF';
-                 processButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
-                 processButton.classList.add('bg-blue-600', 'hover:bg-blue-700', 'focus:outline-none', 'focus:ring-2', 'focus:ring-offset-2', 'focus:ring-blue-500');
-            });
-            */
-            // --- End Placeholder ---
-
-            // Simulate a delay for processing (remove in real implementation)
-            setTimeout(() => {
-                // Simulate success
-                const simulatedDownloadUrl = '#'; // Replace with actual URL from backend
-                downloadLink.href = simulatedDownloadUrl;
-                outputArea.classList.remove('hidden'); // Show output area
-
-                // Reset button state after simulation
-                processButton.disabled = false;
-                buttonIconSend.classList.remove('hidden');
-                buttonIconLoader.classList.add('hidden');
-                buttonText.textContent = 'Process PDF';
-                 processButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
-                 processButton.classList.add('bg-blue-600', 'hover:bg-blue-700', 'focus:outline-none', 'focus:ring-2', 'focus:ring-offset-2', 'focus:ring-blue-500');
-
-            }, 3000); // 3-second delay
+                downloadLink.download = `quizizz_content_${new Date().toISOString().slice(0,10)}.csv`;
+                
+                // Update CSV info
+                const rowCount = csvData.length;
+                csvInfo.textContent = `Successfully created CSV with ${rowCount} rows of content.`;
+                
+                // Show output area
+                outputArea.classList.remove('hidden');
+                resetButtonState();
+                updateStatus("Complete!", 100);
+                
+            } catch (error) {
+                console.error("Error:", error);
+                showError(error.message || "An error occurred during processing. Please try again.");
+                resetButtonState();
+            }
         });
 
-         // Optional: Add drag and drop functionality to the upload area
-         uploadAreaLabel.addEventListener('dragover', (event) => {
-             event.preventDefault(); // Prevent default behavior (prevent file from being opened)
-             uploadAreaLabel.classList.add('border-blue-500'); // Add hover style
-         });
+        // Extract text from PDF using PDF.js
+        async function extractContentFromPDF(file) {
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                let fullText = '';
+                let pages = [];
+                
+                // Show progress during extraction
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    updateStatus(`Extracting text from page ${i} of ${pdf.numPages}...`, 10 + (i / pdf.numPages * 40));
+                    const page = await pdf.getPage(i);
+                    const content = await page.getTextContent();
+                    const pageText = content.items.map(item => item.str).join(' ');
+                    
+                    fullText += pageText + '\n\n';
+                    pages.push({
+                        pageNum: i,
+                        text: pageText
+                    });
+                }
+                
+                return {
+                    text: fullText,
+                    pages: pages
+                };
+            } catch (error) {
+                console.error("PDF extraction error:", error);
+                throw new Error("Failed to extract text from PDF. The file might be corrupted or password-protected.");
+            }
+        }
 
-         uploadAreaLabel.addEventListener('dragleave', (event) => {
-             event.preventDefault();
-             uploadAreaLabel.classList.remove('border-blue-500'); // Remove hover style
-         });
+        // Generate CSV data based on settings
+        function generateCSV(text, pages, contentFormat, csvFormat, includeHeader) {
+            // Initialize data array
+            csvData = [];
+            
+            // Set headers based on CSV format
+            switch (csvFormat) {
+                case 'quizizz':
+                    csvHeaders = ['Question Type', 'Question', 'Option A', 'Option B', 'Option C', 'Option D', 'Answer', 'Explanation'];
+                    break;
+                case 'basic':
+                    csvHeaders = ['Content', 'Page Number'];
+                    break;
+                case 'detailed':
+                    csvHeaders = ['Title', 'Content', 'Keywords', 'Source'];
+                    break;
+                default:
+                    csvHeaders = ['Content', 'Page Number'];
+            }
+            
+            // Process content based on format
+            switch (contentFormat) {
+                case 'paragraph':
+                    processParagraphs(text, pages, csvFormat);
+                    break;
+                case 'sentence':
+                    processSentences(text, pages, csvFormat);
+                    break;
+                case 'key-points':
+                    processKeyPoints(text, pages, csvFormat);
+                    break;
+                default:
+                    processParagraphs(text, pages, csvFormat);
+            }
+            
+            return csvData;
+        }
+        
+        // Process text as paragraphs
+        function processParagraphs(text, pages, csvFormat) {
+            // Split text into paragraphs (text blocks separated by multiple line breaks)
+            const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 30);
+            
+            paragraphs.forEach((paragraph, index) => {
+                // Find which page this paragraph is likely on
+                let pageNum = findPageForContent(paragraph, pages);
+                
+                // Create row based on CSV format
+                let row;
+                switch (csvFormat) {
+                    case 'quizizz':
+                        // For Quizizz format, create fill-in-the-blank questions
+                        const words = paragraph.split(' ');
+                        let blankIndex;
+                        
+                        // For shorter paragraphs, blank out a word near the middle
+                        if (words.length < 15) {
+                            blankIndex = Math.floor(words.length / 2);
+                        } else {
+                            // For longer paragraphs, blank out a significant word
+                            const significantWords = words.filter(word => 
+                                word.length >
+                                4 && !['about', 'after', 'again', 'below', 'could', 'every', 
+                                      'first', 'found', 'great', 'house', 'large', 'learn', 
+                                      'never', 'other', 'place', 'small', 'study', 'their', 
+                                      'there', 'these', 'think', 'three', 'water', 'where', 
+                                      'which', 'world', 'would', 'write'].includes(word.toLowerCase())
+                            );
+                            
+                            if (significantWords.length > 0) {
+                                const wordToBlank = significantWords[Math.floor(Math.random() * significantWords.length)];
+                                blankIndex = words.findIndex(word => word === wordToBlank);
+                                if (blankIndex === -1) blankIndex = Math.floor(words.length / 2);
+                            } else {
+                                blankIndex = Math.floor(words.length / 2);
+                            }
+                        }
+                        
+                        const answer = words[blankIndex].replace(/[.,;:!?]$/, '');
+                        words[blankIndex] = '_______';
+                        const question = words.join(' ');
+                        
+                        row = [
+                            'Multiple Choice',
+                            question,
+                            answer, // Correct answer
+                            generateWrongAnswer(answer), // Wrong option 1
+                            generateWrongAnswer(answer), // Wrong option 2
+                            generateWrongAnswer(answer), // Wrong option 3
+                            answer, // Answer
+                            `This completes the sentence from page ${pageNum}.` // Explanation
+                        ];
+                        break;
+                    case 'basic':
+                        row = [paragraph, pageNum];
+                        break;
+                    case 'detailed':
+                        const title = `Content from page ${pageNum}`;
+                        const keywords = extractKeywords(paragraph);
+                        const source = `Page ${pageNum}`;
+                        row = [title, paragraph, keywords, source];
+                        break;
+                    default:
+                        row = [paragraph, pageNum];
+                }
+                
+                csvData.push(row);
+            });
+        }
+        
+        // Process text as sentences
+        function processSentences(text, pages, csvFormat) {
+            // Split text into sentences (text ending with period, question mark, or exclamation)
+            const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+            
+            sentences.forEach((sentence, index) => {
+                sentence = sentence.trim();
+                if (sentence.length < 20) return; // Skip very short sentences
+                
+                // Find which page this sentence is likely on
+                let pageNum = findPageForContent(sentence, pages);
+                
+                // Create row based on CSV format
+                let row;
+                switch (csvFormat) {
+                    case 'quizizz':
+                        // For Quizizz, create true/false questions
+                        const isTrueQuestion = Math.random() > 0.3; // 70% true, 30% false
+                        
+                        let question, answer, explanation;
+                        
+                        if (isTrueQuestion) {
+                            question = sentence;
+                            answer = 'True';
+                            explanation = `This statement appears on page ${pageNum}.`;
+                        } else {
+                            // Create a false statement by modifying the sentence
+                            const modification = modifySentence(sentence);
+                            question = modification.text;
+                            answer = 'False';
+                            explanation = `The correct statement is: "${sentence}" (Page ${pageNum})`;
+                        }
+                        
+                        row = [
+                            'True/False',
+                            question,
+                            'True',
+                            'False',
+                            '', // Empty C
+                            '', // Empty D
+                            answer,
+                            explanation
+                        ];
+                        break;
+                    case 'basic':
+                        row = [sentence, pageNum];
+                        break;
+                    case 'detailed':
+                        const title = `Sentence from page ${pageNum}`;
+                        const keywords = extractKeywords(sentence);
+                        const source = `Page ${pageNum}`;
+                        row = [title, sentence, keywords, source];
+                        break;
+                    default:
+                        row = [sentence, pageNum];
+                }
+                
+                csvData.push(row);
+            });
+        }
+        
+        // Process text as key points
+        function processKeyPoints(text, pages, csvFormat) {
+            // Split text into paragraphs first
+            const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+            
+            // Process each paragraph to extract key points
+            paragraphs.forEach((paragraph, index) => {
+                if (paragraph.length < 40) return; // Skip very short paragraphs
+                
+                // Find which page this paragraph is likely on
+                let pageNum = findPageForContent(paragraph, pages);
+                
+                // Extract what appears to be a key point (first sentence of paragraph)
+                const firstSentence = paragraph.match(/^[^.!?]+[.!?]+/);
+                let keyPoint = firstSentence ? firstSentence[0].trim() : paragraph.substring(0, Math.min(150, paragraph.length)) + '...';
+                
+                // Create row based on CSV format
+                let row;
+                switch (csvFormat) {
+                    case 'quizizz':
+                        // For Quizizz, create multiple-choice questions
+                        const question = `Which of the following is true about content on page ${pageNum}?`;
+                        
+                        row = [
+                            'Multiple Choice',
+                            question,
+                            keyPoint, // Correct answer
+                            generateWrongOption(keyPoint), // Wrong option 1
+                            generateWrongOption(keyPoint), // Wrong option 2
+                            generateWrongOption(keyPoint), // Wrong option 3
+                            keyPoint, // Answer
+                            `This key point is from page ${pageNum}.` // Explanation
+                        ];
+                        break;
+                    case 'basic':
+                        row = [keyPoint, pageNum];
+                        break;
+                    case 'detailed':
+                        const title = `Key Point from page ${pageNum}`;
+                        const keywords = extractKeywords(keyPoint);
+                        const source = `Page ${pageNum}, derived from paragraph`;
+                        row = [title, keyPoint, keywords, source];
+                        break;
+                    default:
+                        row = [keyPoint, pageNum];
+                }
+                
+                csvData.push(row);
+            });
+        }
+        
+        // Helper function to find which page contains specific content
+        function findPageForContent(content, pages) {
+            for (let i = 0; i < pages.length; i++) {
+                if (pages[i].text.includes(content.substring(0, 50))) {
+                    return pages[i].pageNum;
+                }
+            }
+            return Math.floor(Math.random() * pages.length) + 1; // Fallback to random page
+        }
+        
+        // Helper function to extract keywords from text
+        function extractKeywords(text) {
+            // Simple keyword extraction - find relatively unique words
+            const words = text.toLowerCase().match(/\b[a-z]{5,}\b/g) || [];
+            const uniqueWords = [...new Set(words)];
+            
+            // Get up to 5 keywords
+            return uniqueWords.slice(0, 5).join(', ');
+        }
+        
+        // Helper function to modify a sentence to make it false
+        function modifySentence(sentence) {
+            // Simple modifications to make a sentence false
+            const modifications = [
+                { type: 'negate', text: sentence.replace(/\b(is|are|was|were|has|have|had|do|does|did)\b/i, match => {
+                    const negations = {
+                        'is': 'is not', 'are': 'are not', 'was': 'was not', 'were': 'were not',
+                        'has': 'has not', 'have': 'have not', 'had': 'had not',
+                        'do': 'do not', 'does': 'does not', 'did': 'did not'
+                    };
+                    return negations[match.toLowerCase()];
+                }) },
+                { type: 'numbers', text: sentence.replace(/\b(\d+)\b/g, match => {
+                    const num = parseInt(match);
+                    return (num + Math.floor(Math.random() * 10) + 1).toString();
+                }) },
+                { type: 'adjective', text: sentence.replace(/\b(small|large|big|tiny|huge|important|significant|minor|major)\b/i, match => {
+                    const opposites = {
+                        'small': 'large', 'large': 'small', 'big': 'small', 'tiny': 'huge', 'huge': 'tiny',
+                        'important': 'unimportant', 'significant': 'insignificant',
+                        'minor': 'major', 'major': 'minor'
+                    };
+                    return opposites[match.toLowerCase()] || 'different';
+                }) }
+            ];
+            
+            // Pick a random modification
+            const mod = modifications.find(m => m.text !== sentence) || modifications[0];
+            return mod;
+        }
+        
+        // Helper function to generate a wrong answer for fill-in-the-blank
+        function generateWrongAnswer(answer) {
+            // Generate a plausible but wrong answer
+            if (answer.length <= 3) {
+                // For short words, just use common short words
+                const shortWords = ['the', 'and', 'but', 'not', 'yes', 'no', 'why', 'how', 'who', 'can', 'may', 'now'];
+                return shortWords[Math.floor(Math.random() * shortWords.length)];
+            }
+            
+            if (/^\d+$/.test(answer)) {
+                // For numbers, modify slightly
+                const num = parseInt(answer);
+                return (num + Math.floor(Math.random() * 10) + 1).toString();
+            }
+            
+            // For normal words, try to generate something similar but different
+            const vowels = ['a', 'e', 'i', 'o', 'u'];
+            const consonants = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z'];
+            
+            // Option 1: Change a letter
+            if (answer.length > 4) {
+                let modified = answer.split('');
+                const posToChange = Math.floor(Math.random() * modified.length);
+                const isVowel = vowels.includes(modified[posToChange].toLowerCase());
+                
+                modified[posToChange] = isVowel 
+                    ? vowels[Math.floor(Math.random() * vowels.length)]
+                    : consonants[Math.floor(Math.random() * consonants.length)];
+                
+                return modified.join('');
+            }
+            
+            // Option 2: Use a word of similar length
+            const similarLengthWords = [
+                'time', 'year', 'work', 'life', 'part', 'good', 'case', 'make', 'each', 'find',
+                'know', 'look', 'come', 'take', 'give', 'area', 'word', 'help', 'view', 'name'
+            ];
+            
+            return similarLengthWords[Math.floor(Math.random() * similarLengthWords.length)];
+        }
+        
+        // Helper function to generate wrong options for multiple choice
+        function generateWrongOption(correctOption) {
+            // Generate plausible wrong options
+            const genericOptions = [
+                "This information is not mentioned in the text.",
+                "The opposite of what is stated in the text.",
+                "A misrepresentation of the facts presented.",
+                "An unrelated concept not covered in this material.",
+                "A common misconception about this topic.",
+                "A partially correct statement with key errors.",
+                "An oversimplification that misses important details.",
+                "A statement that confuses cause and effect."
+            ];
+            
+            return genericOptions[Math.floor(Math.random() * genericOptions.length)];
+        }
+        
+        // Generate CSV content as a string
+        function generateCSVContent(data, headers, includeHeader) {
+            let csvContent = "";
+            
+            // Add header row if specified
+            if (includeHeader) {
+                csvContent += headers.map(escapeCSV).join(',') + '\r\n';
+            }
+            
+            // Add data rows
+            data.forEach(row => {
+                csvContent += row.map(escapeCSV).join(',') + '\r\n';
+            });
+            
+            return csvContent;
+        }
+        
+        // Helper function to escape CSV values
+        function escapeCSV(value) {
+            if (value === null || value === undefined) {
+                return '';
+            }
+            
+            value = String(value);
+            
+            // If the value contains commas, quotes, or newlines, enclose it in quotes
+            if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+                // Double any quotes inside the value
+                value = value.replace(/"/g, '""');
+                return `"${value}"`;
+            }
+            
+            return value;
+        }
+        
+        // Update preview table
+        function updatePreview(data, headers) {
+            // Clear previous preview
+            previewHeader.innerHTML = '';
+            previewBody.innerHTML = '';
+            
+            // Add headers
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.className = 'px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider';
+                th.textContent = header;
+                previewHeader.appendChild(th);
+            });
+            
+            // Add rows (limit to first 5)
+            const previewData = data.slice(0, 5);
+            previewData.forEach(row => {
+                const tr = document.createElement('tr');
+                
+                row.forEach(cell => {
+                    const td = document.createElement('td');
+                    td.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300';
+                    // Truncate long content
+                    td.textContent = cell.length > 50 ? cell.substring(0, 50) + '...' : cell;
+                    tr.appendChild(td);
+                });
+                
+                previewBody.appendChild(tr);
+            });
+        }
 
-         uploadAreaLabel.addEventListener('drop', (event) => {
-             event.preventDefault();
-             uploadAreaLabel.classList.remove('border-blue-500'); // Remove hover style
+        // Helper function to show error message
+        function showError(message) {
+            errorMessage.classList.remove('hidden');
+            errorText.textContent = message;
+            processingStatus.classList.add('hidden');
+        }
 
-             const files = event.dataTransfer.files;
-             if (files.length > 0) {
-                 // Assign the dropped file to the file input
-                 fileInput.files = files;
-                 // Manually trigger the change event
-                 const changeEvent = new Event('change', { bubbles: true });
-                 fileInput.dispatchEvent(changeEvent);
-             }
-         });
+        // Helper function to reset file input
+        function resetFileInput() {
+            selectedFile = null;
+            fileInput.value = '';
+            uploadIconDefault.classList.remove('hidden');
+            uploadIconSelected.classList.add('hidden');
+            uploadTextDefault.classList.remove('hidden');
+            uploadTextSelected.classList.add('hidden');
+            uploadTextSelected.textContent = '';
+            csvSettings.classList.add('hidden');
+            processButton.disabled = true;
+            processButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+            processButton.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'focus:outline-none', 'focus:ring-2', 'focus:ring-offset-2', 'focus:ring-blue-500');
+        }
 
+        // Helper function to set processing state
+        function setProcessingState(isProcessing) {
+            if (isProcessing) {
+                processButton.disabled = true;
+                buttonIconSend.classList.add('hidden');
+                buttonIconLoader.classList.remove('hidden');
+                buttonText.textContent = 'Processing...';
+                errorMessage.classList.add('hidden');
+                processingStatus.classList.remove('hidden');
+            } else {
+                resetButtonState();
+            }
+        }
 
+        // Helper function to reset button state
+        function resetButtonState() {
+            processButton.disabled = false;
+            buttonIconSend.classList.remove('hidden');
+            buttonIconLoader.classList.add('hidden');
+            buttonText.textContent = 'Generate CSV';
+            processButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+            processButton.classList.add('bg-blue-600', 'hover:bg-blue-700', 'focus:outline-none', 'focus:ring-2', 'focus:ring-offset-2', 'focus:ring-blue-500');
+        }
+
+        // Helper function to update status
+        function updateStatus(message, percentComplete) {
+            statusText.textContent = message;
+            progressBar.style.width = `${percentComplete}%`;
+        }
+
+        // Optional: Add drag and drop functionality to the upload area
+        uploadAreaLabel.addEventListener('dragover', (event) => {
+            event.preventDefault(); // Prevent default behavior
+            uploadAreaLabel.classList.add('border-blue-500'); // Add hover style
+        });
+
+        uploadAreaLabel.addEventListener('dragleave', (event) => {
+            event.preventDefault();
+            uploadAreaLabel.classList.remove('border-blue-500'); // Remove hover style
+        });
+
+        uploadAreaLabel.addEventListener('drop', (event) => {
+            event.preventDefault();
+            uploadAreaLabel.classList.remove('border-blue-500'); // Remove hover style
+
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                // Assign the dropped file to the file input
+                fileInput.files = files;
+                // Manually trigger the change event
+                const changeEvent = new Event('change', { bubbles: true });
+                fileInput.dispatchEvent(changeEvent);
+            }
+        });
     </script>
 
 </body>
 </html>
-
