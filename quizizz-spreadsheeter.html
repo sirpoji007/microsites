@@ -85,8 +85,8 @@
             </div>
         </div>
 
-        <h1 class="text-3xl font-bold text-gray-800 mb-4">Quizizz CSV Generator</h1>
-        <p class="text-gray-600 mb-8">Upload your PDF material and extract content into a Quizizz-friendly CSV spreadsheet!</p>
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">Quizizz Question Generator</h1>
+        <p class="text-gray-600 mb-8">Upload your PDF material and convert it into a Quizizz-compatible CSV file!</p>
 
         <div id="upload-area" class="mb-6 border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 transition duration-300 ease-in-out cursor-pointer">
             <input type="file" accept=".pdf" id="pdfUpload">
@@ -110,32 +110,29 @@
             </label>
         </div>
 
-        <div id="csv-settings" class="mb-6 hidden">
+        <div id="question-settings" class="mb-6 hidden">
             <div class="flex flex-col gap-4">
                 <div class="border rounded-md p-4 bg-gray-50 dark:bg-gray-800">
-                    <h3 class="text-left text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">CSV Format Options</h3>
+                    <h3 class="text-left text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Question Settings</h3>
                     
                     <div class="mb-3">
-                        <label for="content-format" class="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left mb-1">Content Format:</label>
-                        <select id="content-format" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            <option value="paragraph">Extract paragraphs</option>
-                            <option value="sentence">Extract sentences</option>
-                            <option value="key-points">Extract key points</option>
-                        </select>
+                        <label for="num-mc-questions" class="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left mb-1">Number of Multiple Choice Questions:</label>
+                        <input type="number" id="num-mc-questions" min="0" max="50" value="10" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     
                     <div class="mb-3">
-                        <label for="csv-columns" class="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left mb-1">CSV Columns:</label>
-                        <select id="csv-columns" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            <option value="quizizz">Quizizz Format (Question, Options, Answer, Explanation)</option>
-                            <option value="basic">Basic Format (Content, Page Number)</option>
-                            <option value="detailed">Detailed Format (Title, Content, Keywords, Source)</option>
-                        </select>
+                        <label for="num-open-questions" class="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left mb-1">Number of Open-Ended Questions:</label>
+                        <input type="number" id="num-open-questions" min="0" max="10" value="2" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="mc-points" class="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left mb-1">Points for Multiple Choice Questions:</label>
+                        <input type="number" id="mc-points" min="1" max="20" value="1" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     
-                    <div class="flex items-center mt-3">
-                        <input type="checkbox" id="include-header" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4" checked>
-                        <label for="include-header" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Include header row</label>
+                    <div class="mb-3">
+                        <label for="open-points" class="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left mb-1">Points for Open-Ended Questions:</label>
+                        <input type="number" id="open-points" min="1" max="20" value="5" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                     </div>
                 </div>
             </div>
@@ -158,7 +155,7 @@
             <svg id="button-icon-loader" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin mr-3 hidden">
                 <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
             </svg>
-            <span id="button-text">Generate CSV</span>
+            <span id="button-text">Generate Questions</span>
         </button>
 
         <div id="processing-status" class="mt-4 hidden">
@@ -169,7 +166,7 @@
         </div>
 
         <div id="preview-container" class="mt-6 hidden">
-            <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2 text-left">Preview (first 5 rows):</h3>
+            <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2 text-left">Preview (first 3 rows):</h3>
             <div class="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead class="bg-gray-50 dark:bg-gray-900">
@@ -194,7 +191,7 @@
             </svg>
             <p class="text-lg font-semibold mb-4">CSV Generation Complete!</p>
             <p id="csv-info" class="mb-4"></p>
-            <a id="download-link" href="#" download="quizizz_content.csv" class="flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-300 ease-in-out">
+            <a id="download-link" href="#" download="quizizz_questions.csv" class="flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-300 ease-in-out">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                     <polyline points="7 10 12 15 17 10"/>
@@ -206,14 +203,15 @@
                 <p class="text-sm mb-2">Next steps:</p>
                 <ol class="list-decimal list-inside text-sm">
                     <li class="mb-1">Download the CSV file</li>
-                    <li class="mb-1">Upload it to your GitHub repository</li>
-                    <li class="mb-1">In Quizizz, import the CSV when creating a new quiz</li>
+                    <li class="mb-1">In Quizizz, click "Create" → "Quiz"</li>
+                    <li class="mb-1">Click "Import from spreadsheet" and upload this CSV</li>
+                    <li class="mb-1">Review and edit your questions as needed</li>
                 </ol>
             </div>
         </div>
 
         <p class="text-xs text-gray-500 mt-8">
-            Note: This tool extracts text content from your PDF and formats it for Quizizz. You may need to edit the CSV to create proper questions before uploading to Quizizz.
+            Note: This tool extracts content from your PDF and formats it according to the Quizizz template format. You may need to review and refine the questions before using them in a quiz.
         </p>
 
     </div>
@@ -226,10 +224,11 @@
         const uploadIconSelected = document.getElementById('upload-icon-selected');
         const uploadTextDefault = document.getElementById('upload-text-default');
         const uploadTextSelected = document.getElementById('upload-text-selected');
-        const csvSettings = document.getElementById('csv-settings');
-        const contentFormatSelect = document.getElementById('content-format');
-        const csvColumnsSelect = document.getElementById('csv-columns');
-        const includeHeaderCheckbox = document.getElementById('include-header');
+        const questionSettings = document.getElementById('question-settings');
+        const numMCQuestionsInput = document.getElementById('num-mc-questions');
+        const numOpenQuestionsInput = document.getElementById('num-open-questions');
+        const mcPointsInput = document.getElementById('mc-points');
+        const openPointsInput = document.getElementById('open-points');
         const errorMessage = document.getElementById('error-message');
         const errorText = document.getElementById('error-text');
         const processButton = document.getElementById('process-button');
@@ -250,8 +249,18 @@
         let extractedText = '';
         let extractedPages = [];
         let csvData = [];
-        let csvHeaders = [];
+        // CSV headers exactly matching the Quizizz template
+        const csvHeaders = ["Question Type", "Question", "Option A", "Option B", "Option C", "Option D", "Correct Answer", "Points"];
         const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+        // Domain-specific keywords for more relevant question generation
+        const DOMAIN_KEYWORDS = {
+            finance: ["money", "bank", "loan", "interest", "credit", "debit", "invest", "market", "stock", "bond", "asset", "liability", "capital", "deposit", "finance", "fiscal", "fund", "portfolio", "security", "share", "yield", "dividend", "equity"],
+            science: ["experiment", "hypothesis", "theory", "research", "laboratory", "data", "evidence", "observation", "molecule", "atom", "cell", "element", "compound", "reaction", "energy", "ecosystem", "species", "organism"],
+            history: ["century", "decade", "era", "period", "ancient", "medieval", "modern", "revolution", "war", "empire", "kingdom", "dynasty", "treaty", "monarch", "president", "government", "civilization", "culture"],
+            literature: ["novel", "poem", "essay", "author", "character", "plot", "theme", "setting", "dialogue", "narrative", "genre", "literary", "fiction", "nonfiction", "prose", "verse", "metaphor", "symbol"],
+            technology: ["computer", "software", "hardware", "internet", "digital", "network", "system", "algorithm", "database", "program", "code", "application", "device", "innovation", "technology"]
+        };
 
         // Handle file selection
         fileInput.addEventListener('change', function(event) {
@@ -287,7 +296,7 @@
             errorMessage.classList.add('hidden'); // Hide error message
             outputArea.classList.add('hidden'); // Hide output area
             previewContainer.classList.add('hidden'); // Hide preview
-            csvSettings.classList.remove('hidden'); // Show CSV settings
+            questionSettings.classList.remove('hidden'); // Show question settings
             
             // Enable process button
             processButton.disabled = false;
@@ -316,32 +325,36 @@
                     throw new Error("Could not extract text from PDF. The file might be empty, corrupted, or password-protected.");
                 }
                 
-                updateStatus("Processing content and generating CSV...", 70);
+                updateStatus("Analyzing content and generating questions...", 50);
                 
                 // Get settings
-                const contentFormat = contentFormatSelect.value;
-                const csvFormat = csvColumnsSelect.value;
-                const includeHeader = includeHeaderCheckbox.checked;
+                const numMCQuestions = parseInt(numMCQuestionsInput.value);
+                const numOpenQuestions = parseInt(numOpenQuestionsInput.value);
+                const mcPoints = parseInt(mcPointsInput.value);
+                const openPoints = parseInt(openPointsInput.value);
                 
-                // Generate CSV based on settings
-                generateCSV(extractedText, extractedPages, contentFormat, csvFormat, includeHeader);
+                // Generate questions based on settings
+                generateQuestions(extractedText, extractedPages, numMCQuestions, numOpenQuestions, mcPoints, openPoints);
+                
+                updateStatus("Formatting CSV data...", 80);
                 
                 // Show preview of the CSV
                 updatePreview(csvData, csvHeaders);
                 previewContainer.classList.remove('hidden');
                 
                 // Create downloadable CSV
-                const csvContent = generateCSVContent(csvData, csvHeaders, includeHeader);
+                const csvContent = generateCSVContent(csvData, csvHeaders, true);
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                 const url = URL.createObjectURL(blob);
                 
                 // Set download link
                 downloadLink.href = url;
-                downloadLink.download = `quizizz_content_${new Date().toISOString().slice(0,10)}.csv`;
+                downloadLink.download = `quizizz_questions_${new Date().toISOString().slice(0,10)}.csv`;
                 
                 // Update CSV info
-                const rowCount = csvData.length;
-                csvInfo.textContent = `Successfully created CSV with ${rowCount} rows of content.`;
+                const mcCount = csvData.filter(row => row[0] === "Multiple Choice").length;
+                const openCount = csvData.filter(row => row[0] === "Open Ended").length;
+                csvInfo.textContent = `Successfully created ${mcCount} multiple choice and ${openCount} open-ended questions.`;
                 
                 // Show output area
                 outputArea.classList.remove('hidden');
@@ -365,7 +378,7 @@
                 
                 // Show progress during extraction
                 for (let i = 1; i <= pdf.numPages; i++) {
-                    updateStatus(`Extracting text from page ${i} of ${pdf.numPages}...`, 10 + (i / pdf.numPages * 40));
+                    updateStatus(`Extracting text from page ${i} of ${pdf.numPages}...`, 10 + (i / pdf.numPages * 30));
                     const page = await pdf.getPage(i);
                     const content = await page.getTextContent();
                     const pageText = content.items.map(item => item.str).join(' ');
@@ -387,226 +400,954 @@
             }
         }
 
-        // Generate CSV data based on settings
-        function generateCSV(text, pages, contentFormat, csvFormat, includeHeader) {
+        // Generate questions based on settings
+        function generateQuestions(text, pages, numMCQuestions, numOpenQuestions, mcPoints, openPoints) {
             // Initialize data array
             csvData = [];
             
-            // Set headers based on CSV format
-            switch (csvFormat) {
-                case 'quizizz':
-                    csvHeaders = ['Question Type', 'Question', 'Option A', 'Option B', 'Option C', 'Option D', 'Answer', 'Explanation'];
-                    break;
-                case 'basic':
-                    csvHeaders = ['Content', 'Page Number'];
-                    break;
-                case 'detailed':
-                    csvHeaders = ['Title', 'Content', 'Keywords', 'Source'];
-                    break;
-                default:
-                    csvHeaders = ['Content', 'Page Number'];
+            // Detect domain for more relevant questions
+            const domain = detectContentDomain(text);
+            
+            // Process content for different question types
+            if (numMCQuestions > 0) {
+                generateMultipleChoiceQuestions(text, pages, numMCQuestions, mcPoints, domain);
             }
             
-            // Process content based on format
-            switch (contentFormat) {
-                case 'paragraph':
-                    processParagraphs(text, pages, csvFormat);
-                    break;
-                case 'sentence':
-                    processSentences(text, pages, csvFormat);
-                    break;
-                case 'key-points':
-                    processKeyPoints(text, pages, csvFormat);
-                    break;
-                default:
-                    processParagraphs(text, pages, csvFormat);
+            if (numOpenQuestions > 0) {
+                generateOpenEndedQuestions(text, pages, numOpenQuestions, openPoints, domain);
             }
             
             return csvData;
         }
         
-        // Process text as paragraphs
-        function processParagraphs(text, pages, csvFormat) {
+        // Detect the domain of the content for better question generation
+        function detectContentDomain(text) {
+            const textLower = text.toLowerCase();
+            let domainCounts = {};
+            
+            // Count keywords from each domain
+            for (const [domain, keywords] of Object.entries(DOMAIN_KEYWORDS)) {
+                domainCounts[domain] = 0;
+                keywords.forEach(keyword => {
+                    const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
+                    const matches = textLower.match(regex);
+                    if (matches) {
+                        domainCounts[domain] += matches.length;
+                    }
+                });
+            }
+            
+            // Find domain with highest count
+            let maxCount = 0;
+            let detectedDomain = 'general';
+            
+            for (const [domain, count] of Object.entries(domainCounts)) {
+                if (count > maxCount) {
+                    maxCount = count;
+                    detectedDomain = domain;
+                }
+            }
+            
+            return detectedDomain;
+        }
+        
+        // Generate multiple choice questions
+        function generateMultipleChoiceQuestions(text, pages, numQuestions, points, domain) {
             // Split text into paragraphs (text blocks separated by multiple line breaks)
             const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 30);
             
-            paragraphs.forEach((paragraph, index) => {
+            // Extract key concepts based on domain
+            const keyConcepts = extractKeyConcepts(text, domain);
+            
+            // Generate concept-based questions
+            const conceptQuestions = generateConceptBasedQuestions(keyConcepts, domain, Math.floor(numQuestions * 0.7));
+            
+            // Generate content-based questions from paragraphs
+            const contentQuestions = generateContentBasedQuestions(paragraphs, pages, numQuestions - conceptQuestions.length);
+            
+            // Combine and add to csvData
+            conceptQuestions.concat(contentQuestions).forEach(q => {
+                csvData.push([
+                    "Multiple Choice",
+                    q.question,
+                    q.options[0],
+                    q.options[1],
+                    q.options[2],
+                    q.options[3],
+                    q.answer, // A, B, C, or D
+                    points.toString()
+                ]);
+            });
+        }
+        
+        // Generate open-ended questions
+        function generateOpenEndedQuestions(text, pages, numQuestions, points, domain) {
+            // Extract topics from the text
+            const topics = extractTopics(text, domain);
+            
+            // Generate a variety of open-ended question types
+            for (let i = 0; i < numQuestions; i++) {
+                if (i < topics.length) {
+                    const question = generateOpenQuestion(topics[i], domain);
+                    
+                    csvData.push([
+                        "Open Ended",
+                        question,
+                        "", // Empty options for open-ended questions
+                        "",
+                        "",
+                        "",
+                        "", // No correct answer for open-ended
+                        points.toString()
+                    ]);
+                }
+            }
+        }
+        
+        // Extract key concepts from text
+        function extractKeyConcepts(text, domain) {
+            const concepts = [];
+            
+            // Look for specific patterns based on domain
+            if (domain === 'finance') {
+                // Look for definitions, terms, and key financial concepts
+                const financialTerms = [
+                    "money market", "capital market", "interest rate", "inflation", "exchange rate",
+                    "financial instrument", "security", "stock", "bond", "derivative",
+                    "bank", "financial institution", "central bank", "commercial bank",
+                    "loan", "credit", "deposit", "investment", "portfolio", "risk",
+                    "return", "yield", "dividend", "equity", "debt", "asset", "liability"
+                ];
+                
+                financialTerms.forEach(term => {
+                    const regex = new RegExp(`${term}[s]?(?:\\s+(?:is|are|refers to|means|can be defined as)\\s+[^.]+\\.)|(?:[^.]+\\s+(?:is|are|called)\\s+(?:(?:the|a|an)\\s+)?${term}[s]?\\.)`, 'gi');
+                    const matches = text.match(regex);
+                    
+                    if (matches) {
+                        matches.forEach(match => {
+                            concepts.push({
+                                term: term,
+                                description: match.trim()
+                            });
+                        });
+                    }
+                });
+            } else if (domain === 'science') {
+                // Look for scientific concepts and definitions
+                const regex = /([A-Z][a-z]+(?:\s+[a-z]+){0,3})\s+(?:is|are|refers to|means|can be defined as)\s+([^.]+)\./g;
+                let match;
+                
+                while ((match = regex.exec(text)) !== null) {
+                    concepts.push({
+                        term: match[1],
+                        description: match[0].trim()
+                    });
+                }
+            } else {
+                // Generic approach for other domains
+                // Look for sentences with likely definitional structures
+                const regex = /([A-Z][a-z]+(?:\s+[a-z]+){0,3})\s+(?:is|are|refers to|means|can be defined as|represents|consists of)\s+([^.]+)\./g;
+                let match;
+                
+                while ((match = regex.exec(text)) !== null) {
+                    concepts.push({
+                        term: match[1],
+                        description: match[0].trim()
+                    });
+                }
+            }
+            
+            // If we couldn't find enough concepts, add some key sentences
+            if (concepts.length < 10) {
+                // Extract sentences with important keywords based on domain
+                const domainWords = DOMAIN_KEYWORDS[domain] || [];
+                const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+                
+                sentences.forEach(sentence => {
+                    if (sentence.length > 30 && sentence.length < 200) {
+                        // Check if the sentence contains important keywords
+                        const containsKeywords = domainWords.some(word => sentence.toLowerCase().includes(word));
+                        
+                        if (containsKeywords) {
+                            // Try to identify the main concept
+                            const words = sentence.split(' ');
+                            let term = words.slice(0, 3).join(' '); // Use first few words as term
+                            
+                            concepts.push({
+                                term: term,
+                                description: sentence.trim()
+                            });
+                        }
+                    }
+                });
+            }
+            
+            // Deduplicate and return limited set
+            return [...new Map(concepts.map(item => [item.description, item])).values()];
+        }
+        
+        // Extract topics from text for open-ended questions
+        function extractTopics(text, domain) {
+            const topics = [];
+            
+            // Split into paragraphs
+            const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 50);
+            
+            // For each substantial paragraph, try to identify the topic
+            paragraphs.forEach(paragraph => {
+                // Get the first sentence as potential topic
+                const firstSentence = paragraph.match(/^[^.!?]+[.!?]+/);
+                
+                if (firstSentence) {
+                    const sentence = firstSentence[0].trim();
+                    
+                    // Check if the sentence contains domain-specific keywords
+                    const domainWords = DOMAIN_KEYWORDS[domain] || [];
+                    const containsKeywords = domainWords.some(word => sentence.toLowerCase().includes(word));
+                    
+                    if (containsKeywords && sentence.length > 30) {
+                        topics.push({
+                            topic: sentence,
+                            content: paragraph
+                        });
+                    }
+                }
+            });
+            
+            // If we couldn't extract enough topics, use entire paragraphs
+            if (topics.length < 5 && paragraphs.length > 0) {
+                for (let i = 0; i < Math.min(paragraphs.length, 10); i++) {
+                    const paragraph = paragraphs[i];
+                    if (paragraph.length > 100) {
+                        topics.push({
+                            topic: paragraph.substring(0, 100) + "...",
+                            content: paragraph
+                        });
+                    }
+                }
+            }
+            
+            return topics;
+        }
+        
+        // Generate multiple choice questions based on key concepts
+        function generateConceptBasedQuestions(concepts, domain, numQuestions) {
+            const questions = [];
+            const usedConcepts = new Set();
+            
+            // Ensure we don't create more questions than we have concepts
+            const maxQuestions = Math.min(numQuestions, concepts.length);
+            
+            for (let i = 0; i < maxQuestions; i++) {
+                // Find a concept we haven't used yet
+                let conceptIndex;
+                do {
+                    conceptIndex = Math.floor(Math.random() * concepts.length);
+                } while (usedConcepts.has(conceptIndex) && usedConcepts.size < concepts.length);
+                
+                // If we've used all concepts, break
+                if (usedConcepts.size >= concepts.length) break;
+                
+                usedConcepts.add(conceptIndex);
+                const concept = concepts[conceptIndex];
+                
+                // Generate different question types
+                const questionTypes = [
+                    generateDefinitionQuestion,
+                    generateIdentificationQuestion,
+                    generateFunctionQuestion,
+                    generateCharacteristicQuestion
+                ];
+                
+                const questionGenerator = questionTypes[Math.floor(Math.random() * questionTypes.length)];
+                const question = questionGenerator(concept, domain);
+                
+                if (question) {
+                    questions.push(question);
+                }
+            }
+            
+            return questions;
+        }
+        
+        // Generate content-based questions from paragraphs
+        function generateContentBasedQuestions(paragraphs, pages, numQuestions) {
+            const questions = [];
+            const usedParagraphs = new Set();
+            
+            // Ensure we don't create more questions than we have paragraphs
+            const maxQuestions = Math.min(numQuestions, paragraphs.length);
+            
+            for (let i = 0; i < maxQuestions; i++) {
+                // Find a paragraph we haven't used yet
+                let paragraphIndex;
+                do {
+                    paragraphIndex = Math.floor(Math.random() * paragraphs.length);
+                } while (usedParagraphs.has(paragraphIndex) && usedParagraphs.size < paragraphs.length);
+                
+                // If we've used all paragraphs, break
+                if (usedParagraphs.size >= paragraphs.length) break;
+                
+                usedParagraphs.add(paragraphIndex);
+                const paragraph = paragraphs[paragraphIndex];
+                
                 // Find which page this paragraph is likely on
                 let pageNum = findPageForContent(paragraph, pages);
                 
-                // Create row based on CSV format
-                let row;
-                switch (csvFormat) {
-                    case 'quizizz':
-                        // For Quizizz format, create fill-in-the-blank questions
-                        const words = paragraph.split(' ');
-                        let blankIndex;
-                        
-                        // For shorter paragraphs, blank out a word near the middle
-                        if (words.length < 15) {
-                            blankIndex = Math.floor(words.length / 2);
-                        } else {
-                            // For longer paragraphs, blank out a significant word
-                            const significantWords = words.filter(word => 
-                                word.length >
-                                4 && !['about', 'after', 'again', 'below', 'could', 'every', 
-                                      'first', 'found', 'great', 'house', 'large', 'learn', 
-                                      'never', 'other', 'place', 'small', 'study', 'their', 
-                                      'there', 'these', 'think', 'three', 'water', 'where', 
-                                      'which', 'world', 'would', 'write'].includes(word.toLowerCase())
-                            );
-                            
-                            if (significantWords.length > 0) {
-                                const wordToBlank = significantWords[Math.floor(Math.random() * significantWords.length)];
-                                blankIndex = words.findIndex(word => word === wordToBlank);
-                                if (blankIndex === -1) blankIndex = Math.floor(words.length / 2);
-                            } else {
-                                blankIndex = Math.floor(words.length / 2);
+                // Generate a factual question from the paragraph
+                const question = generateFactualQuestion(paragraph, pageNum);
+                
+                if (question) {
+                    questions.push(question);
+                }
+            }
+            
+            return questions;
+        }
+        
+        // Generate definition question
+        function generateDefinitionQuestion(concept, domain) {
+            const term = concept.term;
+            const description = concept.description;
+            
+            let question = `Which of the following best defines ${term}?`;
+            
+            // Extract the actual definition part, removing the term itself
+            let definition = description.replace(new RegExp(`${term}\\s+(?:is|are|refers to|means|can be defined as)\\s+`, 'i'), '').replace(/\.$/, '');
+            
+            // If definition extraction failed, use the full description
+            if (definition === description) {
+                definition = description;
+            }
+            
+            // Generate 3 incorrect definitions
+            const incorrectOptions = generateIncorrectDefinitions(definition, domain);
+            
+            // Combine options and randomly place the correct answer
+            const options = [definition, ...incorrectOptions];
+            shuffleArray(options);
+            
+            // Find the index of the correct answer (A, B, C, D)
+            const correctIndex = options.indexOf(definition);
+            const answerLetter = String.fromCharCode(65 + correctIndex); // A, B, C, or D
+            
+            return {
+                question: question,
+                options: options,
+                answer: answerLetter
+            };
+        }
+        
+        // Generate identification question
+        function generateIdentificationQuestion(concept, domain) {
+            const term = concept.term;
+            const description = concept.description;
+            
+            // Create a question that asks to identify the term based on description
+            let descriptionForQuestion = description.replace(new RegExp(`${term}\\s+(?:is|are|refers to|means|can be defined as)\\s+`, 'i'), 'It ');
+            descriptionForQuestion = descriptionForQuestion.replace(new RegExp(`\\b${term}\\b`, 'gi'), 'it');
+            
+            let question = `Which of the following is being described: "${descriptionForQuestion}"`;
+            
+            // Generate 3 incorrect terms
+            const incorrectOptions = generateIncorrectTerms(term, domain);
+            
+            // Combine options and randomly place the correct answer
+            const options = [term, ...incorrectOptions];
+            shuffleArray(options);
+            
+            // Find the index of the correct answer (A, B, C, D)
+            const correctIndex = options.indexOf(term);
+            const answerLetter = String.fromCharCode(65 + correctIndex); // A, B, C, or D
+            
+            return {
+                question: question,
+                options: options,
+                answer: answerLetter
+            };
+        }
+        
+        // Generate function question
+        function generateFunctionQuestion(concept, domain) {
+            // This works best for finance, science, and technology domains
+            if (!['finance', 'science', 'technology'].includes(domain)) {
+                return generateDefinitionQuestion(concept, domain);
+            }
+            
+            const term = concept.term;
+            
+            let question = `What is the primary function of ${term}?`;
+            
+            // Extract the function from the description
+            let functionDescription = '';
+            const description = concept.description;
+            
+            if (description.includes('function') || description.includes('purpose') || 
+                description.includes('role') || description.includes('used to') || 
+                description.includes('serves to')) {
+                // Try to extract the function part
+                const parts = description.split(/\s+(?:function|purpose|role|used\s+to|serves\s+to)\s+/i);
+                if (parts.length > 1) {
+                    functionDescription = parts[1].replace(/\.$/, '');
+                } else {
+                    functionDescription = description;
+                }
+            } else {
+                // If no explicit function mentioned, use the whole description
+                functionDescription = description;
+            }
+            
+            // Generate 3 incorrect function descriptions
+            const incorrectOptions = generateIncorrectFunctions(functionDescription, domain);
+            
+            // Combine options and randomly place the correct answer
+            const options = [functionDescription, ...incorrectOptions];
+            shuffleArray(options);
+            
+            // Find the index of the correct answer (A, B, C, D)
+            const correctIndex = options.indexOf(functionDescription);
+            const answerLetter = String.fromCharCode(65 + correctIndex); // A, B, C, or D
+            
+            return {
+                question: question,
+                options: options,
+                answer: answerLetter
+            };
+        }
+        
+        // Generate characteristic question
+        function generateCharacteristicQuestion(concept, domain) {
+            const term = concept.term;
+            
+            let question = `Which of the following is a characteristic of ${term}?`;
+            
+            // Use the description as the correct answer
+            const correctOption = concept.description;
+            
+            // Generate 3 incorrect characteristics
+            const incorrectOptions = generateIncorrectCharacteristics(correctOption, domain);
+            
+            // Combine options and randomly place the correct answer
+            const options = [correctOption, ...incorrectOptions];
+            shuffleArray(options);
+            
+            // Find the index of the correct answer (A, B, C, D)
+            const correctIndex = options.indexOf(correctOption);
+            const answerLetter = String.fromCharCode(65 + correctIndex); // A, B, C, or D
+            
+            return {
+                question: question,
+                options: options,
+                answer: answerLetter
+            };
+        }
+        
+        // Generate factual question from paragraph
+        function generateFactualQuestion(paragraph, pageNum) {
+            // Extract factual statements
+            const sentences = paragraph.match(/[^.!?]+[.!?]+/g) || [];
+            if (sentences.length === 0) return null;
+            
+            // Find sentences with likely factual content
+            const factualSentences = sentences.filter(s => 
+                s.length > 30 && s.length < 150 && 
+                !s.includes('might') && !s.includes('may') && !s.includes('could') && 
+                !s.includes('would') && !s.includes('should')
+            );
+            
+            if (factualSentences.length === 0) return null;
+            
+            // Pick a random factual sentence
+            const sentence = factualSentences[Math.floor(Math.random() * factualSentences.length)];
+            
+            // Identify key parts of the sentence to create question
+            const words = sentence.split(' ');
+            let questionType, question, correctAnswer;
+            
+            if (words.length < 7) return null; // Sentence too short
+            
+            // Try to find a fact to ask about
+            const keyTerms = findKeyTerms(sentence);
+            
+            if (keyTerms.length > 0) {
+                // Pick a random key term
+                const keyTerm = keyTerms[Math.floor(Math.random() * keyTerms.length)];
+                
+                // Create a question based on the key term
+                question = sentence.replace(new RegExp(`\\b${keyTerm}\\b`, 'i'), '_______');
+                question = "Which of the following correctly completes this statement: " + question;
+                correctAnswer = keyTerm;
+                
+                // Generate 3 incorrect answers
+                const incorrectOptions = generateIncorrectAnswers(correctAnswer);
+                
+                // Combine options and randomly place the correct answer
+                const options = [correctAnswer, ...incorrectOptions];
+                shuffleArray(options);
+                
+                // Find the index of the correct answer (A, B, C, D)
+                const correctIndex = options.indexOf(correctAnswer);
+                const answerLetter = String.fromCharCode(65 + correctIndex); // A, B, C, or D
+                
+                return {
+                    question: question,
+                    options: options,
+                    answer: answerLetter
+                };
+            }
+            
+            // Fallback if no key terms found
+            // Create a "which statement is true" question
+            question = `Which of the following statements about page ${pageNum} content is true?`;
+            correctAnswer = sentence;
+            
+            // Generate 3 false statements
+            const incorrectOptions = generateFalseStatements(correctAnswer);
+            
+            // Combine options and randomly place the correct answer
+            const options = [correctAnswer, ...incorrectOptions];
+            shuffleArray(options);
+            
+            // Find the index of the correct answer (A, B, C, D)
+            const correctIndex = options.indexOf(correctAnswer);
+            const answerLetter = String.fromCharCode(65 + correctIndex); // A, B, C, or D
+            
+            return {
+                question: question,
+                options: options,
+                answer: answerLetter
+            };
+        }
+        
+        // Generate an open-ended question
+        function generateOpenQuestion(topic, domain) {
+            const openQuestionTemplates = [
+                // Analysis questions
+                `Analyze the key factors that influence ${topic.topic}`,
+                `Discuss the significance of ${topic.topic} and its implications.`,
+                `Explain how ${topic.topic} relates to broader concepts in this field.`,
+                
+                // Evaluation questions
+                `Evaluate the effectiveness of approaches related to ${topic.topic}.`,
+                `Compare and contrast different perspectives on ${topic.topic}.`,
+                `Critically assess the impact of ${topic.topic} on related areas.`,
+                
+                // Application questions
+                `How might the principles of ${topic.topic} be applied in a real-world situation?`,
+                `Describe how you would implement solutions based on ${topic.topic}.`,
+                `What strategies would you recommend regarding ${topic.topic} and why?`
+            ];
+            
+            // Add domain-specific questions
+            if (domain === 'finance') {
+                openQuestionTemplates.push(
+                    `Explain how changes in economic conditions would affect ${topic.topic}.`,
+                    `Discuss how risk and return considerations apply to ${topic.topic}.`,
+                    `Analyze the regulatory implications related to ${topic.topic}.`
+                );
+            } else if (domain === 'science') {
+                openQuestionTemplates.push(
+                    `Describe the experimental evidence supporting theories about ${topic.topic}.`,
+                    `Explain the relationship between ${topic.topic} and other scientific phenomena.`,
+                    `How might future research advance our understanding of ${topic.topic}?`
+                );
+            }
+            
+            // Pick a random question template
+            return openQuestionTemplates[Math.floor(Math.random() * openQuestionTemplates.length)];
+        }
+        
+        // Helper functions
+        
+        // Find key terms in a sentence
+        function findKeyTerms(sentence) {
+            const words = sentence.split(' ');
+            const keyTerms = [];
+            
+            // Look for nouns, especially those starting with capital letters
+            for (let i = 0; i < words.length; i++) {
+                const word = words[i].replace(/[.,;:!?]$/, ''); // Remove punctuation
+                
+                // Skip short words and common words
+                if (word.length < 4) continue;
+                if (['about', 'after', 'again', 'below', 'could', 'every', 
+                     'first', 'found', 'great', 'house', 'large', 'learn', 
+                     'never', 'other', 'place', 'small', 'study', 'their', 
+                     'there', 'these', 'think', 'three', 'water', 'where', 
+                     'which', 'world', 'would', 'write'].includes(word.toLowerCase())) {
+                    continue;
+                }
+                
+                // Prioritize capitalized words (likely proper nouns)
+                if (/^[A-Z][a-z]+$/.test(word)) {
+                    keyTerms.push(word);
+                } 
+                // Look for domain-specific terms
+                else if (/^[a-z]+$/.test(word.toLowerCase()) && word.length > 5) {
+                    keyTerms.push(word);
+                }
+            }
+            
+            return keyTerms;
+        }
+        
+        // Generate incorrect definitions
+        function generateIncorrectDefinitions(correctDefinition, domain) {
+            const incorrectOptions = [];
+            
+            // Generate 3 plausible but incorrect definitions
+            for (let i = 0; i < 3; i++) {
+                // Modify the correct definition to create an incorrect one
+                let incorrectDef;
+                
+                // Different modification strategies
+                const modStrategy = Math.floor(Math.random() * 3);
+                
+                switch (modStrategy) {
+                    case 0: // Negate a key part
+                        incorrectDef = correctDefinition.replace(/\b(is|are|can|has|have|does|do)\b/i, match => {
+                            const negations = {
+                                'is': 'is not', 'are': 'are not', 'can': 'cannot',
+                                'has': 'does not have', 'have': 'do not have',
+                                'does': 'does not', 'do': 'do not'
+                            };
+                            return negations[match.toLowerCase()];
+                        });
+                        break;
+                    case 1: // Replace key terms
+                        incorrectDef = correctDefinition;
+                        const words = correctDefinition.split(' ');
+                        // Find words to replace (non-common words)
+                        for (let w = 0; w < words.length; w++) {
+                            if (words[w].length > 5 && !/^(about|after|again|below|could|every|first|found|great|their|there|these|those|where|which|would)$/i.test(words[w])) {
+                                // Replace with an opposite or different term
+                                const opposites = {
+                                    'increase': 'decrease', 'decrease': 'increase',
+                                    'positive': 'negative', 'negative': 'positive',
+                                    'higher': 'lower', 'lower': 'higher',
+                                    'more': 'less', 'less': 'more',
+                                    'large': 'small', 'small': 'large',
+                                    'long': 'short', 'short': 'long',
+                                    'strong': 'weak', 'weak': 'strong',
+                                    'important': 'insignificant', 'significant': 'minor'
+                                };
+                                
+                                const wordLower = words[w].toLowerCase().replace(/[.,;:!?]$/, '');
+                                if (opposites[wordLower]) {
+                                    incorrectDef = incorrectDef.replace(new RegExp(`\\b${words[w]}\\b`, 'i'), opposites[wordLower]);
+                                    break; // Only replace one word
+                                }
                             }
                         }
-                        
-                        const answer = words[blankIndex].replace(/[.,;:!?]$/, '');
-                        words[blankIndex] = '_______';
-                        const question = words.join(' ');
-                        
-                        row = [
-                            'Multiple Choice',
-                            question,
-                            answer, // Correct answer
-                            generateWrongAnswer(answer), // Wrong option 1
-                            generateWrongAnswer(answer), // Wrong option 2
-                            generateWrongAnswer(answer), // Wrong option 3
-                            answer, // Answer
-                            `This completes the sentence from page ${pageNum}.` // Explanation
+                        break;
+                    case 2: // Completely different but plausible definition
+                        // Create a definition unrelated to the original
+                        const genericDefinitions = [
+                            "A theoretical concept with limited practical applications in real-world scenarios.",
+                            "A minor technical procedure used primarily in research settings.",
+                            "An outdated approach that has largely been replaced by more modern methods.",
+                            "A specialized technique applied only in rare circumstances.",
+                            "A conceptual framework that lacks empirical support in recent studies.",
+                            "A controversial method that divides opinion among experts in the field."
                         ];
+                        incorrectDef = genericDefinitions[Math.floor(Math.random() * genericDefinitions.length)];
                         break;
-                    case 'basic':
-                        row = [paragraph, pageNum];
-                        break;
-                    case 'detailed':
-                        const title = `Content from page ${pageNum}`;
-                        const keywords = extractKeywords(paragraph);
-                        const source = `Page ${pageNum}`;
-                        row = [title, paragraph, keywords, source];
-                        break;
-                    default:
-                        row = [paragraph, pageNum];
                 }
                 
-                csvData.push(row);
-            });
+                // Ensure the incorrect definition is different from the correct one
+                if (incorrectDef !== correctDefinition && !incorrectOptions.includes(incorrectDef)) {
+                    incorrectOptions.push(incorrectDef);
+                } else {
+                    // If we generated a duplicate, use a generic incorrect option
+                    incorrectOptions.push(`A different concept unrelated to what is described in the text.`);
+                }
+            }
+            
+            return incorrectOptions;
         }
         
-        // Process text as sentences
-        function processSentences(text, pages, csvFormat) {
-            // Split text into sentences (text ending with period, question mark, or exclamation)
-            const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+        // Generate incorrect terms
+        function generateIncorrectTerms(correctTerm, domain) {
+            const incorrectOptions = [];
             
-            sentences.forEach((sentence, index) => {
-                sentence = sentence.trim();
-                if (sentence.length < 20) return; // Skip very short sentences
+            // Domain-specific related but incorrect terms
+            let relatedTerms = [];
+            
+            if (domain === 'finance') {
+                relatedTerms = [
+                    "Money market", "Capital market", "Stock market", "Bond market", "Forex market",
+                    "Commercial bank", "Investment bank", "Central bank", "Retail bank",
+                    "Treasury bill", "Commercial paper", "Certificate of deposit", "Banker's acceptance",
+                    "Stock", "Bond", "Mutual fund", "ETF", "Derivative", "Option", "Future",
+                    "Interest rate", "Inflation rate", "Exchange rate", "Discount rate", "Federal funds rate",
+                    "Asset", "Liability", "Equity", "Revenue", "Expense"
+                ];
+            } else if (domain === 'science') {
+                relatedTerms = [
+                    "Hypothesis", "Theory", "Law", "Principle", "Paradigm",
+                    "Molecule", "Atom", "Cell", "Tissue", "Organ", "System",
+                    "Ecosystem", "Biome", "Habitat", "Niche", "Species",
+                    "Element", "Compound", "Mixture", "Solution", "Reaction",
+                    "Force", "Energy", "Momentum", "Velocity", "Acceleration"
+                ];
+            } else if (domain === 'history') {
+                relatedTerms = [
+                    "Renaissance", "Reformation", "Revolution", "Empire", "Republic",
+                    "Democracy", "Monarchy", "Aristocracy", "Feudalism", "Capitalism", "Socialism",
+                    "Treaty", "Alliance", "Coalition", "League", "Union",
+                    "Ancient", "Medieval", "Modern", "Post-modern", "Contemporary",
+                    "War", "Conflict", "Conquest", "Invasion", "Occupation"
+                ];
+            } else {
+                // Generic terms for other domains
+                relatedTerms = [
+                    "Process", "System", "Framework", "Method", "Approach",
+                    "Concept", "Theory", "Model", "Structure", "Function",
+                    "Element", "Component", "Module", "Unit", "Section",
+                    "Category", "Classification", "Type", "Kind", "Class",
+                    "Development", "Evolution", "Progression", "Advancement", "Improvement"
+                ];
+            }
+            
+            // Filter out the correct term
+            relatedTerms = relatedTerms.filter(term => term.toLowerCase() !== correctTerm.toLowerCase());
+            
+            // Generate 3 incorrect terms
+            for (let i = 0; i < 3; i++) {
+                if (relatedTerms.length > 0) {
+                    // Pick a random related term
+                    const randIndex = Math.floor(Math.random() * relatedTerms.length);
+                    const term = relatedTerms[randIndex];
+                    
+                    // Remove to avoid duplicates
+                    relatedTerms.splice(randIndex, 1);
+                    
+                    incorrectOptions.push(term);
+                } else {
+                    // Fallback if we ran out of related terms
+                    incorrectOptions.push(`Alternative concept ${i+1}`);
+                }
+            }
+            
+            return incorrectOptions;
+        }
+        
+        // Generate incorrect functions
+        function generateIncorrectFunctions(correctFunction, domain) {
+            const incorrectOptions = [];
+            
+            // Domain-specific incorrect functions
+            let incorrectFunctions = [];
+            
+            if (domain === 'finance') {
+                incorrectFunctions = [
+                    "To increase market volatility during economic downturns.",
+                    "To restrict access to capital for emerging businesses.",
+                    "To centralize financial decision-making within governing bodies.",
+                    "To maximize short-term profits at the expense of sustainable growth.",
+                    "To create artificial barriers between different market segments.",
+                    "To complicate financial transactions for regulatory purposes."
+                ];
+            } else if (domain === 'science') {
+                incorrectFunctions = [
+                    "To contradict established scientific principles rather than build upon them.",
+                    "To limit experimental replication across different laboratory settings.",
+                    "To segregate scientific disciplines rather than promote interdisciplinary approaches.",
+                    "To prioritize theoretical models over empirical observations.",
+                    "To maintain historical scientific paradigms despite contradictory evidence.",
+                    "To restrict access to scientific knowledge within specialized communities."
+                ];
+            } else if (domain === 'technology') {
+                incorrectFunctions = [
+                    "To increase system complexity without enhancing functionality.",
+                    "To limit compatibility with other technological systems.",
+                    "To prioritize aesthetic design over practical usability.",
+                    "To maximize resource consumption rather than efficiency.",
+                    "To restrict user customization and control over the system.",
+                    "To enforce obsolescence of previous technological iterations."
+                ];
+            } else {
+                // Generic incorrect functions
+                incorrectFunctions = [
+                    "To complicate rather than simplify the underlying processes.",
+                    "To restrict rather than expand accessibility to resources.",
+                    "To prioritize form over function in practical applications.",
+                    "To maintain traditional approaches despite their limitations.",
+                    "To segregate rather than integrate related components.",
+                    "To maximize costs while minimizing practical benefits."
+                ];
+            }
+            
+            // Shuffle the array
+            shuffleArray(incorrectFunctions);
+            
+            // Take the first 3
+            return incorrectFunctions.slice(0, 3);
+        }
+        
+        // Generate incorrect characteristics
+        function generateIncorrectCharacteristics(correctCharacteristic, domain) {
+            // Create opposite or unrelated characteristics
+            const incorrectOptions = [];
+            
+            // Domain-specific incorrect characteristics
+            let incorrectCharacteristics = [];
+            
+            if (domain === 'finance') {
+                incorrectCharacteristics = [
+                    "It consistently underperforms compared to traditional investment strategies.",
+                    "It eliminates all forms of financial risk, guaranteeing absolute safety.",
+                    "It operates entirely outside regulatory frameworks and oversight.",
+                    "It requires minimal capital investment while promising unrealistic returns.",
+                    "It functions independently of broader economic conditions and market forces.",
+                    "It eliminates the need for diversification in investment portfolios."
+                ];
+            } else if (domain === 'science') {
+                incorrectCharacteristics = [
+                    "It contradicts fundamental laws of thermodynamics and physics.",
+                    "It produces results that cannot be replicated under controlled conditions.",
+                    "It functions equally effectively across all temperature and pressure ranges.",
+                    "It operates independently of genetic or evolutionary principles.",
+                    "It demonstrates properties that violate established chemical bonds.",
+                    "It shows perfect efficiency with zero energy loss in all processes."
+                ];
+            } else {
+                // Generic incorrect characteristics
+                incorrectCharacteristics = [
+                    "It consistently exhibits properties contradicting its basic definition.",
+                    "It functions completely independently of related systems and processes.",
+                    "It demonstrates perfect efficiency in all possible scenarios.",
+                    "It lacks any practical applications in real-world situations.",
+                    "It operates under principles that contradict established research.",
+                    "It remains unchanged regardless of external conditions or pressures."
+                ];
+            }
+            
+            // Shuffle the array
+            shuffleArray(incorrectCharacteristics);
+            
+            // Take the first 3
+            return incorrectCharacteristics.slice(0, 3);
+        }
+        
+        // Generate incorrect answers for factual questions
+        function generateIncorrectAnswers(correctAnswer) {
+            const incorrectOptions = [];
+            
+            // Generate 3 plausible but incorrect answers
+            for (let i = 0; i < 3; i++) {
+                let incorrectAnswer;
                 
-                // Find which page this sentence is likely on
-                let pageNum = findPageForContent(sentence, pages);
+                // If the correct answer is a number, generate nearby numbers
+                if (/^\d+(\.\d+)?$/.test(correctAnswer)) {
+                    const num = parseFloat(correctAnswer);
+                    const percentChange = Math.random() * 0.5 + 0.2; // 20-70% change
+                    const direction = Math.random() > 0.5 ? 1 : -1;
+                    incorrectAnswer = Math.round(num * (1 + direction * percentChange)).toString();
+                    
+                    // If we ended up with the same number, add or subtract 1
+                    if (incorrectAnswer === correctAnswer) {
+                        incorrectAnswer = (num + (direction > 0 ? 1 : -1)).toString();
+                    }
+                } 
+                // If the correct answer is a word or phrase
+                else {
+                    // List of plausible alternatives based on word length
+                    const alternatives = {
+                        short: ["primary", "secondary", "critical", "optional", "central", "marginal", "direct", "indirect", "formal", "informal", "active", "passive", "public", "private", "internal", "external"],
+                        medium: ["significant", "negligible", "essential", "peripheral", "productive", "counterproductive", "conventional", "innovative", "theoretical", "practical", "quantitative", "qualitative", "historical", "contemporary"],
+                        long: ["comprehensive", "fragmentary", "interdisciplinary", "specialized", "conventional", "revolutionary", "transparent", "opaque", "democratic", "authoritarian", "centralized", "decentralized", "homogeneous", "heterogeneous"]
+                    };
+                    
+                    // Select alternatives based on length of correct answer
+                    let wordPool;
+                    if (correctAnswer.length < 6) {
+                        wordPool = alternatives.short;
+                    } else if (correctAnswer.length < 10) {
+                        wordPool = alternatives.medium;
+                    } else {
+                        wordPool = alternatives.long;
+                    }
+                    
+                    incorrectAnswer = wordPool[Math.floor(Math.random() * wordPool.length)];
+                    
+                    // If by chance we picked the correct answer, pick another
+                    if (incorrectAnswer === correctAnswer) {
+                        incorrectAnswer = wordPool[(wordPool.indexOf(incorrectAnswer) + 1) % wordPool.length];
+                    }
+                }
                 
-                // Create row based on CSV format
-                let row;
-                switch (csvFormat) {
-                    case 'quizizz':
-                        // For Quizizz, create true/false questions
-                        const isTrueQuestion = Math.random() > 0.3; // 70% true, 30% false
+                // If we generated a duplicate, try a different approach
+                if (incorrectOptions.includes(incorrectAnswer)) {
+                    const genericOptions = ["alternative", "different option", "another possibility"];
+                    incorrectAnswer = genericOptions[i % genericOptions.length];
+                }
+                
+                incorrectOptions.push(incorrectAnswer);
+            }
+            
+            return incorrectOptions;
+        }
+        
+        // Generate false statements
+        function generateFalseStatements(trueStatement) {
+            const falseStatements = [];
+            
+            // Different strategies to create false statements
+            for (let i = 0; i < 3; i++) {
+                let falseStatement;
+                
+                switch (i) {
+                    case 0: // Negate a key part
+                        falseStatement = trueStatement.replace(/\b(is|are|can|has|have|does|do|will|would)\b/i, match => {
+                            const negations = {
+                                'is': 'is not', 'are': 'are not', 'can': 'cannot',
+                                'has': 'does not have', 'have': 'do not have',
+                                'does': 'does not', 'do': 'do not',
+                                'will': 'will not', 'would': 'would not'
+                            };
+                            return negations[match.toLowerCase()];
+                        });
+                        break;
+                    case 1: // Replace numbers or quantities
+                        falseStatement = trueStatement.replace(/\b(\d+)(\s*%|\s*percent)?\b/g, match => {
+                            const num = parseInt(match);
+                            return (num + Math.floor(Math.random() * 10) + 5).toString() + (match.includes('%') ? '%' : '');
+                        });
                         
-                        let question, answer, explanation;
-                        
-                        if (isTrueQuestion) {
-                            question = sentence;
-                            answer = 'True';
-                            explanation = `This statement appears on page ${pageNum}.`;
-                        } else {
-                            // Create a false statement by modifying the sentence
-                            const modification = modifySentence(sentence);
-                            question = modification.text;
-                            answer = 'False';
-                            explanation = `The correct statement is: "${sentence}" (Page ${pageNum})`;
+                        // If no numbers were replaced, try replacing quantifiers
+                        if (falseStatement === trueStatement) {
+                            falseStatement = trueStatement.replace(/\b(many|most|some|few|all|none|several)\b/i, match => {
+                                const replacements = {
+                                    'many': 'few', 'most': 'none', 'some': 'all',
+                                    'few': 'most', 'all': 'none', 'none': 'all',
+                                    'several': 'no'
+                                };
+                                return replacements[match.toLowerCase()];
+                            });
                         }
-                        
-                        row = [
-                            'True/False',
-                            question,
-                            'True',
-                            'False',
-                            '', // Empty C
-                            '', // Empty D
-                            answer,
-                            explanation
+                        break;
+                    case 2: // Generic false statement
+                        const genericFalseStatements = [
+                            "The text explicitly contradicts this concept on multiple occasions.",
+                            "This represents a common misconception rather than what the material states.",
+                            "This statement directly opposes the key principles outlined in the document.",
+                            "This conflates two separate ideas that are distinguished in the original text.",
+                            "This oversimplifies a complex concept in a way that misrepresents it."
                         ];
+                        falseStatement = genericFalseStatements[Math.floor(Math.random() * genericFalseStatements.length)];
                         break;
-                    case 'basic':
-                        row = [sentence, pageNum];
-                        break;
-                    case 'detailed':
-                        const title = `Sentence from page ${pageNum}`;
-                        const keywords = extractKeywords(sentence);
-                        const source = `Page ${pageNum}`;
-                        row = [title, sentence, keywords, source];
-                        break;
-                    default:
-                        row = [sentence, pageNum];
                 }
                 
-                csvData.push(row);
-            });
-        }
-        
-        // Process text as key points
-        function processKeyPoints(text, pages, csvFormat) {
-            // Split text into paragraphs first
-            const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+                // If the falseStatement is still the same as trueStatement, use a default
+                if (falseStatement === trueStatement) {
+                    falseStatement = "The opposite of what is stated in the text.";
+                }
+                
+                falseStatements.push(falseStatement);
+            }
             
-            // Process each paragraph to extract key points
-            paragraphs.forEach((paragraph, index) => {
-                if (paragraph.length < 40) return; // Skip very short paragraphs
-                
-                // Find which page this paragraph is likely on
-                let pageNum = findPageForContent(paragraph, pages);
-                
-                // Extract what appears to be a key point (first sentence of paragraph)
-                const firstSentence = paragraph.match(/^[^.!?]+[.!?]+/);
-                let keyPoint = firstSentence ? firstSentence[0].trim() : paragraph.substring(0, Math.min(150, paragraph.length)) + '...';
-                
-                // Create row based on CSV format
-                let row;
-                switch (csvFormat) {
-                    case 'quizizz':
-                        // For Quizizz, create multiple-choice questions
-                        const question = `Which of the following is true about content on page ${pageNum}?`;
-                        
-                        row = [
-                            'Multiple Choice',
-                            question,
-                            keyPoint, // Correct answer
-                            generateWrongOption(keyPoint), // Wrong option 1
-                            generateWrongOption(keyPoint), // Wrong option 2
-                            generateWrongOption(keyPoint), // Wrong option 3
-                            keyPoint, // Answer
-                            `This key point is from page ${pageNum}.` // Explanation
-                        ];
-                        break;
-                    case 'basic':
-                        row = [keyPoint, pageNum];
-                        break;
-                    case 'detailed':
-                        const title = `Key Point from page ${pageNum}`;
-                        const keywords = extractKeywords(keyPoint);
-                        const source = `Page ${pageNum}, derived from paragraph`;
-                        row = [title, keyPoint, keywords, source];
-                        break;
-                    default:
-                        row = [keyPoint, pageNum];
-                }
-                
-                csvData.push(row);
-            });
+            return falseStatements;
         }
         
         // Helper function to find which page contains specific content
@@ -617,105 +1358,6 @@
                 }
             }
             return Math.floor(Math.random() * pages.length) + 1; // Fallback to random page
-        }
-        
-        // Helper function to extract keywords from text
-        function extractKeywords(text) {
-            // Simple keyword extraction - find relatively unique words
-            const words = text.toLowerCase().match(/\b[a-z]{5,}\b/g) || [];
-            const uniqueWords = [...new Set(words)];
-            
-            // Get up to 5 keywords
-            return uniqueWords.slice(0, 5).join(', ');
-        }
-        
-        // Helper function to modify a sentence to make it false
-        function modifySentence(sentence) {
-            // Simple modifications to make a sentence false
-            const modifications = [
-                { type: 'negate', text: sentence.replace(/\b(is|are|was|were|has|have|had|do|does|did)\b/i, match => {
-                    const negations = {
-                        'is': 'is not', 'are': 'are not', 'was': 'was not', 'were': 'were not',
-                        'has': 'has not', 'have': 'have not', 'had': 'had not',
-                        'do': 'do not', 'does': 'does not', 'did': 'did not'
-                    };
-                    return negations[match.toLowerCase()];
-                }) },
-                { type: 'numbers', text: sentence.replace(/\b(\d+)\b/g, match => {
-                    const num = parseInt(match);
-                    return (num + Math.floor(Math.random() * 10) + 1).toString();
-                }) },
-                { type: 'adjective', text: sentence.replace(/\b(small|large|big|tiny|huge|important|significant|minor|major)\b/i, match => {
-                    const opposites = {
-                        'small': 'large', 'large': 'small', 'big': 'small', 'tiny': 'huge', 'huge': 'tiny',
-                        'important': 'unimportant', 'significant': 'insignificant',
-                        'minor': 'major', 'major': 'minor'
-                    };
-                    return opposites[match.toLowerCase()] || 'different';
-                }) }
-            ];
-            
-            // Pick a random modification
-            const mod = modifications.find(m => m.text !== sentence) || modifications[0];
-            return mod;
-        }
-        
-        // Helper function to generate a wrong answer for fill-in-the-blank
-        function generateWrongAnswer(answer) {
-            // Generate a plausible but wrong answer
-            if (answer.length <= 3) {
-                // For short words, just use common short words
-                const shortWords = ['the', 'and', 'but', 'not', 'yes', 'no', 'why', 'how', 'who', 'can', 'may', 'now'];
-                return shortWords[Math.floor(Math.random() * shortWords.length)];
-            }
-            
-            if (/^\d+$/.test(answer)) {
-                // For numbers, modify slightly
-                const num = parseInt(answer);
-                return (num + Math.floor(Math.random() * 10) + 1).toString();
-            }
-            
-            // For normal words, try to generate something similar but different
-            const vowels = ['a', 'e', 'i', 'o', 'u'];
-            const consonants = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z'];
-            
-            // Option 1: Change a letter
-            if (answer.length > 4) {
-                let modified = answer.split('');
-                const posToChange = Math.floor(Math.random() * modified.length);
-                const isVowel = vowels.includes(modified[posToChange].toLowerCase());
-                
-                modified[posToChange] = isVowel 
-                    ? vowels[Math.floor(Math.random() * vowels.length)]
-                    : consonants[Math.floor(Math.random() * consonants.length)];
-                
-                return modified.join('');
-            }
-            
-            // Option 2: Use a word of similar length
-            const similarLengthWords = [
-                'time', 'year', 'work', 'life', 'part', 'good', 'case', 'make', 'each', 'find',
-                'know', 'look', 'come', 'take', 'give', 'area', 'word', 'help', 'view', 'name'
-            ];
-            
-            return similarLengthWords[Math.floor(Math.random() * similarLengthWords.length)];
-        }
-        
-        // Helper function to generate wrong options for multiple choice
-        function generateWrongOption(correctOption) {
-            // Generate plausible wrong options
-            const genericOptions = [
-                "This information is not mentioned in the text.",
-                "The opposite of what is stated in the text.",
-                "A misrepresentation of the facts presented.",
-                "An unrelated concept not covered in this material.",
-                "A common misconception about this topic.",
-                "A partially correct statement with key errors.",
-                "An oversimplification that misses important details.",
-                "A statement that confuses cause and effect."
-            ];
-            
-            return genericOptions[Math.floor(Math.random() * genericOptions.length)];
         }
         
         // Generate CSV content as a string
@@ -767,8 +1409,8 @@
                 previewHeader.appendChild(th);
             });
             
-            // Add rows (limit to first 5)
-            const previewData = data.slice(0, 5);
+            // Add rows (limit to first 3)
+            const previewData = data.slice(0, 3);
             previewData.forEach(row => {
                 const tr = document.createElement('tr');
                 
@@ -776,12 +1418,21 @@
                     const td = document.createElement('td');
                     td.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300';
                     // Truncate long content
-                    td.textContent = cell.length > 50 ? cell.substring(0, 50) + '...' : cell;
+                    td.textContent = cell.length > 30 ? cell.substring(0, 30) + '...' : cell;
                     tr.appendChild(td);
                 });
                 
                 previewBody.appendChild(tr);
             });
+        }
+        
+        // Shuffle array (Fisher-Yates algorithm)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
         }
 
         // Helper function to show error message
@@ -800,7 +1451,7 @@
             uploadTextDefault.classList.remove('hidden');
             uploadTextSelected.classList.add('hidden');
             uploadTextSelected.textContent = '';
-            csvSettings.classList.add('hidden');
+            questionSettings.classList.add('hidden');
             processButton.disabled = true;
             processButton.classList.add('bg-gray-400', 'cursor-not-allowed');
             processButton.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'focus:outline-none', 'focus:ring-2', 'focus:ring-offset-2', 'focus:ring-blue-500');
@@ -825,7 +1476,7 @@
             processButton.disabled = false;
             buttonIconSend.classList.remove('hidden');
             buttonIconLoader.classList.add('hidden');
-            buttonText.textContent = 'Generate CSV';
+            buttonText.textContent = 'Generate Questions';
             processButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
             processButton.classList.add('bg-blue-600', 'hover:bg-blue-700', 'focus:outline-none', 'focus:ring-2', 'focus:ring-offset-2', 'focus:ring-blue-500');
         }
