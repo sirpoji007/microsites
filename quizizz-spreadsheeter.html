@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quizizz CSV Generator</title>
+    <title>Quizizz Spreadsheet Generator</title>
     <link rel="icon" type="image/png" href="https://sirpoji007.github.io/microsites/spreadsheeter.png">
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Quizizz CSV Generator">
-    <meta property="og:description" content="Upload your PDF material and convert it into a Quizizz-compatible CSV file!">
+    <meta property="og:title" content="Quizizz XLSX Generator">
+    <meta property="og:description" content="Upload your PDF material and convert it into a Quizizz-compatible XLSX file!">
     <meta property="og:image" content="https://sirpoji007.github.io/microsites/spreadsheeter.png">
     <meta property="og:type" content="website">
-    <!-- End Open Graph Meta Tags -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- PDF.js library for extracting PDF text -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@google/generative-ai@0.1.3/dist/index.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -71,9 +71,17 @@
                 document.documentElement.classList.remove('dark');
             }
         });
-        
+
         // Set PDF.js worker path
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // Initialize Gemini API (Replace with your actual API key)
+        // WARNING: Hardcoding API keys in client-side code is not secure for production.
+        // Consider using a backend proxy to handle API calls securely.
+        const API_KEY = "AIzaSyA-TFoxojtQ8IYKljCvi0aobP0wpo2uKPg"; // Replace with your actual API key
+        const genAI = new GenAI.GoogleGenerativeAI(API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Using gemini-1.5-flash for potentially faster responses
+
     </script>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 flex flex-col items-center justify-center p-4">
@@ -93,7 +101,7 @@
         </div>
 
         <h1 class="text-3xl font-bold text-gray-800 mb-4">Quizizz Question Generator</h1>
-        <p class="text-gray-600 mb-8">Upload your PDF material and convert it into a Quizizz-compatible CSV file!</p>
+        <p class="text-gray-600 mb-8">Upload your PDF material and convert it into a Quizizz-compatible sheet file!</p>
 
         <div id="upload-area" class="mb-6 border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 transition duration-300 ease-in-out cursor-pointer">
             <input type="file" accept=".pdf" id="pdfUpload">
@@ -121,22 +129,22 @@
             <div class="flex flex-col gap-4">
                 <div class="border rounded-md p-4 bg-gray-50 dark:bg-gray-800">
                     <h3 class="text-left text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Question Settings</h3>
-                    
+
                     <div class="mb-3">
                         <label for="num-mc-questions" class="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left mb-1">Number of Multiple Choice Questions:</label>
                         <input type="number" id="num-mc-questions" min="0" max="50" value="10" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="num-open-questions" class="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left mb-1">Number of Open-Ended Questions:</label>
                         <input type="number" id="num-open-questions" min="0" max="10" value="2" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
-                    <div class="mb-3 hidden"> 
+                    <div class="mb-3 hidden">
                         <label for="mc-points" class="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left mb-1">Points for Multiple Choice Questions:</label>
                         <input type="number" id="mc-points" min="1" max="20" value="1" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                     </div>
-                    
+
                     <div class="mb-3 hidden">
                         <label for="open-points" class="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left mb-1">Points for Open-Ended Questions:</label>
                         <input type="number" id="open-points" min="1" max="20" value="5" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500">
@@ -178,12 +186,10 @@
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead class="bg-gray-50 dark:bg-gray-900">
                         <tr id="preview-header">
-                            <!-- Headers will be inserted here -->
-                        </tr>
+                            </tr>
                     </thead>
                     <tbody id="preview-body" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                        <!-- Rows will be inserted here -->
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
@@ -196,22 +202,22 @@
                 <line x1="16" y1="17" x2="8" y2="17"/>
                 <line x1="10" y1="9" x2="8" y2="9"/>
             </svg>
-            <p class="text-lg font-semibold mb-4">CSV Generation Complete!</p>
-            <p id="csv-info" class="mb-4"></p>
-            <a id="download-link" href="#" download="quizizz_questions.csv" class="flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-300 ease-in-out">
+            <p class="text-lg font-semibold mb-4">Sheet Generation Complete!</p>
+            <p id="xlsx-info" class="mb-4"></p>
+            <a id="download-link" href="#" download="quizizz_questions.xlsx" class="flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-300 ease-in-out">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                     <polyline points="7 10 12 15 17 10"/>
                     <line x1="12" y1="15" x2="12" y2="3"/>
                 </svg>
-                Download CSV
+                Download XLSX
             </a>
             <div class="mt-4 text-left">
                 <p class="text-sm mb-2">Next steps:</p>
                 <ol class="list-decimal list-inside text-sm">
-                    <li class="mb-1">Download the CSV file</li>
+                    <li class="mb-1">Download the sheet file</li>
                     <li class="mb-1">In Quizizz, click "Create" → "Quiz"</li>
-                    <li class="mb-1">Click "Import from spreadsheet" and upload this CSV</li>
+                    <li class="mb-1">Click "Import from spreadsheet" and upload this sheet</li>
                     <li class="mb-1">Review and edit your questions as needed</li>
                 </ol>
             </div>
@@ -222,7 +228,7 @@
         </p>
 
     </div>
-    
+
     <footer class="text-center py-4 mt-auto text-sm text-white">
         SirPoji 2025 @ All rights reserved
     </footer>
@@ -253,678 +259,370 @@
         const previewHeader = document.getElementById('preview-header');
         const previewBody = document.getElementById('preview-body');
         const outputArea = document.getElementById('output-area');
-        const csvInfo = document.getElementById('csv-info');
+        const xlsxInfo = document.getElementById('xlsx-info'); // Changed from csvInfo
         const downloadLink = document.getElementById('download-link');
 
         let selectedFile = null;
         let extractedText = '';
-        let extractedPages = [];
-        let csvData = [];
-        const csvHeaders = ["Question Text", "Question Type", "Option 1", "Option 2", "Option 3", "Option 4", "Option 5", "Correct Answer", "Time (seconds)", "Image link", "Answer Explanation"];
+        let quizizzData = []; // Changed from csvData
+        const quizizzHeaders = ["Question Text", "Question Type", "Option 1", "Option 2", "Option 3", "Option 4", "Option 5", "Correct Answer", "Time (seconds)", "Image link", "Answer Explanation"]; // Headers remain the same for Quizizz template
         const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
-        const DOMAIN_KEYWORDS = {
-            finance: ["money", "bank", "loan", "interest", "credit", "debit", "invest", "market", "stock", "bond", "asset", "liability", "capital", "deposit", "finance", "fiscal", "fund", "portfolio", "security", "share", "yield", "dividend", "equity"],
-            science: ["experiment", "hypothesis", "theory", "research", "laboratory", "data", "evidence", "observation", "molecule", "atom", "cell", "element", "compound", "reaction", "energy", "ecosystem", "species", "organism"],
-            history: ["century", "decade", "era", "period", "ancient", "medieval", "modern", "revolution", "war", "empire", "kingdom", "dynasty", "treaty", "monarch", "president", "government", "civilization", "culture"],
-            literature: ["novel", "poem", "essay", "author", "character", "plot", "theme", "setting", "dialogue", "narrative", "genre", "literary", "fiction", "nonfiction", "prose", "verse", "metaphor", "symbol"],
-            technology: ["computer", "software", "hardware", "internet", "digital", "network", "system", "algorithm", "database", "program", "code", "application", "device", "innovation", "technology"]
-        };
+        // --- Utility Functions ---
+
+        // Show an error message
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.classList.remove('hidden');
+            // Automatically hide after 5 seconds
+            setTimeout(() => {
+                errorMessage.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Hide the error message
+        function hideError() {
+            errorMessage.classList.add('hidden');
+            errorText.textContent = '';
+        }
+
+        // Reset file input and UI state
+        function resetFileInput() {
+            selectedFile = null;
+            extractedText = '';
+            fileInput.value = ''; // Clear the file input
+            uploadIconDefault.classList.remove('hidden');
+            uploadIconSelected.classList.add('hidden');
+            uploadTextDefault.classList.remove('hidden');
+            uploadTextSelected.classList.add('hidden');
+            uploadTextSelected.textContent = '';
+            questionSettings.classList.add('hidden');
+            setProcessingState(false);
+            updateStatus('', 0);
+            previewContainer.classList.add('hidden');
+            previewHeader.innerHTML = '';
+            previewBody.innerHTML = '';
+            outputArea.classList.add('hidden');
+            quizizzData = []; // Reset data
+            hideError();
+        }
+
+        // Set the processing button and status state
+        function setProcessingState(isProcessing) {
+            if (isProcessing) {
+                processButton.classList.add('bg-blue-600', 'hover:bg-blue-700', 'cursor-progress');
+                processButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                processButton.disabled = true;
+                buttonIconSend.classList.add('hidden');
+                buttonIconLoader.classList.remove('hidden');
+                buttonText.textContent = 'Processing...';
+                processingStatus.classList.remove('hidden');
+            } else {
+                 // Only enable if a file is selected
+                if (selectedFile) {
+                    processButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                    processButton.classList.add('bg-blue-600', 'hover:bg-blue-700', 'cursor-pointer');
+                    processButton.disabled = false;
+                    buttonText.textContent = 'Generate Questions';
+                } else {
+                     processButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+                     processButton.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'cursor-pointer');
+                     processButton.disabled = true;
+                     buttonText.textContent = 'Generate Questions';
+                }
+                buttonIconSend.classList.remove('hidden');
+                buttonIconLoader.classList.add('hidden');
+            }
+        }
+
+        // Update the processing status and progress bar
+        function updateStatus(message, percentComplete) {
+            statusText.textContent = message;
+            progressBar.style.width = `${percentComplete}%`;
+             if (message === "" && percentComplete === 0) {
+                processingStatus.classList.add('hidden');
+            } else {
+                processingStatus.classList.remove('hidden');
+            }
+        }
+
+        // Display data preview (same logic as CSV preview, just different data source)
+        function displayPreview(data) {
+            previewHeader.innerHTML = '';
+            previewBody.innerHTML = '';
+
+            // Add headers
+            quizizzHeaders.forEach(header => {
+                const th = document.createElement('th');
+                th.classList.add('px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-500', 'uppercase', 'tracking-wider');
+                th.textContent = header;
+                previewHeader.appendChild(th);
+            });
+
+            // Add rows (first 3)
+            data.slice(0, 3).forEach(rowData => {
+                const tr = document.createElement('tr');
+                tr.classList.add('hover:bg-gray-100', 'dark:hover:bg-gray-700');
+                rowData.forEach((cellData, index) => {
+                    const td = document.createElement('td');
+                    td.classList.add('px-6', 'py-4', 'whitespace-nowrap', 'text-sm', 'text-gray-500', 'dark:text-gray-400');
+                     // Truncate long text for preview
+                    td.textContent = cellData.length > 100 ? cellData.substring(0, 100) + '...' : cellData;
+                    tr.appendChild(td);
+                });
+                previewBody.appendChild(tr);
+            });
+
+            previewContainer.classList.remove('hidden');
+        }
+
+        // --- PDF Processing ---
+
+        // Extract text from PDF file
+        async function extractTextFromPDF(file) {
+            updateStatus('Extracting text from PDF...', 10);
+            const reader = new FileReader();
+
+            return new Promise((resolve, reject) => {
+                reader.onload = async function(event) {
+                    const arrayBuffer = event.target.result;
+                    try {
+                        const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                        let fullText = '';
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const textContent = await page.getTextContent();
+                            const pageText = textContent.items.map(item => item.str).join(' ');
+                            fullText += pageText + '\n\n'; // Add some separation between pages
+                            updateStatus(`Extracting text from page ${i}/${pdf.numPages}...`, 10 + Math.floor((i / pdf.numPages) * 40)); // Progress from 10% to 50%
+                        }
+                        updateStatus('PDF text extraction complete.', 50);
+                        resolve(fullText);
+                    } catch (error) {
+                        console.error('Error extracting text from PDF:', error);
+                        showError('Error extracting text from PDF. Please try another file.');
+                        reject(error);
+                    }
+                };
+                reader.onerror = function(event) {
+                    console.error('Error reading file:', event.target.error);
+                    showError('Error reading file. Please try again.');
+                    reject(event.target.error);
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // --- Gemini API Integration ---
+
+        // Generate questions using Gemini API
+        async function generateQuestionsWithGemini(text, numMC, numOpen) {
+            updateStatus('Generating questions with AI...', 55);
+            const prompt = `
+            You are a helpful assistant that generates Quizizz questions from provided text.
+            Generate ${numMC} multiple-choice questions and ${numOpen} open-ended questions based on the following text.
+            Format the output as a JSON array of question objects. Each object should have the following structure:
+            {
+              "question_text": "...",
+              "question_type": "MC" or "OPEN",
+              "options": ["Option 1", "Option 2", "Option 3", "Option 4"], // Only for MC questions
+              "correct_answer": "...", // For MC, the text of the correct option. For OPEN, a suggested answer or keywords.
+              "time_seconds": 30, // Default time
+              "image_link": "", // Leave empty
+              "answer_explanation": "" // Leave empty or provide a brief explanation
+            }
+
+            Ensure the multiple-choice questions have exactly 4 options.
+            Ensure the correct answer for MC questions is one of the provided options.
+            Ensure the questions and answers are directly based on the provided text.
+
+            Provided text:
+            ---
+            ${text}
+            ---
+
+            Output JSON array:
+            `;
+
+            try {
+                const result = await model.generateContent(prompt);
+                const response = await result.response;
+                const textResponse = response.text();
+
+                // Attempt to parse the JSON response
+                // Sometimes the API might include markdown backticks or extra text
+                const jsonMatch = textResponse.match(/```json\n([\s\S]*?)\n```/);
+                let questions;
+                if (jsonMatch && jsonMatch[1]) {
+                    questions = JSON.parse(jsonMatch[1]);
+                } else {
+                    // Fallback: try to parse the whole response if no markdown block is found
+                    questions = JSON.parse(textResponse);
+                }
+
+                updateStatus('AI question generation complete.', 90);
+                return questions;
+
+            } catch (error) {
+                console.error('Error generating questions with Gemini API:', error);
+                showError('Error generating questions with AI. Please check your API key and try again.');
+                throw error; // Re-throw to be caught by the main process handler
+            }
+        }
+
+        // Convert generated questions to Quizizz data format (array of arrays)
+        function convertQuestionsToQuizizzData(questions) {
+            const data = questions.map(q => {
+                const row = new Array(quizizzHeaders.length).fill(''); // Initialize with empty strings
+                row[0] = q.question_text;
+                row[1] = q.question_type === 'MC' ? 'Multiple Choice' : 'Open-Ended';
+
+                if (q.question_type === 'MC' && q.options) {
+                    // Ensure we only take up to 5 options for the Quizizz format
+                    q.options.slice(0, 5).forEach((option, index) => {
+                        row[index + 2] = option; // Options go from index 2 to 6
+                    });
+                }
+
+                row[7] = q.correct_answer;
+                row[8] = q.time_seconds || 30; // Default to 30 seconds if not provided
+                row[9] = q.image_link || '';
+                row[10] = q.answer_explanation || '';
+
+                return row;
+            });
+            return data;
+        }
+
+        // --- XLSX Generation ---
+
+        // Generate XLSX file from data
+        function generateXLSX(data) {
+            // Add headers to the data array
+            const dataWithHeaders = [quizizzHeaders, ...data];
+
+            // Create a new workbook
+            const wb = XLSX.utils.book_new();
+            // Convert data array to a worksheet
+            const ws = XLSX.utils.aoa_to_sheet(dataWithHeaders);
+            // Add the worksheet to the workbook
+            XLSX.utils.book_append_sheet(wb, ws, "Quizizz Questions");
+
+            // Write the workbook to a binary string
+            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+            // Convert binary string to ArrayBuffer
+            function s2ab(s) {
+                const buf = new ArrayBuffer(s.length);
+                const view = new Uint8Array(buf);
+                for (let i = 0; i < s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+                return buf;
+            }
+
+            // Create a Blob from the ArrayBuffer
+            return new Blob([s2ab(wbout)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        }
+
+
+        // --- Event Listeners ---
 
         // Handle file selection
         fileInput.addEventListener('change', function(event) {
-            console.log("[DEBUG] fileInput 'change' event triggered. Event object:", event); // DEBUG
+            hideError(); // Hide any previous errors
             const file = event.target.files[0];
-            console.log("[DEBUG] file from event.target.files[0]:", file); // DEBUG
 
             if (!file) {
-                console.log("[DEBUG] No file selected or dialog cancelled."); // DEBUG
-                if (selectedFile) {
-                    console.log("[DEBUG] Previously selected file existed, calling resetFileInput."); // DEBUG
-                    resetFileInput();
-                }
+                resetFileInput();
                 return;
             }
-            console.log("[DEBUG] File selected:", file.name, "Type:", file.type, "Size:", file.size); // DEBUG
 
             if (file.type !== 'application/pdf') {
-                console.log("[DEBUG] Invalid file type:", file.type); // DEBUG
                 showError('Please select a valid PDF file.');
                 resetFileInput();
                 return;
             }
+
             if (file.size > MAX_FILE_SIZE) {
-                console.log("[DEBUG] File too large:", file.size); // DEBUG
                 showError(`File is too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)}MB.`);
                 resetFileInput();
                 return;
             }
 
-            console.log("[DEBUG] File is valid. Updating selectedFile and UI."); // DEBUG
             selectedFile = file;
             uploadIconDefault.classList.add('hidden');
             uploadIconSelected.classList.remove('hidden');
             uploadTextDefault.classList.add('hidden');
             uploadTextSelected.classList.remove('hidden');
             uploadTextSelected.textContent = file.name;
-
-            errorMessage.classList.add('hidden');
-            outputArea.classList.add('hidden');
-            previewContainer.classList.add('hidden');
-            if (downloadLink) {
-                downloadLink.href = '#';
-                downloadLink.removeAttribute('download');
-            }
-            csvData = []; 
-
             questionSettings.classList.remove('hidden');
-            setProcessingState(false); 
-            console.log("[DEBUG] File selection processing complete. selectedFile:", selectedFile ? selectedFile.name : null); // DEBUG
+            setProcessingState(false); // Enable the process button
+            updateStatus('', 0); // Clear status
+            previewContainer.classList.add('hidden'); // Hide preview
+            outputArea.classList.add('hidden'); // Hide output
         });
 
+        // Handle process button click
         processButton.addEventListener('click', async function() {
             if (!selectedFile) {
-                showError('Please select a PDF file first.');
+                showError('Please upload a PDF file first.');
                 return;
             }
 
-            outputArea.classList.add('hidden');
-            previewContainer.classList.add('hidden');
-            if (downloadLink) {
-                downloadLink.href = '#';
-                downloadLink.removeAttribute('download');
-            }
-            errorMessage.classList.add('hidden');
+            hideError(); // Hide any previous errors
+            setProcessingState(true); // Set button to processing state
+            updateStatus('Starting process...', 0);
+            outputArea.classList.add('hidden'); // Hide previous output
 
-            setProcessingState(true);
-            updateStatus("Reading PDF file...", 10);
+            const numMC = parseInt(numMCQuestionsInput.value, 10) || 0;
+            const numOpen = parseInt(numOpenQuestionsInput.value, 10) || 0;
+
+            if (numMC <= 0 && numOpen <= 0) {
+                 showError('Please specify the number of multiple choice or open-ended questions.');
+                 setProcessingState(false);
+                 updateStatus('', 0);
+                 return;
+            }
+
 
             try {
-                const result = await extractContentFromPDF(selectedFile);
-                extractedText = result.text;
-                extractedPages = result.pages;
+                // Step 1: Extract text from PDF
+                extractedText = await extractTextFromPDF(selectedFile);
 
-                if (!extractedText || extractedText.trim().length === 0) {
-                    throw new Error("Could not extract text from PDF. The file might be empty, corrupted, or password-protected.");
+                // Step 2: Generate questions using Gemini API
+                const generatedQuestions = await generateQuestionsWithGemini(extractedText, numMC, numOpen);
+
+                // Step 3: Convert generated questions to Quizizz data format
+                quizizzData = convertQuestionsToQuizizzData(generatedQuestions); // Use quizizzData
+
+                if (quizizzData.length === 0) {
+                    showError('AI did not generate any questions. Please try again or use a different PDF.');
+                     updateStatus('Processing failed.', 100);
+                    setProcessingState(false);
+                    return;
                 }
 
-                updateStatus("Analyzing content and generating questions...", 50);
+                // Step 4: Display preview
+                displayPreview(quizizzData); // Use quizizzData for preview
 
-                const numMCQuestions = parseInt(numMCQuestionsInput.value);
-                const numOpenQuestions = parseInt(numOpenQuestionsInput.value);
-
-                generateQuestions(extractedText, extractedPages, numMCQuestions, numOpenQuestions);
-
-                updateStatus("Formatting CSV data...", 80);
-
-                const csvContent = generateCSVContent(csvData, csvHeaders, true);
-                if (!csvContent && csvData.length > 0) {
-                    console.warn("CSV content generation resulted in an empty string, but csvData was not empty.");
-                }
-
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-
+                // Step 5: Prepare and show download link (Generate XLSX)
+                const xlsxBlob = generateXLSX(quizizzData); // Generate XLSX blob
+                const url = URL.createObjectURL(xlsxBlob);
                 downloadLink.href = url;
-                downloadLink.download = `quizizz_questions_${new Date().toISOString().slice(0,10)}.csv`;
-
-                const mcCount = csvData.filter(row => row[1] === "Multiple Choice").length; 
-                const openCount = csvData.filter(row => row[1] === "Open Ended").length;   
-                csvInfo.textContent = `Successfully created ${mcCount} multiple choice and ${openCount} open-ended questions.`;
-
-                updatePreview(csvData, csvHeaders);
-                previewContainer.classList.remove('hidden');
+                downloadLink.download = 'quizizz_questions.xlsx'; // Set download filename
+                xlsxInfo.textContent = `Generated ${quizizzData.length} questions.`; // Update info text
                 outputArea.classList.remove('hidden');
 
-                updateStatus("Complete!", 100);
-                buttonIconSend.classList.remove('hidden');
-                buttonIconLoader.classList.add('hidden');
-                buttonText.textContent = 'Generate Questions';
-                processButton.disabled = false;
+                updateStatus('Complete!', 100);
+                setProcessingState(false); // Reset button state
 
             } catch (error) {
-                console.error("Error during processing:", error); 
-                showError(error.message || "An error occurred during processing. Please try again.");
-                setProcessingState(false); 
-                updateStatus("Error occurred.", 0); 
+                // Errors are already shown by the respective functions
+                updateStatus('Processing failed.', 100);
+                setProcessingState(false);
             }
         });
 
-        async function extractContentFromPDF(file) {
-            try {
-                const arrayBuffer = await file.arrayBuffer();
-                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                let fullText = '';
-                let pages = [];
-                
-                for (let i = 1; i <= pdf.numPages; i++) {
-                    updateStatus(`Extracting text from page ${i} of ${pdf.numPages}...`, 10 + (i / pdf.numPages * 30));
-                    const page = await pdf.getPage(i);
-                    const content = await page.getTextContent();
-                    const pageText = content.items.map(item => item.str).join(' ');
-                    
-                    fullText += pageText + '\n\n';
-                    pages.push({
-                        pageNum: i,
-                        text: pageText
-                    });
-                }
-                
-                return {
-                    text: fullText,
-                    pages: pages
-                };
-            } catch (error) {
-                console.error("PDF extraction error:", error);
-                throw new Error("Failed to extract text from PDF. The file might be corrupted or password-protected.");
-            }
-        }
-
-        function generateQuestions(text, pages, numMCQuestions, numOpenQuestions) { 
-            csvData = [];
-            const domain = detectContentDomain(text);
-            if (numMCQuestions > 0) {
-                generateMultipleChoiceQuestions(text, pages, numMCQuestions, domain); 
-            }
-            if (numOpenQuestions > 0) {
-                generateOpenEndedQuestions(text, pages, numOpenQuestions, domain); 
-            }
-            return csvData;
-        }
-
-        function detectContentDomain(text) {
-            const textLower = text.toLowerCase();
-            let domainCounts = {};
-            for (const [domain, keywords] of Object.entries(DOMAIN_KEYWORDS)) {
-                domainCounts[domain] = 0;
-                keywords.forEach(keyword => {
-                    const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
-                    const matches = textLower.match(regex);
-                    if (matches) {
-                        domainCounts[domain] += matches.length;
-                    }
-                });
-            }
-            let maxCount = 0;
-            let detectedDomain = 'general';
-            for (const [domain, count] of Object.entries(domainCounts)) {
-                if (count > maxCount) {
-                    maxCount = count;
-                    detectedDomain = domain;
-                }
-            }
-            return detectedDomain;
-        }
-
-        function generateMultipleChoiceQuestions(text, pages, numQuestions, domain) { 
-            const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 30);
-            const keyConcepts = extractKeyConcepts(text, domain);
-            const conceptQuestions = generateConceptBasedQuestions(keyConcepts, domain, Math.floor(numQuestions * 0.7));
-            const contentQuestions = generateContentBasedQuestions(paragraphs, pages, Math.max(0, numQuestions - conceptQuestions.length)); 
-            
-            conceptQuestions.concat(contentQuestions).forEach(q => {
-                if (q && q.options && q.options.length === 4 && q.question && q.answer && typeof q.answer === 'number') { 
-                    csvData.push([
-                        q.question,           
-                        "Multiple Choice",    
-                        q.options[0],         
-                        q.options[1],         
-                        q.options[2],         
-                        q.options[3],         
-                        "",                   
-                        q.answer.toString(),  
-                        "30",                 
-                        "",                   
-                        ""                    
-                    ]);
-                } else {
-                    console.warn("Skipping malformed MC question:", q);
-                }
-            });
-        }
-
-        function generateOpenEndedQuestions(text, pages, numQuestions, domain) { 
-            const topics = extractTopics(text, domain);
-            for (let i = 0; i < numQuestions; i++) {
-                if (i < topics.length && topics[i]) {
-                    const question = generateOpenQuestion(topics[i], domain);
-                     if(question) {
-                        csvData.push([
-                            question,           
-                            "Open Ended",       
-                            "",                 
-                            "",                 
-                            "",                 
-                            "",                 
-                            "",                 
-                            "",                 
-                            "60",               
-                            "",                 
-                            ""                  
-                        ]);
-                    } else {
-                        console.warn("Skipping malformed Open question for topic:", topics[i]);
-                    }
-                } else if (topics.length === 0 && i === 0 && numQuestions > 0) { 
-                    csvData.push([
-                        `Summarize the main points of the provided document. (Page 1)`, 
-                        "Open Ended",       
-                        "", "", "", "", "", 
-                        "", "60", "", ""    
-                    ]);
-                    break; 
-                }
-            }
-        }
-
-        function extractKeyConcepts(text, domain) { 
-            const concepts = [];
-            if (domain === 'finance') {
-                const financialTerms = [
-                    "money market", "capital market", "interest rate", "inflation", "exchange rate",
-                    "financial instrument", "security", "stock", "bond", "derivative",
-                    "bank", "financial institution", "central bank", "commercial bank",
-                    "loan", "credit", "deposit", "investment", "portfolio", "risk",
-                    "return", "yield", "dividend", "equity", "debt", "asset", "liability"
-                ];
-                financialTerms.forEach(term => {
-                    const regex = new RegExp(`${term}[s]?(?:\\s+(?:is|are|refers to|means|can be defined as)\\s+[^.]+\\.)|(?:[^.]+\\s+(?:is|are|called)\\s+(?:(?:the|a|an)\\s+)?${term}[s]?\\.)`, 'gi');
-                    const matches = text.match(regex);
-                    if (matches) {
-                        matches.forEach(match => {
-                            if (match.length < 300) concepts.push({ term: term, description: match.trim() });
-                        });
-                    }
-                });
-            } else if (domain === 'science') {
-                const regex = /([A-Z][a-z]+(?:\s+[a-z]+){0,3})\s+(?:is|are|refers to|means|can be defined as)\s+([^.]+)\./g;
-                let match;
-                while ((match = regex.exec(text)) !== null) {
-                    if (match[0].length < 300) concepts.push({ term: match[1], description: match[0].trim() });
-                }
-            } else {
-                const regex = /([A-Z][a-z]+(?:\s+[a-z]+){0,3})\s+(?:is|are|refers to|means|can be defined as|represents|consists of)\s+([^.]+)\./g;
-                let match;
-                while ((match = regex.exec(text)) !== null) {
-                     if (match[0].length < 300) concepts.push({ term: match[1], description: match[0].trim() });
-                }
-            }
-            if (concepts.length < 10) {
-                const domainWords = DOMAIN_KEYWORDS[domain] || [];
-                const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
-                if (sentences) {
-                    sentences.forEach(sentence => {
-                        if (sentence.length > 30 && sentence.length < 200) {
-                            const containsKeywords = domainWords.some(word => sentence.toLowerCase().includes(word));
-                            if (containsKeywords) {
-                                const words = sentence.split(' ');
-                                let term = words.slice(0, 3).join(' ');
-                                concepts.push({ term: term, description: sentence.trim() });
-                            }
-                        }
-                    });
-                }
-            }
-            return [...new Map(concepts.map(item => [item.description, item])).values()].slice(0, 50);
-        }
-        function extractTopics(text, domain) { 
-            const topics = [];
-            const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 50);
-            paragraphs.forEach(paragraph => {
-                const firstSentence = paragraph.match(/^[^.!?]+[.!?]+/);
-                if (firstSentence) {
-                    const sentence = firstSentence[0].trim();
-                    const domainWords = DOMAIN_KEYWORDS[domain] || [];
-                    const containsKeywords = domainWords.some(word => sentence.toLowerCase().includes(word));
-                    if (containsKeywords && sentence.length > 30 && sentence.length < 250) {
-                        topics.push({ topic: sentence, content: paragraph });
-                    }
-                }
-            });
-            if (topics.length < 5 && paragraphs.length > 0) {
-                for (let i = 0; i < Math.min(paragraphs.length, 10); i++) {
-                    const paragraph = paragraphs[i];
-                    if (paragraph.length > 100 && paragraph.length < 500) { 
-                        topics.push({ topic: paragraph.substring(0, 100) + "...", content: paragraph });
-                    }
-                }
-            }
-            return [...new Map(topics.map(item => [item.topic, item])).values()].slice(0, 20);
-        }
-        function generateConceptBasedQuestions(concepts, domain, numQuestions) {
-            const questions = [];
-            if (!concepts || concepts.length === 0) return questions;
-            const usedConcepts = new Set();
-            const maxQuestions = Math.min(numQuestions, concepts.length);
-            for (let i = 0; i < maxQuestions; i++) {
-                let conceptIndex;
-                if (usedConcepts.size >= concepts.length) break;
-                do {
-                    conceptIndex = Math.floor(Math.random() * concepts.length);
-                } while (usedConcepts.has(conceptIndex));
-                usedConcepts.add(conceptIndex);
-                const concept = concepts[conceptIndex];
-                if (!concept || !concept.term || !concept.description) continue;
-
-                const questionTypes = [generateDefinitionQuestion, generateIdentificationQuestion, generateFunctionQuestion, generateCharacteristicQuestion];
-                const questionGenerator = questionTypes[Math.floor(Math.random() * questionTypes.length)];
-                const question = questionGenerator(concept, domain);
-                if (question) questions.push(question);
-            }
-            return questions;
-        }
-        function generateContentBasedQuestions(paragraphs, pages, numQuestions) {
-            const questions = [];
-            if (!paragraphs || paragraphs.length === 0) return questions;
-            const usedParagraphs = new Set();
-            const maxQuestions = Math.min(numQuestions, paragraphs.length);
-            for (let i = 0; i < maxQuestions; i++) {
-                let paragraphIndex;
-                if (usedParagraphs.size >= paragraphs.length) break;
-                do {
-                    paragraphIndex = Math.floor(Math.random() * paragraphs.length);
-                } while (usedParagraphs.has(paragraphIndex));
-                usedParagraphs.add(paragraphIndex);
-                const paragraph = paragraphs[paragraphIndex];
-                if (!paragraph) continue;
-                let pageNum = findPageForContent(paragraph, pages);
-                const question = generateFactualQuestion(paragraph, pageNum);
-                if (question) questions.push(question);
-            }
-            return questions;
-        }
-
-        function generateDefinitionQuestion(concept, domain) {
-            if (!concept || !concept.term || !concept.description) return null;
-            const term = concept.term.slice(0,50); 
-            const description = concept.description.slice(0,250); 
-            let question = `Which of the following best defines ${term}?`.slice(0,300);
-            let definition = description.replace(new RegExp(`${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s+(?:is|are|refers to|means|can be defined as)\\s+`, 'i'), '').replace(/\.$/, '');
-            if (definition === description) definition = description;
-            const incorrectOptions = generateIncorrectDefinitions(definition, domain);
-            if (incorrectOptions.length < 3) return null; 
-            const options = [definition, ...incorrectOptions.slice(0,3)]; 
-            shuffleArray(options);
-            const correctIndex = options.indexOf(definition);
-            if (correctIndex === -1) return null;
-            const answerNumber = correctIndex + 1; 
-            return { question: question, options: options.map(o => String(o).slice(0,150)), answer: answerNumber };
-        }
-        function generateIdentificationQuestion(concept, domain) {
-            if (!concept || !concept.term || !concept.description) return null;
-            const term = concept.term.slice(0,50);
-            const description = concept.description.slice(0,250);
-            let descriptionForQuestion = description.replace(new RegExp(`${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s+(?:is|are|refers to|means|can be defined as)\\s+`, 'i'), 'It ');
-            descriptionForQuestion = descriptionForQuestion.replace(new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi'), 'it');
-            let question = `Which of the following is being described: "${descriptionForQuestion.slice(0,200)}${descriptionForQuestion.length > 200 ? '...' : ''}"`.slice(0,300);
-            const incorrectOptions = generateIncorrectTerms(term, domain);
-            if (incorrectOptions.length < 3) return null;
-            const options = [term, ...incorrectOptions.slice(0,3)];
-            shuffleArray(options);
-            const correctIndex = options.indexOf(term);
-            if (correctIndex === -1) return null;
-            const answerNumber = correctIndex + 1;
-            return { question: question, options: options.map(o => String(o).slice(0,100)), answer: answerNumber };
-        }
-        function generateFunctionQuestion(concept, domain) {
-            if (!concept || !concept.term || !concept.description) return null;
-            if (!['finance', 'science', 'technology'].includes(domain)) return generateDefinitionQuestion(concept, domain); 
-            const term = concept.term.slice(0,50);
-            const description = concept.description.slice(0,250);
-            let question = `What is the primary function of ${term}?`.slice(0,300);
-            let functionDescription = description; 
-            if (description.match(/\b(function|purpose|role|used to|serves to)\b/i)) {
-                const parts = description.split(/\s+(?:function|purpose|role|used\s+to|serves\s+to)\s+/i);
-                if (parts.length > 1) functionDescription = parts[1].replace(/\.$/, '');
-            }
-            const incorrectOptions = generateIncorrectFunctions(functionDescription, domain);
-            if (incorrectOptions.length < 3) return null;
-            const options = [functionDescription, ...incorrectOptions.slice(0,3)];
-            shuffleArray(options);
-            const correctIndex = options.indexOf(functionDescription);
-            if (correctIndex === -1) return null;
-            const answerNumber = correctIndex + 1;
-            return { question: question, options: options.map(o => String(o).slice(0,150)), answer: answerNumber };
-        }
-        function generateCharacteristicQuestion(concept, domain) {
-            if (!concept || !concept.term || !concept.description) return null;
-            const term = concept.term.slice(0,50);
-            const description = concept.description.slice(0,250);
-            let question = `Which of the following is a characteristic of ${term}?`.slice(0,300);
-            const correctOption = description;
-            const incorrectOptions = generateIncorrectCharacteristics(correctOption, domain);
-            if (incorrectOptions.length < 3) return null;
-            const options = [correctOption, ...incorrectOptions.slice(0,3)];
-            shuffleArray(options);
-            const correctIndex = options.indexOf(correctOption);
-            if (correctIndex === -1) return null;
-            const answerNumber = correctIndex + 1;
-            return { question: question, options: options.map(o => String(o).slice(0,150)), answer: answerNumber };
-        }
-        function generateFactualQuestion(paragraph, pageNum) {
-            if (!paragraph) return null;
-            const sentences = paragraph.match(/[^.!?]+[.!?]+/g) || [];
-            if (sentences.length === 0) return null;
-            const factualSentences = sentences.filter(s => s.length > 30 && s.length < 150 && !s.match(/\b(might|may|could|would|should)\b/i) );
-            if (factualSentences.length === 0) return null;
-            const sentence = factualSentences[Math.floor(Math.random() * factualSentences.length)].slice(0,200);
-            const keyTerms = findKeyTerms(sentence);
-            let question, correctAnswer, incorrectOptions, options, correctIndex, answerNumber;
-
-            if (keyTerms.length > 0) {
-                const keyTerm = keyTerms[Math.floor(Math.random() * keyTerms.length)].slice(0,50); 
-                question = sentence.replace(new RegExp(`\\b${keyTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i'), '_______');
-                question = ("Which of the following correctly completes this statement: " + question).slice(0,300);
-                correctAnswer = keyTerm;
-                incorrectOptions = generateIncorrectAnswers(correctAnswer);
-                if (incorrectOptions.length < 3) return null;
-                options = [correctAnswer, ...incorrectOptions.slice(0,3)];
-            } else {
-                question = `Which of the following statements about page ${pageNum} content is true?`.slice(0,300);
-                correctAnswer = sentence;
-                incorrectOptions = generateFalseStatements(correctAnswer);
-                if (incorrectOptions.length < 3) return null;
-                options = [correctAnswer, ...incorrectOptions.slice(0,3)];
-            }
-            shuffleArray(options);
-            correctIndex = options.indexOf(correctAnswer);
-            if (correctIndex === -1) return null; 
-            answerNumber = correctIndex + 1;
-            return { question: question, options: options.map(o => String(o).slice(0,150)), answer: answerNumber };
-        }
-
-        function generateOpenQuestion(topicInfo, domain) { 
-             if (!topicInfo || !topicInfo.topic) return null; 
-             const topic = topicInfo.topic.slice(0,100); 
-            const openQuestionTemplates = [
-                `Analyze the key factors that influence ${topic}...`,
-                `Discuss the significance of ${topic}... and its implications.`,
-                `Explain how ${topic}... relates to broader concepts in this field.`,
-                `Evaluate the effectiveness of approaches related to ${topic}...`,
-                `Compare and contrast different perspectives on ${topic}...`,
-            ];
-            if (domain === 'finance') openQuestionTemplates.push(`Explain how economic changes affect ${topic}...`);
-            if (domain === 'science') openQuestionTemplates.push(`Describe evidence for theories about ${topic}...`);
-            return openQuestionTemplates[Math.floor(Math.random() * openQuestionTemplates.length)].slice(0,300);
-        }
-        function findKeyTerms(sentence) { 
-            const words = sentence.split(' ');
-            const keyTerms = [];
-            const commonWords = new Set(['about', 'after', 'again', 'below', 'could', 'every', 'first', 'found', 'great', 'house', 'large', 'learn', 'never', 'other', 'place', 'small', 'study', 'their', 'there', 'these', 'think', 'three', 'water', 'where', 'which', 'world', 'would', 'write', 'the', 'a', 'an', 'is', 'are', 'was', 'were', 'of', 'in', 'on', 'at', 'to', 'for', 'with', 'by', 'from']);
-            for (let i = 0; i < words.length; i++) {
-                const word = words[i].replace(/[.,;:!?]$/, '');
-                if (word.length < 4 || commonWords.has(word.toLowerCase())) continue;
-                if (/^[A-Z][a-z]+$/.test(word) || (word.length > 5 && /^[a-z]+$/i.test(word))) {
-                    keyTerms.push(word);
-                }
-            }
-            return keyTerms.slice(0,10); 
-        }
-        function generateIncorrectOptionsHelper(baseOptions, count = 3) {
-            shuffleArray(baseOptions);
-            return baseOptions.slice(0, count).map((opt, idx) => `${opt} (Option ${idx + Math.random().toFixed(2)})`); 
-        }
-        function generateIncorrectDefinitions(correctDefinition, domain) {
-            const genericDefinitions = [ "A theoretical concept with limited practical applications.", "A minor technical procedure.", "An outdated approach.", "A specialized technique.", "A conceptual framework lacking support.", "A controversial method." ];
-            return generateIncorrectOptionsHelper(genericDefinitions);
-        }
-        function generateIncorrectTerms(correctTerm, domain) {
-            let relatedTermsPool = DOMAIN_KEYWORDS[domain] || Object.values(DOMAIN_KEYWORDS).flat();
-            relatedTermsPool = relatedTermsPool.filter(term => term.toLowerCase() !== String(correctTerm).toLowerCase());
-            if (relatedTermsPool.length < 3) relatedTermsPool.push("Generic Term Alpha", "Generic Term Beta", "Generic Term Gamma");
-            return generateIncorrectOptionsHelper(relatedTermsPool);
-        }
-        function generateIncorrectFunctions(correctFunction, domain) {
-            const genericFunctions = [ "To increase complexity.", "To limit compatibility.", "To prioritize aesthetics over usability.", "To maximize resource consumption.", "To restrict user control.", "To enforce obsolescence."];
-            return generateIncorrectOptionsHelper(genericFunctions);
-        }
-        function generateIncorrectCharacteristics(correctCharacteristic, domain) {
-            const genericChars = [ "Contradicts its basic definition.", "Functions independently of related systems.", "Demonstrates perfect efficiency.", "Lacks practical applications.", "Operates on disproven principles.", "Remains unchanged by external factors."];
-            return generateIncorrectOptionsHelper(genericChars);
-        }
-        function generateIncorrectAnswers(correctAnswer) {
-            const alternatives = { short: ["primary", "secondary", "critical", "optional"], medium: ["significant", "negligible", "essential", "peripheral"], long: ["comprehensive", "fragmentary", "interdisciplinary", "specialized"] };
-            let wordPool = String(correctAnswer).length < 6 ? alternatives.short : (String(correctAnswer).length < 10 ? alternatives.medium : alternatives.long);
-            wordPool = wordPool.filter(w => w.toLowerCase() !== String(correctAnswer).toLowerCase());
-            if (wordPool.length < 3) wordPool.push("Alternative A", "Alternative B", "Alternative C");
-            return generateIncorrectOptionsHelper(wordPool);
-         }
-        function generateFalseStatements(trueStatement) {
-            const genericFalse = [ "The text explicitly contradicts this concept.", "This represents a common misconception.", "This statement directly opposes key principles.", "This conflates two separate ideas.", "This oversimplifies a complex concept."];
-            return generateIncorrectOptionsHelper(genericFalse);
-        }
-        function findPageForContent(content, pages) {
-            if (!pages || pages.length === 0) return 1; 
-            for (let i = 0; i < pages.length; i++) {
-                if (pages[i] && pages[i].text && pages[i].text.includes(String(content).substring(0, 50))) return pages[i].pageNum;
-            }
-            return Math.floor(Math.random() * pages.length) + 1;
-        }
-        function generateCSVContent(data, headers, includeHeader) {
-            let csvContent = "";
-            if (includeHeader) csvContent += headers.map(escapeCSV).join(',') + '\r\n';
-            if (data) {
-                data.forEach(row => {
-                    if (row && Array.isArray(row)) { 
-                        csvContent += row.map(escapeCSV).join(',') + '\r\n';
-                    }
-                });
-            }
-            return csvContent;
-        }
-        function escapeCSV(value) {
-            if (value === null || value === undefined) return '';
-            value = String(value);
-            if (value.includes(',') || value.includes('"') || value.includes('\n') || value.includes('\r')) { 
-                value = value.replace(/"/g, '""').replace(/\r?\n|\r/g, ' '); 
-                return `"${value}"`;
-            }
-            return value;
-        }
-        function updatePreview(data, headers) {
-            previewHeader.innerHTML = '';
-            previewBody.innerHTML = '';
-            if (headers) {
-                headers.forEach(header => {
-                    const th = document.createElement('th');
-                    th.className = 'px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider';
-                    th.textContent = header;
-                    previewHeader.appendChild(th);
-                });
-            }
-            if (data) {
-                const previewData = data.slice(0, 3);
-                previewData.forEach(row => {
-                    const tr = document.createElement('tr');
-                    if (row && Array.isArray(row)) {
-                        row.forEach(cell => {
-                            const td = document.createElement('td');
-                            td.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300';
-                            td.textContent = String(cell).length > 30 ? String(cell).substring(0, 30) + '...' : String(cell);
-                            tr.appendChild(td);
-                        });
-                    }
-                    previewBody.appendChild(tr);
-                });
-            }
-        }
-        function shuffleArray(array) {
-            if (!array || !Array.isArray(array)) return [];
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        function showError(message) {
-            errorMessage.classList.remove('hidden');
-            errorText.textContent = message;
-            processingStatus.classList.add('hidden'); 
-        }
-
-        function resetFileInput() {
-            selectedFile = null;
-            fileInput.value = ''; 
-            uploadIconDefault.classList.remove('hidden');
-            uploadIconSelected.classList.add('hidden');
-            uploadTextDefault.classList.remove('hidden');
-            uploadTextSelected.classList.add('hidden');
-            uploadTextSelected.textContent = '';
-
-            questionSettings.classList.add('hidden');
-            outputArea.classList.add('hidden');
-            previewContainer.classList.add('hidden');
-            errorMessage.classList.add('hidden');
-
-            if (downloadLink) {
-                downloadLink.href = '#';
-                downloadLink.removeAttribute('download');
-            }
-            csvData = []; 
-
-            setProcessingState(false); 
-            updateStatus("", 0); 
-        }
-
-        function setProcessingState(isProcessing) {
-            processButton.disabled = isProcessing;
-
-            if (isProcessing) {
-                buttonIconSend.classList.add('hidden');
-                buttonIconLoader.classList.remove('hidden');
-                buttonText.textContent = 'Processing...';
-                errorMessage.classList.add('hidden'); 
-                processingStatus.classList.remove('hidden');
-            } else { 
-                buttonIconSend.classList.remove('hidden');
-                buttonIconLoader.classList.add('hidden');
-                buttonText.textContent = 'Generate Questions';
-                
-                if (selectedFile) {
-                    processButton.disabled = false;
-                    processButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
-                    processButton.classList.add('bg-blue-600', 'hover:bg-blue-700', 'focus:outline-none', 'focus:ring-2', 'focus:ring-offset-2', 'focus:ring-blue-500');
-                } else {
-                    processButton.disabled = true;
-                    processButton.classList.add('bg-gray-400', 'cursor-not-allowed');
-                    processButton.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'focus:outline-none', 'focus:ring-2', 'focus:ring-offset-2', 'focus:ring-blue-500');
-                }
-            }
-        }
-
-        function updateStatus(message, percentComplete) {
-            statusText.textContent = message;
-            progressBar.style.width = `${percentComplete}%`;
-            if (message === "Complete!" || message.toLowerCase().includes("error")) {
-                 processingStatus.classList.remove('hidden'); 
-            } else if (percentComplete < 100 && percentComplete > 0) {
-                 processingStatus.classList.remove('hidden');
-            } else if (percentComplete === 0 && message === "") { 
-                processingStatus.classList.add('hidden');
-            }
-        }
-
+        // Handle drag and drop
         uploadAreaLabel.addEventListener('dragover', (event) => {
             event.preventDefault();
             uploadAreaLabel.classList.add('border-blue-500');
@@ -944,7 +642,8 @@
             }
         });
 
-        setProcessingState(false);
+        // Initial state setup
+        setProcessingState(false); // Ensure button is disabled on load
 
     </script>
 </body>
