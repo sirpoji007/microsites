@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quizizz CSV Generator</title>
-    <link rel="icon" type="image/png" href="https://sirpoji007.github.io/microsites/spreadsheeter.png">
+    <link rel="icon" type="image/png" href="https://sirpoji.github.io/microsites/spreadsheeter.png">
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Quizizz CSV Generator">
     <meta property="og:description" content="Upload your PDF material and convert it into a Quizizz-compatible CSV file!">
-    <meta property="og:image" content="https://sirpoji007.github.io/microsites/spreadsheeter.png">
+    <meta property="og:image" content="https://sirpoji.github.io/microsites/spreadsheeter.png">
     <meta property="og:type" content="website">
     <!-- End Open Graph Meta Tags -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -260,7 +260,8 @@
         let extractedText = '';
         let extractedPages = [];
         let csvData = [];
-        const csvHeaders = ["Question Type", "Question", "Option A", "Option B", "Option C", "Option D", "Correct Answer", "Points"];
+        // Updated CSV headers
+        const csvHeaders = ["Question Type", "Question", "Option A", "Option B", "Option C", "Option D", "Correct Answer", "Points", "Time (seconds)", "Answer Explanation"];
         const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
         const DOMAIN_KEYWORDS = {
@@ -275,7 +276,6 @@
         fileInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (!file) {
-                // If user cancels file selection after having one, reset to initial state
                 if (selectedFile) resetFileInput();
                 return;
             }
@@ -304,10 +304,10 @@
                 downloadLink.href = '#';
                 downloadLink.removeAttribute('download');
             }
-            csvData = []; // Clear previous data
+            csvData = []; 
 
             questionSettings.classList.remove('hidden');
-            setProcessingState(false); // Enables process button if file is selected
+            setProcessingState(false); 
         });
 
         // Handle Process Button Click
@@ -317,7 +317,6 @@
                 return;
             }
 
-            // Reset UI elements related to previous output/errors
             outputArea.classList.add('hidden');
             previewContainer.classList.add('hidden');
             if (downloadLink) {
@@ -351,9 +350,8 @@
 
                 const csvContent = generateCSVContent(csvData, csvHeaders, true);
                 if (!csvContent && csvData.length > 0) {
-                    console.warn("CSV content generation resulted in an empty string, but csvData was not empty. This might indicate an issue in generateCSVContent or escapeCSV function.");
+                    console.warn("CSV content generation resulted in an empty string, but csvData was not empty.");
                 }
-
 
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                 const url = URL.createObjectURL(blob);
@@ -370,18 +368,16 @@
                 outputArea.classList.remove('hidden');
 
                 updateStatus("Complete!", 100);
-                // Keep button active for re-generation, reset icons/text
                 buttonIconSend.classList.remove('hidden');
                 buttonIconLoader.classList.add('hidden');
                 buttonText.textContent = 'Generate Questions';
-                processButton.disabled = false; // Explicitly enable after success
-                // The processingStatus bar will show "Complete!" until the next action.
+                processButton.disabled = false;
 
             } catch (error) {
-                console.error("Error during processing:", error); // Log the full error to console
+                console.error("Error during processing:", error); 
                 showError(error.message || "An error occurred during processing. Please try again.");
-                setProcessingState(false); // This will reset button and hide progress bar
-                updateStatus("Error occurred.", 0); // Explicitly set status text for error
+                setProcessingState(false); 
+                updateStatus("Error occurred.", 0); 
             }
         });
 
@@ -458,7 +454,7 @@
             const contentQuestions = generateContentBasedQuestions(paragraphs, pages, Math.max(0, numQuestions - conceptQuestions.length)); 
             
             conceptQuestions.concat(contentQuestions).forEach(q => {
-                if (q && q.options && q.options.length === 4 && q.question && q.answer) { 
+                if (q && q.options && q.options.length === 4 && q.question && q.answer && typeof q.answer === 'number') { 
                     csvData.push([
                         "Multiple Choice",
                         q.question,
@@ -466,8 +462,10 @@
                         q.options[1],
                         q.options[2],
                         q.options[3],
-                        q.answer, 
-                        points.toString()
+                        q.answer.toString(), // Correct answer as number (1-4)
+                        points.toString(),
+                        "30", // Default time in seconds
+                        ""    // Empty answer explanation
                     ]);
                 } else {
                     console.warn("Skipping malformed MC question:", q);
@@ -483,7 +481,12 @@
                      if(question) {
                         csvData.push([
                             "Open Ended",
-                            question, "", "", "", "", "", points.toString()
+                            question, 
+                            "", "", "", "", // Options
+                            "", // Correct Answer
+                            points.toString(),
+                            "60", // Default time in seconds
+                            ""    // Empty answer explanation
                         ]);
                     } else {
                         console.warn("Skipping malformed Open question for topic:", topics[i]);
@@ -491,7 +494,12 @@
                 } else if (topics.length === 0 && i === 0 && numQuestions > 0) { 
                     csvData.push([
                         "Open Ended",
-                        `Summarize the main points of the provided document. (Page 1)`, "", "", "", "", "", points.toString()
+                        `Summarize the main points of the provided document. (Page 1)`, 
+                        "", "", "", "", // Options
+                        "", // Correct Answer
+                        points.toString(),
+                        "60", // Default time in seconds
+                        ""    // Empty answer explanation
                     ]);
                     break; 
                 }
@@ -557,7 +565,7 @@
                     const sentence = firstSentence[0].trim();
                     const domainWords = DOMAIN_KEYWORDS[domain] || [];
                     const containsKeywords = domainWords.some(word => sentence.toLowerCase().includes(word));
-                    if (containsKeywords && sentence.length > 30 && sentence.length < 250) { // Limit sentence length
+                    if (containsKeywords && sentence.length > 30 && sentence.length < 250) {
                         topics.push({ topic: sentence, content: paragraph });
                     }
                 }
@@ -565,7 +573,7 @@
             if (topics.length < 5 && paragraphs.length > 0) {
                 for (let i = 0; i < Math.min(paragraphs.length, 10); i++) {
                     const paragraph = paragraphs[i];
-                    if (paragraph.length > 100 && paragraph.length < 500) { // Limit paragraph for topic
+                    if (paragraph.length > 100 && paragraph.length < 500) { 
                         topics.push({ topic: paragraph.substring(0, 100) + "...", content: paragraph });
                     }
                 }
@@ -614,10 +622,12 @@
             }
             return questions;
         }
+
+        // --- Helper functions for MCQs now return answer as number (1-4) ---
         function generateDefinitionQuestion(concept, domain) {
             if (!concept || !concept.term || !concept.description) return null;
-            const term = concept.term.slice(0,50); // Truncate term
-            const description = concept.description.slice(0,250); // Truncate desc
+            const term = concept.term.slice(0,50); 
+            const description = concept.description.slice(0,250); 
             let question = `Which of the following best defines ${term}?`.slice(0,300);
             let definition = description.replace(new RegExp(`${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s+(?:is|are|refers to|means|can be defined as)\\s+`, 'i'), '').replace(/\.$/, '');
             if (definition === description) definition = description;
@@ -627,8 +637,8 @@
             shuffleArray(options);
             const correctIndex = options.indexOf(definition);
             if (correctIndex === -1) return null;
-            const answerLetter = String.fromCharCode(65 + correctIndex);
-            return { question: question, options: options.map(o => String(o).slice(0,150)), answer: answerLetter };
+            const answerNumber = correctIndex + 1; // Correct answer as 1, 2, 3, or 4
+            return { question: question, options: options.map(o => String(o).slice(0,150)), answer: answerNumber };
         }
         function generateIdentificationQuestion(concept, domain) {
             if (!concept || !concept.term || !concept.description) return null;
@@ -642,29 +652,29 @@
             const options = [term, ...incorrectOptions.slice(0,3)];
             shuffleArray(options);
             const correctIndex = options.indexOf(term);
-             if (correctIndex === -1) return null;
-            const answerLetter = String.fromCharCode(65 + correctIndex);
-            return { question: question, options: options.map(o => String(o).slice(0,100)), answer: answerLetter };
+            if (correctIndex === -1) return null;
+            const answerNumber = correctIndex + 1;
+            return { question: question, options: options.map(o => String(o).slice(0,100)), answer: answerNumber };
         }
         function generateFunctionQuestion(concept, domain) {
-             if (!concept || !concept.term || !concept.description) return null;
-            if (!['finance', 'science', 'technology'].includes(domain)) return generateDefinitionQuestion(concept, domain);
+            if (!concept || !concept.term || !concept.description) return null;
+            if (!['finance', 'science', 'technology'].includes(domain)) return generateDefinitionQuestion(concept, domain); // Fallback
             const term = concept.term.slice(0,50);
             const description = concept.description.slice(0,250);
             let question = `What is the primary function of ${term}?`.slice(0,300);
-            let functionDescription = description; // Default to full description
+            let functionDescription = description; 
             if (description.match(/\b(function|purpose|role|used to|serves to)\b/i)) {
                 const parts = description.split(/\s+(?:function|purpose|role|used\s+to|serves\s+to)\s+/i);
                 if (parts.length > 1) functionDescription = parts[1].replace(/\.$/, '');
             }
             const incorrectOptions = generateIncorrectFunctions(functionDescription, domain);
-             if (incorrectOptions.length < 3) return null;
+            if (incorrectOptions.length < 3) return null;
             const options = [functionDescription, ...incorrectOptions.slice(0,3)];
             shuffleArray(options);
             const correctIndex = options.indexOf(functionDescription);
-             if (correctIndex === -1) return null;
-            const answerLetter = String.fromCharCode(65 + correctIndex);
-            return { question: question, options: options.map(o => String(o).slice(0,150)), answer: answerLetter };
+            if (correctIndex === -1) return null;
+            const answerNumber = correctIndex + 1;
+            return { question: question, options: options.map(o => String(o).slice(0,150)), answer: answerNumber };
         }
         function generateCharacteristicQuestion(concept, domain) {
             if (!concept || !concept.term || !concept.description) return null;
@@ -677,9 +687,9 @@
             const options = [correctOption, ...incorrectOptions.slice(0,3)];
             shuffleArray(options);
             const correctIndex = options.indexOf(correctOption);
-             if (correctIndex === -1) return null;
-            const answerLetter = String.fromCharCode(65 + correctIndex);
-            return { question: question, options: options.map(o => String(o).slice(0,150)), answer: answerLetter };
+            if (correctIndex === -1) return null;
+            const answerNumber = correctIndex + 1;
+            return { question: question, options: options.map(o => String(o).slice(0,150)), answer: answerNumber };
         }
         function generateFactualQuestion(paragraph, pageNum) {
             if (!paragraph) return null;
@@ -687,17 +697,17 @@
             if (sentences.length === 0) return null;
             const factualSentences = sentences.filter(s => s.length > 30 && s.length < 150 && !s.match(/\b(might|may|could|would|should)\b/i) );
             if (factualSentences.length === 0) return null;
-            const sentence = factualSentences[Math.floor(Math.random() * factualSentences.length)].slice(0,200); // Truncate sentence
+            const sentence = factualSentences[Math.floor(Math.random() * factualSentences.length)].slice(0,200);
             const keyTerms = findKeyTerms(sentence);
-            let question, correctAnswer, incorrectOptions, options, correctIndex, answerLetter;
+            let question, correctAnswer, incorrectOptions, options, correctIndex, answerNumber;
 
             if (keyTerms.length > 0) {
-                const keyTerm = keyTerms[Math.floor(Math.random() * keyTerms.length)].slice(0,50); // Truncate keyterm
+                const keyTerm = keyTerms[Math.floor(Math.random() * keyTerms.length)].slice(0,50); 
                 question = sentence.replace(new RegExp(`\\b${keyTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i'), '_______');
                 question = ("Which of the following correctly completes this statement: " + question).slice(0,300);
                 correctAnswer = keyTerm;
                 incorrectOptions = generateIncorrectAnswers(correctAnswer);
-                 if (incorrectOptions.length < 3) return null;
+                if (incorrectOptions.length < 3) return null;
                 options = [correctAnswer, ...incorrectOptions.slice(0,3)];
             } else {
                 question = `Which of the following statements about page ${pageNum} content is true?`.slice(0,300);
@@ -709,12 +719,14 @@
             shuffleArray(options);
             correctIndex = options.indexOf(correctAnswer);
             if (correctIndex === -1) return null; 
-            answerLetter = String.fromCharCode(65 + correctIndex);
-            return { question: question, options: options.map(o => String(o).slice(0,150)), answer: answerLetter };
+            answerNumber = correctIndex + 1;
+            return { question: question, options: options.map(o => String(o).slice(0,150)), answer: answerNumber };
         }
+        // --- End of MCQs returning answer as number ---
+
         function generateOpenQuestion(topicInfo, domain) { 
              if (!topicInfo || !topicInfo.topic) return null; 
-             const topic = topicInfo.topic.slice(0,100); // Truncate topic for question
+             const topic = topicInfo.topic.slice(0,100); 
             const openQuestionTemplates = [
                 `Analyze the key factors that influence ${topic}...`,
                 `Discuss the significance of ${topic}... and its implications.`,
@@ -737,11 +749,11 @@
                     keyTerms.push(word);
                 }
             }
-            return keyTerms.slice(0,10); // Limit number of key terms
+            return keyTerms.slice(0,10); 
         }
         function generateIncorrectOptionsHelper(baseOptions, count = 3) {
             shuffleArray(baseOptions);
-            return baseOptions.slice(0, count).map((opt, idx) => `${opt} (Option ${idx + Math.random().toFixed(2)})`); // Ensure unique enough
+            return baseOptions.slice(0, count).map((opt, idx) => `${opt} (Option ${idx + Math.random().toFixed(2)})`); 
         }
         function generateIncorrectDefinitions(correctDefinition, domain) {
             const genericDefinitions = [ "A theoretical concept with limited practical applications.", "A minor technical procedure.", "An outdated approach.", "A specialized technique.", "A conceptual framework lacking support.", "A controversial method." ];
@@ -773,7 +785,7 @@
             return generateIncorrectOptionsHelper(genericFalse);
         }
         function findPageForContent(content, pages) {
-            if (!pages || pages.length === 0) return 1; // Default to page 1 if no pages
+            if (!pages || pages.length === 0) return 1; 
             for (let i = 0; i < pages.length; i++) {
                 if (pages[i] && pages[i].text && pages[i].text.includes(String(content).substring(0, 50))) return pages[i].pageNum;
             }
@@ -784,7 +796,7 @@
             if (includeHeader) csvContent += headers.map(escapeCSV).join(',') + '\r\n';
             if (data) {
                 data.forEach(row => {
-                    if (row && Array.isArray(row)) { // Ensure row is an array
+                    if (row && Array.isArray(row)) { 
                         csvContent += row.map(escapeCSV).join(',') + '\r\n';
                     }
                 });
@@ -794,8 +806,8 @@
         function escapeCSV(value) {
             if (value === null || value === undefined) return '';
             value = String(value);
-            if (value.includes(',') || value.includes('"') || value.includes('\n') || value.includes('\r')) { // Added \r
-                value = value.replace(/"/g, '""').replace(/\r?\n|\r/g, ' '); // Replace newlines with space for Quizizz
+            if (value.includes(',') || value.includes('"') || value.includes('\n') || value.includes('\r')) { 
+                value = value.replace(/"/g, '""').replace(/\r?\n|\r/g, ' '); 
                 return `"${value}"`;
             }
             return value;
@@ -836,17 +848,15 @@
             return array;
         }
 
-        // Helper function to show error message
         function showError(message) {
             errorMessage.classList.remove('hidden');
             errorText.textContent = message;
-            processingStatus.classList.add('hidden'); // Hide progress if error shown
+            processingStatus.classList.add('hidden'); 
         }
 
-        // Helper function to reset file input and related UI
         function resetFileInput() {
             selectedFile = null;
-            fileInput.value = ''; // Important to clear the actual file input
+            fileInput.value = ''; 
             uploadIconDefault.classList.remove('hidden');
             uploadIconSelected.classList.add('hidden');
             uploadTextDefault.classList.remove('hidden');
@@ -862,13 +872,12 @@
                 downloadLink.href = '#';
                 downloadLink.removeAttribute('download');
             }
-            csvData = []; // Clear any previous CSV data
+            csvData = []; 
 
-            setProcessingState(false); // This will correctly set button state
-            updateStatus("", 0); // Clear status text and progress
+            setProcessingState(false); 
+            updateStatus("", 0); 
         }
 
-        // Helper function to set UI for processing state
         function setProcessingState(isProcessing) {
             processButton.disabled = isProcessing;
 
@@ -876,16 +885,13 @@
                 buttonIconSend.classList.add('hidden');
                 buttonIconLoader.classList.remove('hidden');
                 buttonText.textContent = 'Processing...';
-                errorMessage.classList.add('hidden'); // Hide any previous errors
+                errorMessage.classList.add('hidden'); 
                 processingStatus.classList.remove('hidden');
-            } else { // Reverting from processing state (or setting initial state)
+            } else { 
                 buttonIconSend.classList.remove('hidden');
                 buttonIconLoader.classList.add('hidden');
                 buttonText.textContent = 'Generate Questions';
-                // Keep processingStatus hidden unless explicitly shown on success/error
-                // processingStatus.classList.add('hidden'); // Only hide if not showing "Complete!" or "Error"
-
-                // Re-evaluate button enabled state based on selectedFile
+                
                 if (selectedFile) {
                     processButton.disabled = false;
                     processButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
@@ -898,20 +904,18 @@
             }
         }
 
-        // Helper function to update status message and progress bar
         function updateStatus(message, percentComplete) {
             statusText.textContent = message;
             progressBar.style.width = `${percentComplete}%`;
             if (message === "Complete!" || message.toLowerCase().includes("error")) {
-                // Don't immediately hide processingStatus if it's a final message
+                 processingStatus.classList.remove('hidden'); // Keep status visible for final messages
             } else if (percentComplete < 100 && percentComplete > 0) {
                  processingStatus.classList.remove('hidden');
-            } else {
+            } else if (percentComplete === 0 && message === "") { // Initial reset
                 processingStatus.classList.add('hidden');
             }
         }
 
-        // Drag and drop functionality
         uploadAreaLabel.addEventListener('dragover', (event) => {
             event.preventDefault();
             uploadAreaLabel.classList.add('border-blue-500');
@@ -931,7 +935,6 @@
             }
         });
 
-        // Initial setup: ensure button is disabled if no file selected
         setProcessingState(false);
 
     </script>
