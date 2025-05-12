@@ -132,12 +132,13 @@
                         <input type="number" id="num-open-questions" min="0" max="10" value="2" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
-                    <div class="mb-3">
+                    <!-- Points inputs are still here visually but not used in CSV generation for the new template -->
+                    <div class="mb-3 hidden"> 
                         <label for="mc-points" class="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left mb-1">Points for Multiple Choice Questions:</label>
                         <input type="number" id="mc-points" min="1" max="20" value="1" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     
-                    <div class="mb-3">
+                    <div class="mb-3 hidden">
                         <label for="open-points" class="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left mb-1">Points for Open-Ended Questions:</label>
                         <input type="number" id="open-points" min="1" max="20" value="5" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                     </div>
@@ -238,8 +239,8 @@
         const questionSettings = document.getElementById('question-settings');
         const numMCQuestionsInput = document.getElementById('num-mc-questions');
         const numOpenQuestionsInput = document.getElementById('num-open-questions');
-        const mcPointsInput = document.getElementById('mc-points');
-        const openPointsInput = document.getElementById('open-points');
+        const mcPointsInput = document.getElementById('mc-points'); // Kept for UI, not used in new CSV
+        const openPointsInput = document.getElementById('open-points'); // Kept for UI, not used in new CSV
         const errorMessage = document.getElementById('error-message');
         const errorText = document.getElementById('error-text');
         const processButton = document.getElementById('process-button');
@@ -260,8 +261,8 @@
         let extractedText = '';
         let extractedPages = [];
         let csvData = [];
-        // Updated CSV headers
-        const csvHeaders = ["Question Type", "Question", "Option A", "Option B", "Option C", "Option D", "Correct Answer", "Points", "Time (seconds)", "Answer Explanation"];
+        // Updated CSV headers according to the new strict format
+        const csvHeaders = ["Question Text", "Question Type", "Option 1", "Option 2", "Option 3", "Option 4", "Option 5", "Correct Answer", "Time (seconds)", "Image link", "Answer Explanation"];
         const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
         const DOMAIN_KEYWORDS = {
@@ -341,10 +342,10 @@
 
                 const numMCQuestions = parseInt(numMCQuestionsInput.value);
                 const numOpenQuestions = parseInt(numOpenQuestionsInput.value);
-                const mcPoints = parseInt(mcPointsInput.value);
-                const openPoints = parseInt(openPointsInput.value);
+                // const mcPoints = parseInt(mcPointsInput.value); // Points no longer used in CSV
+                // const openPoints = parseInt(openPointsInput.value); // Points no longer used in CSV
 
-                generateQuestions(extractedText, extractedPages, numMCQuestions, numOpenQuestions, mcPoints, openPoints);
+                generateQuestions(extractedText, extractedPages, numMCQuestions, numOpenQuestions); // Points removed from args
 
                 updateStatus("Formatting CSV data...", 80);
 
@@ -359,8 +360,8 @@
                 downloadLink.href = url;
                 downloadLink.download = `quizizz_questions_${new Date().toISOString().slice(0,10)}.csv`;
 
-                const mcCount = csvData.filter(row => row[0] === "Multiple Choice").length;
-                const openCount = csvData.filter(row => row[0] === "Open Ended").length;
+                const mcCount = csvData.filter(row => row[1] === "Multiple Choice").length; // Column 2 is Question Type
+                const openCount = csvData.filter(row => row[1] === "Open Ended").length;   // Column 2 is Question Type
                 csvInfo.textContent = `Successfully created ${mcCount} multiple choice and ${openCount} open-ended questions.`;
 
                 updatePreview(csvData, csvHeaders);
@@ -411,14 +412,14 @@
             }
         }
 
-        function generateQuestions(text, pages, numMCQuestions, numOpenQuestions, mcPoints, openPoints) {
+        function generateQuestions(text, pages, numMCQuestions, numOpenQuestions) { // Points removed from args
             csvData = [];
             const domain = detectContentDomain(text);
             if (numMCQuestions > 0) {
-                generateMultipleChoiceQuestions(text, pages, numMCQuestions, mcPoints, domain);
+                generateMultipleChoiceQuestions(text, pages, numMCQuestions, domain); // Points removed
             }
             if (numOpenQuestions > 0) {
-                generateOpenEndedQuestions(text, pages, numOpenQuestions, openPoints, domain);
+                generateOpenEndedQuestions(text, pages, numOpenQuestions, domain); // Points removed
             }
             return csvData;
         }
@@ -447,7 +448,7 @@
             return detectedDomain;
         }
 
-        function generateMultipleChoiceQuestions(text, pages, numQuestions, points, domain) {
+        function generateMultipleChoiceQuestions(text, pages, numQuestions, domain) { // Points removed
             const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 30);
             const keyConcepts = extractKeyConcepts(text, domain);
             const conceptQuestions = generateConceptBasedQuestions(keyConcepts, domain, Math.floor(numQuestions * 0.7));
@@ -456,16 +457,17 @@
             conceptQuestions.concat(contentQuestions).forEach(q => {
                 if (q && q.options && q.options.length === 4 && q.question && q.answer && typeof q.answer === 'number') { 
                     csvData.push([
-                        "Multiple Choice",
-                        q.question,
-                        q.options[0],
-                        q.options[1],
-                        q.options[2],
-                        q.options[3],
-                        q.answer.toString(), // Correct answer as number (1-4)
-                        points.toString(),
-                        "30", // Default time in seconds
-                        ""    // Empty answer explanation
+                        q.question,           // Column 1: Question Text
+                        "Multiple Choice",    // Column 2: Question Type
+                        q.options[0],         // Column 3: Option 1
+                        q.options[1],         // Column 4: Option 2
+                        q.options[2],         // Column 5: Option 3
+                        q.options[3],         // Column 6: Option 4
+                        "",                   // Column 7: Option 5 (empty)
+                        q.answer.toString(),  // Column 8: Correct Answer (number 1-4)
+                        "30",                 // Column 9: Time (seconds)
+                        "",                   // Column 10: Image link (empty)
+                        ""                    // Column 11: Answer explanation (empty)
                     ]);
                 } else {
                     console.warn("Skipping malformed MC question:", q);
@@ -473,33 +475,34 @@
             });
         }
 
-        function generateOpenEndedQuestions(text, pages, numQuestions, points, domain) {
+        function generateOpenEndedQuestions(text, pages, numQuestions, domain) { // Points removed
             const topics = extractTopics(text, domain);
             for (let i = 0; i < numQuestions; i++) {
                 if (i < topics.length && topics[i]) {
                     const question = generateOpenQuestion(topics[i], domain);
                      if(question) {
                         csvData.push([
-                            "Open Ended",
-                            question, 
-                            "", "", "", "", // Options
-                            "", // Correct Answer
-                            points.toString(),
-                            "60", // Default time in seconds
-                            ""    // Empty answer explanation
+                            question,           // Column 1: Question Text
+                            "Open Ended",       // Column 2: Question Type
+                            "",                 // Column 3: Option 1
+                            "",                 // Column 4: Option 2
+                            "",                 // Column 5: Option 3
+                            "",                 // Column 6: Option 4
+                            "",                 // Column 7: Option 5
+                            "",                 // Column 8: Correct Answer (empty)
+                            "60",               // Column 9: Time (seconds)
+                            "",                 // Column 10: Image link (empty)
+                            ""                  // Column 11: Answer explanation (empty)
                         ]);
                     } else {
                         console.warn("Skipping malformed Open question for topic:", topics[i]);
                     }
                 } else if (topics.length === 0 && i === 0 && numQuestions > 0) { 
                     csvData.push([
-                        "Open Ended",
-                        `Summarize the main points of the provided document. (Page 1)`, 
-                        "", "", "", "", // Options
-                        "", // Correct Answer
-                        points.toString(),
-                        "60", // Default time in seconds
-                        ""    // Empty answer explanation
+                        `Summarize the main points of the provided document. (Page 1)`, // Column 1
+                        "Open Ended",       // Column 2
+                        "", "", "", "", "", // Columns 3-7
+                        "", "60", "", ""    // Columns 8-11
                     ]);
                     break; 
                 }
@@ -623,7 +626,6 @@
             return questions;
         }
 
-        // --- Helper functions for MCQs now return answer as number (1-4) ---
         function generateDefinitionQuestion(concept, domain) {
             if (!concept || !concept.term || !concept.description) return null;
             const term = concept.term.slice(0,50); 
@@ -637,7 +639,7 @@
             shuffleArray(options);
             const correctIndex = options.indexOf(definition);
             if (correctIndex === -1) return null;
-            const answerNumber = correctIndex + 1; // Correct answer as 1, 2, 3, or 4
+            const answerNumber = correctIndex + 1; 
             return { question: question, options: options.map(o => String(o).slice(0,150)), answer: answerNumber };
         }
         function generateIdentificationQuestion(concept, domain) {
@@ -658,7 +660,7 @@
         }
         function generateFunctionQuestion(concept, domain) {
             if (!concept || !concept.term || !concept.description) return null;
-            if (!['finance', 'science', 'technology'].includes(domain)) return generateDefinitionQuestion(concept, domain); // Fallback
+            if (!['finance', 'science', 'technology'].includes(domain)) return generateDefinitionQuestion(concept, domain); 
             const term = concept.term.slice(0,50);
             const description = concept.description.slice(0,250);
             let question = `What is the primary function of ${term}?`.slice(0,300);
@@ -722,7 +724,6 @@
             answerNumber = correctIndex + 1;
             return { question: question, options: options.map(o => String(o).slice(0,150)), answer: answerNumber };
         }
-        // --- End of MCQs returning answer as number ---
 
         function generateOpenQuestion(topicInfo, domain) { 
              if (!topicInfo || !topicInfo.topic) return null; 
@@ -908,10 +909,10 @@
             statusText.textContent = message;
             progressBar.style.width = `${percentComplete}%`;
             if (message === "Complete!" || message.toLowerCase().includes("error")) {
-                 processingStatus.classList.remove('hidden'); // Keep status visible for final messages
+                 processingStatus.classList.remove('hidden'); 
             } else if (percentComplete < 100 && percentComplete > 0) {
                  processingStatus.classList.remove('hidden');
-            } else if (percentComplete === 0 && message === "") { // Initial reset
+            } else if (percentComplete === 0 && message === "") { 
                 processingStatus.classList.add('hidden');
             }
         }
