@@ -132,7 +132,6 @@
                         <input type="number" id="num-open-questions" min="0" max="10" value="2" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
-                    <!-- Points inputs are still here visually but not used in CSV generation for the new template -->
                     <div class="mb-3 hidden"> 
                         <label for="mc-points" class="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left mb-1">Points for Multiple Choice Questions:</label>
                         <input type="number" id="mc-points" min="1" max="20" value="1" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500">
@@ -239,8 +238,8 @@
         const questionSettings = document.getElementById('question-settings');
         const numMCQuestionsInput = document.getElementById('num-mc-questions');
         const numOpenQuestionsInput = document.getElementById('num-open-questions');
-        const mcPointsInput = document.getElementById('mc-points'); // Kept for UI, not used in new CSV
-        const openPointsInput = document.getElementById('open-points'); // Kept for UI, not used in new CSV
+        const mcPointsInput = document.getElementById('mc-points');
+        const openPointsInput = document.getElementById('open-points');
         const errorMessage = document.getElementById('error-message');
         const errorText = document.getElementById('error-text');
         const processButton = document.getElementById('process-button');
@@ -261,7 +260,6 @@
         let extractedText = '';
         let extractedPages = [];
         let csvData = [];
-        // Updated CSV headers according to the new strict format
         const csvHeaders = ["Question Text", "Question Type", "Option 1", "Option 2", "Option 3", "Option 4", "Option 5", "Correct Answer", "Time (seconds)", "Image link", "Answer Explanation"];
         const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
@@ -275,22 +273,34 @@
 
         // Handle file selection
         fileInput.addEventListener('change', function(event) {
+            console.log("[DEBUG] fileInput 'change' event triggered. Event object:", event); // DEBUG
             const file = event.target.files[0];
+            console.log("[DEBUG] file from event.target.files[0]:", file); // DEBUG
+
             if (!file) {
-                if (selectedFile) resetFileInput();
+                console.log("[DEBUG] No file selected or dialog cancelled."); // DEBUG
+                if (selectedFile) {
+                    console.log("[DEBUG] Previously selected file existed, calling resetFileInput."); // DEBUG
+                    resetFileInput();
+                }
                 return;
             }
+            console.log("[DEBUG] File selected:", file.name, "Type:", file.type, "Size:", file.size); // DEBUG
+
             if (file.type !== 'application/pdf') {
+                console.log("[DEBUG] Invalid file type:", file.type); // DEBUG
                 showError('Please select a valid PDF file.');
                 resetFileInput();
                 return;
             }
             if (file.size > MAX_FILE_SIZE) {
+                console.log("[DEBUG] File too large:", file.size); // DEBUG
                 showError(`File is too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)}MB.`);
                 resetFileInput();
                 return;
             }
 
+            console.log("[DEBUG] File is valid. Updating selectedFile and UI."); // DEBUG
             selectedFile = file;
             uploadIconDefault.classList.add('hidden');
             uploadIconSelected.classList.remove('hidden');
@@ -309,9 +319,9 @@
 
             questionSettings.classList.remove('hidden');
             setProcessingState(false); 
+            console.log("[DEBUG] File selection processing complete. selectedFile:", selectedFile ? selectedFile.name : null); // DEBUG
         });
 
-        // Handle Process Button Click
         processButton.addEventListener('click', async function() {
             if (!selectedFile) {
                 showError('Please select a PDF file first.');
@@ -342,10 +352,8 @@
 
                 const numMCQuestions = parseInt(numMCQuestionsInput.value);
                 const numOpenQuestions = parseInt(numOpenQuestionsInput.value);
-                // const mcPoints = parseInt(mcPointsInput.value); // Points no longer used in CSV
-                // const openPoints = parseInt(openPointsInput.value); // Points no longer used in CSV
 
-                generateQuestions(extractedText, extractedPages, numMCQuestions, numOpenQuestions); // Points removed from args
+                generateQuestions(extractedText, extractedPages, numMCQuestions, numOpenQuestions);
 
                 updateStatus("Formatting CSV data...", 80);
 
@@ -360,8 +368,8 @@
                 downloadLink.href = url;
                 downloadLink.download = `quizizz_questions_${new Date().toISOString().slice(0,10)}.csv`;
 
-                const mcCount = csvData.filter(row => row[1] === "Multiple Choice").length; // Column 2 is Question Type
-                const openCount = csvData.filter(row => row[1] === "Open Ended").length;   // Column 2 is Question Type
+                const mcCount = csvData.filter(row => row[1] === "Multiple Choice").length; 
+                const openCount = csvData.filter(row => row[1] === "Open Ended").length;   
                 csvInfo.textContent = `Successfully created ${mcCount} multiple choice and ${openCount} open-ended questions.`;
 
                 updatePreview(csvData, csvHeaders);
@@ -412,14 +420,14 @@
             }
         }
 
-        function generateQuestions(text, pages, numMCQuestions, numOpenQuestions) { // Points removed from args
+        function generateQuestions(text, pages, numMCQuestions, numOpenQuestions) { 
             csvData = [];
             const domain = detectContentDomain(text);
             if (numMCQuestions > 0) {
-                generateMultipleChoiceQuestions(text, pages, numMCQuestions, domain); // Points removed
+                generateMultipleChoiceQuestions(text, pages, numMCQuestions, domain); 
             }
             if (numOpenQuestions > 0) {
-                generateOpenEndedQuestions(text, pages, numOpenQuestions, domain); // Points removed
+                generateOpenEndedQuestions(text, pages, numOpenQuestions, domain); 
             }
             return csvData;
         }
@@ -448,7 +456,7 @@
             return detectedDomain;
         }
 
-        function generateMultipleChoiceQuestions(text, pages, numQuestions, domain) { // Points removed
+        function generateMultipleChoiceQuestions(text, pages, numQuestions, domain) { 
             const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 30);
             const keyConcepts = extractKeyConcepts(text, domain);
             const conceptQuestions = generateConceptBasedQuestions(keyConcepts, domain, Math.floor(numQuestions * 0.7));
@@ -457,17 +465,17 @@
             conceptQuestions.concat(contentQuestions).forEach(q => {
                 if (q && q.options && q.options.length === 4 && q.question && q.answer && typeof q.answer === 'number') { 
                     csvData.push([
-                        q.question,           // Column 1: Question Text
-                        "Multiple Choice",    // Column 2: Question Type
-                        q.options[0],         // Column 3: Option 1
-                        q.options[1],         // Column 4: Option 2
-                        q.options[2],         // Column 5: Option 3
-                        q.options[3],         // Column 6: Option 4
-                        "",                   // Column 7: Option 5 (empty)
-                        q.answer.toString(),  // Column 8: Correct Answer (number 1-4)
-                        "30",                 // Column 9: Time (seconds)
-                        "",                   // Column 10: Image link (empty)
-                        ""                    // Column 11: Answer explanation (empty)
+                        q.question,           
+                        "Multiple Choice",    
+                        q.options[0],         
+                        q.options[1],         
+                        q.options[2],         
+                        q.options[3],         
+                        "",                   
+                        q.answer.toString(),  
+                        "30",                 
+                        "",                   
+                        ""                    
                     ]);
                 } else {
                     console.warn("Skipping malformed MC question:", q);
@@ -475,34 +483,34 @@
             });
         }
 
-        function generateOpenEndedQuestions(text, pages, numQuestions, domain) { // Points removed
+        function generateOpenEndedQuestions(text, pages, numQuestions, domain) { 
             const topics = extractTopics(text, domain);
             for (let i = 0; i < numQuestions; i++) {
                 if (i < topics.length && topics[i]) {
                     const question = generateOpenQuestion(topics[i], domain);
                      if(question) {
                         csvData.push([
-                            question,           // Column 1: Question Text
-                            "Open Ended",       // Column 2: Question Type
-                            "",                 // Column 3: Option 1
-                            "",                 // Column 4: Option 2
-                            "",                 // Column 5: Option 3
-                            "",                 // Column 6: Option 4
-                            "",                 // Column 7: Option 5
-                            "",                 // Column 8: Correct Answer (empty)
-                            "60",               // Column 9: Time (seconds)
-                            "",                 // Column 10: Image link (empty)
-                            ""                  // Column 11: Answer explanation (empty)
+                            question,           
+                            "Open Ended",       
+                            "",                 
+                            "",                 
+                            "",                 
+                            "",                 
+                            "",                 
+                            "",                 
+                            "60",               
+                            "",                 
+                            ""                  
                         ]);
                     } else {
                         console.warn("Skipping malformed Open question for topic:", topics[i]);
                     }
                 } else if (topics.length === 0 && i === 0 && numQuestions > 0) { 
                     csvData.push([
-                        `Summarize the main points of the provided document. (Page 1)`, // Column 1
-                        "Open Ended",       // Column 2
-                        "", "", "", "", "", // Columns 3-7
-                        "", "60", "", ""    // Columns 8-11
+                        `Summarize the main points of the provided document. (Page 1)`, 
+                        "Open Ended",       
+                        "", "", "", "", "", 
+                        "", "60", "", ""    
                     ]);
                     break; 
                 }
