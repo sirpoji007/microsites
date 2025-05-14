@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Extractor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        // Configure PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        
+        // Setup dark mode detection
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+        // Set up tailwind dark mode
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <h1 class="text-3xl font-bold text-center mb-6">Content Extractor</h1>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+            <div class="mb-6">
+                <h2 class="text-xl font-semibold mb-4">Input Options</h2>
+                
+                <div class="flex flex-col md:flex-row gap-4 mb-4">
+                    <button id="pdfTabBtn" class="flex-1 px-4 py-2 bg-primary text-white rounded-lg font-medium transition-all">
+                        Upload PDF
+                    </button>
+                    <button id="urlTabBtn" class="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg font-medium transition-all">
+                        Enter URL
+                    </button>
+                </div>
+                
+                <div id="pdfTab" class="mt-4">
+                    <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
+                        <input type="file" id="pdfFile" class="hidden" accept=".pdf" />
+                        <label for="pdfFile" class="cursor-pointer">
+                            <div class="flex flex-col items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                </svg>
+                                <p class="text-lg font-medium">Drag & drop PDF file or click to browse</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">File will be processed locally</p>
+                            </div>
+                        </label>
+                    </div>
+                    <div id="pdfInfo" class="mt-3 text-gray-600 dark:text-gray-400 hidden"></div>
+                </div>
+                
+                <div id="urlTab" class="mt-4 hidden">
+                    <div class="flex flex-col">
+                        <label for="urlInput" class="font-medium mb-2">Enter URL:</label>
+                        <input type="url" id="urlInput" placeholder="https://example.com" 
+                            class="px-4 py-2 text-base rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary" />
+                        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                            Note: Direct URL extraction may be limited by browser security policies.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-center">
+                <button id="extractBtn" class="px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                    Extract Content
+                </button>
+            </div>
+        </div>
+        
+        <div id="outputSection" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8 hidden">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold">Extracted Content</h2>
+                <div class="flex gap-2">
+                    <button id="copyBtn" class="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-all">
+                        Copy
+                    </button>
+                    <button id="downloadBtn" class="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-all">
+                        Download
+                    </button>
+                </div>
+            </div>
+            
+            <div id="extractedContent" class="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 max-h-96 overflow-y-auto whitespace-pre-wrap font-mono text-sm"></div>
+        </div>
+        
+        <div id="loadingSection" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col items-center justify-center hidden">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary mb-4"></div>
+            <p id="loadingText" class="text-lg">Processing content...</p>
+        </div>
+        
+        <div id="errorSection" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 hidden">
+            <div class="flex items-center text-red-500 mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h2 class="text-xl font-semibold">Error</h2>
+            </div>
+            <p id="errorMessage" class="text-gray-700 dark:text-gray-300"></p>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const pdfTabBtn = document.getElementById('pdfTabBtn');
+        const urlTabBtn = document.getElementById('urlTabBtn');
+        const pdfTab = document.getElementById('pdfTab');
+        const urlTab = document.getElementById('urlTab');
+        const pdfFile = document.getElementById('pdfFile');
+        const pdfInfo = document.getElementById('pdfInfo');
+        const urlInput = document.getElementById('urlInput');
+        const extractBtn = document.getElementById('extractBtn');
+        const outputSection = document.getElementById('outputSection');
+        const extractedContent = document.getElementById('extractedContent');
+        const loadingSection = document.getElementById('loadingSection');
+        const loadingText = document.getElementById('loadingText');
+        const errorSection = document.getElementById('errorSection');
+        const errorMessage = document.getElementById('errorMessage');
+        const copyBtn = document.getElementById('copyBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        let currentTab = 'pdf';
+        let extractedText = '';
+
+        // Tab switching
+        pdfTabBtn.addEventListener('click', () => {
+            currentTab = 'pdf';
+            pdfTabBtn.classList.add('bg-primary', 'text-white');
+            pdfTabBtn.classList.remove('bg-gray-200', 'dark:bg-gray-700');
+            urlTabBtn.classList.remove('bg-primary', 'text-white');
+            urlTabBtn.classList.add('bg-gray-200', 'dark:bg-gray-700');
+            pdfTab.classList.remove('hidden');
+            urlTab.classList.add('hidden');
+            validateInputs();
+        });
+
+        urlTabBtn.addEventListener('click', () => {
+            currentTab = 'url';
+            urlTabBtn.classList.add('bg-primary', 'text-white');
+            urlTabBtn.classList.remove('bg-gray-200', 'dark:bg-gray-700');
+            pdfTabBtn.classList.remove('bg-primary', 'text-white');
+            pdfTabBtn.classList.add('bg-gray-200', 'dark:bg-gray-700');
+            urlTab.classList.remove('hidden');
+            pdfTab.classList.add('hidden');
+            validateInputs();
+        });
+
+        // File input handling
+        pdfFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.type !== 'application/pdf') {
+                    showError('Selected file is not a PDF. Please choose a PDF file.');
+                    pdfFile.value = '';
+                    pdfInfo.classList.add('hidden');
+                    return;
+                }
+
+                const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                pdfInfo.textContent = `Selected: ${file.name} (${fileSizeMB} MB)`;
+                pdfInfo.classList.remove('hidden');
+            } else {
+                pdfInfo.classList.add('hidden');
+            }
+            validateInputs();
+        });
+
+        // URL input validation
+        urlInput.addEventListener('input', validateInputs);
+
+        // Validate inputs to enable/disable extract button
+        function validateInputs() {
+            if (currentTab === 'pdf' && pdfFile.files.length > 0) {
+                extractBtn.disabled = false;
+            } else if (currentTab === 'url' && urlInput.value.trim().startsWith('http')) {
+                extractBtn.disabled = false;
+            } else {
+                extractBtn.disabled = true;
+            }
+        }
+
+        // Extract button click handler
+        extractBtn.addEventListener('click', async () => {
+            hideAllSections();
+            showLoading();
+
+            try {
+                if (currentTab === 'pdf') {
+                    const file = pdfFile.files[0];
+                    if (file) {
+                        extractedText = await extractPdfText(file);
+                    } else {
+                        throw new Error('No PDF file selected');
+                    }
+                } else if (currentTab === 'url') {
+                    const url = urlInput.value.trim();
+                    if (url) {
+                        extractedText = await extractUrlContent(url);
+                    } else {
+                        throw new Error('No URL provided');
+                    }
+                }
+
+                showOutput(extractedText);
+            } catch (error) {
+                console.error('Extraction error:', error);
+                showError(error.message);
+            }
+        });
+
+        // Extract text from PDF
+        async function extractPdfText(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = async function(event) {
+                    try {
+                        const typedArray = new Uint8Array(event.target.result);
+                        const pdf = await pdfjsLib.getDocument(typedArray).promise;
+                        
+                        loadingText.textContent = `Extracting text (0/${pdf.numPages} pages)...`;
+                        
+                        let fullText = '';
+                        
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const textContent = await page.getTextContent();
+                            const pageText = textContent.items.map(item => item.str).join(' ');
+                            
+                            fullText += pageText + '\n\n';
+                            
+                            loadingText.textContent = `Extracting text (${i}/${pdf.numPages} pages)...`;
+                        }
+                        
+                        resolve(fullText.trim());
+                    } catch (error) {
+                        reject(new Error('Failed to extract text from PDF: ' + error.message));
+                    }
+                };
+                
+                reader.onerror = function() {
+                    reject(new Error('Failed to read the PDF file'));
+                };
+                
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // Extract content from URL using the Poe Embed API
+        async function extractUrlContent(url) {
+            loadingText.textContent = "Fetching URL content...";
+            
+            try {
+                // Check if the Poe Embed API is available
+                if (!window.Poe) {
+                    throw new Error("Poe Embed API is not available. Please try uploading a PDF instead.");
+                }
+                
+                // Register a handler for the URL extraction
+                window.Poe.registerHandler("url-extractor", (result, context) => {
+                    const msg = result.responses[0];
+                    
+                    if (msg.status === "error") {
+                        showError("Error: " + (msg.statusText || "Failed to extract content from URL"));
+                        hideLoading();
+                    } else if (msg.status === "complete") {
+                        const extractedText = msg.content;
+                        showOutput(extractedText);
+                        hideLoading();
+                    }
+                });
+                
+                // Use Claude to extract the URL content
+                await window.Poe.sendUserMessage(
+                    `@Claude-3.7-Sonnet Please visit this URL: ${url} and return ONLY the exact text content from the page. Don't add any of your own comments, interpretations, or formatting. I need the raw text exactly as it appears on the page.`,
+                    {
+                        handler: "url-extractor",
+                        stream: false,
+                        openChat: false
+                    }
+                );
+                
+                // Return an empty string because the actual content will be handled by the handler
+                return "";
+            } catch (err) {
+                throw new Error(`Failed to extract content from URL: ${err.message}`);
+            }
+        }
+
+        // Copy button click handler
+        copyBtn.addEventListener('click', () => {
+            if (extractedText) {
+                navigator.clipboard.writeText(extractedText)
+                    .then(() => {
+                        const originalText = copyBtn.textContent;
+                        copyBtn.textContent = 'Copied!';
+                        setTimeout(() => {
+                            copyBtn.textContent = originalText;
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        showError('Failed to copy: ' + err.message);
+                    });
+            }
+        });
+
+        // Download button click handler
+        downloadBtn.addEventListener('click', () => {
+            if (extractedText) {
+                const blob = new Blob([extractedText], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                
+                // Set filename based on the input type
+                let filename;
+                if (currentTab === 'pdf' && pdfFile.files[0]) {
+                    filename = pdfFile.files[0].name.replace('.pdf', '') + '-extracted.txt';
+                } else if (currentTab === 'url') {
+                    try {
+                        const urlObj = new URL(urlInput.value);
+                        filename = urlObj.hostname + '-extracted.txt';
+                    } catch (e) {
+                        filename = 'extracted-content.txt';
+                    }
+                } else {
+                    filename = 'extracted-content.txt';
+                }
+                
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+        });
+
+        // Helper functions to show/hide sections
+        function hideAllSections() {
+            outputSection.classList.add('hidden');
+            loadingSection.classList.add('hidden');
+            errorSection.classList.add('hidden');
+        }
+
+        function showLoading() {
+            loadingSection.classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            loadingSection.classList.add('hidden');
+        }
+
+        function showOutput(text) {
+            hideLoading();
+            extractedContent.textContent = text;
+            outputSection.classList.remove('hidden');
+        }
+
+        function showError(message) {
+            hideLoading();
+            errorMessage.textContent = message;
+            errorSection.classList.remove('hidden');
+        }
+
+        // Initialize
+        validateInputs();
+    </script>
+</body>
+</html>
