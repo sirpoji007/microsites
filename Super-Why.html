@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Super WHY! Adventure Game</title>
+   <script src="https://cdn.tailwindcss.com"></script>
+   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+   <style>
+       body {
+           font-family: 'Inter', sans-serif;
+           background-color: #E0F7FA; /* Light cyan background */
+           color: #00796B; /* Teal text */
+           overscroll-behavior: none; /* Prevent pull-to-refresh on mobile */
+       }
+       .game-container {
+           max-width: 1000px;
+           margin: auto;
+           padding: 10px;
+           border-radius: 20px;
+           background-color: #FFFFFF;
+           box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+           overflow: hidden; /* Ensures rounded corners are respected by children */
+       }
+       .super-why-font {
+           font-family: 'Fredoka One', cursive; /* A playful, rounded font */
+       }
+       .game-button {
+           font-family: 'Fredoka One', cursive;
+           background-color: #FFC107; /* Amber */
+           color: #BF360C; /* Deep Orange */
+           border: 3px solid #BF360C;
+           border-radius: 15px;
+           padding: 10px 20px;
+           text-transform: uppercase;
+           font-size: 1.1rem;
+           box-shadow: 0 5px #A62A00; /* Darker shadow for 3D effect */
+           transition: all 0.1s ease;
+           cursor: pointer;
+           margin: 5px;
+       }
+       .game-button:hover {
+           background-color: #FFD54F; /* Lighter Amber */
+           transform: translateY(-2px);
+           box-shadow: 0 7px #A62A00;
+       }
+       .game-button:active {
+           transform: translateY(2px);
+           box-shadow: 0 3px #A62A00;
+       }
+       .screen {
+           display: none; /* Hidden by default */
+           padding: 20px;
+           border-radius: 15px; /* Rounded corners for inner screens */
+           background-color: #F1F8E9; /* Light green background for screens */
+           min-height: 400px; /* Ensure consistent height */
+           animation: fadeIn 0.5s ease-in-out;
+       }
+       .screen.active {
+           display: block;
+       }
+       @keyframes fadeIn {
+           from { opacity: 0; transform: scale(0.95); }
+           to { opacity: 1; transform: scale(1); }
+       }
+       .character-speech {
+           background-color: #FFF9C4; /* Light yellow speech bubble */
+           border: 2px solid #FFEB3B; /* Yellow border */
+           border-radius: 10px;
+           padding: 10px;
+           margin-top: 10px;
+           font-size: 0.9rem;
+           text-align: center;
+       }
+       .logo {
+           max-width: 300px;
+           height: auto;
+           margin: 0 auto 20px auto; /* Center logo and add bottom margin */
+           display: block;
+       }
+       .prize-item {
+           background-color: #A5D6A7; /* Greenish background for prizes */
+           border: 2px solid #66BB6A;
+           border-radius: 10px;
+           padding: 10px;
+           margin: 5px;
+           text-align: center;
+           width: 80px; /* Fixed width for prize items */
+           height: 80px; /* Fixed height for prize items */
+           display: flex;
+           flex-direction: column;
+           justify-content: center;
+           align-items: center;
+           font-size: 0.8rem;
+       }
+       .letter-brick {
+           width: 50px;
+           height: 50px;
+           background-color: #4FC3F7; /* Light Blue */
+           color: white;
+           display: flex;
+           justify-content: center;
+           align-items: center;
+           font-size: 1.5rem;
+           font-weight: bold;
+           border-radius: 8px;
+           margin: 5px;
+           cursor: grab;
+           user-select: none; /* Prevent text selection during drag */
+           border: 2px solid #039BE5; /* Darker blue border */
+           box-shadow: 0 3px #0277BD;
+       }
+       .drop-zone {
+           width: 60px;
+           height: 60px;
+           background-color: #E0E0E0; /* Grey */
+           border: 2px dashed #9E9E9E;
+           border-radius: 8px;
+           margin: 5px;
+           display: flex;
+           justify-content: center;
+           align-items: center;
+       }
+       .drop-zone.filled .letter-brick {
+           cursor: default;
+       }
+       .choice-button {
+           background-color: #81C784; /* Green */
+           color: white;
+           border: 2px solid #4CAF50;
+       }
+       .choice-button:hover {
+           background-color: #66BB6A;
+       }
+       .rhyme-word {
+           background-color: #BA68C8; /* Purple */
+           color: white;
+           padding: 8px 15px;
+           border-radius: 20px;
+           margin: 5px;
+           cursor: pointer;
+           transition: background-color 0.2s;
+       }
+       .rhyme-word:hover {
+           background-color: #AB47BC;
+       }
+       .rhyme-word.selected {
+           background-color: #7B1FA2; /* Darker Purple */
+           box-shadow: 0 0 10px #CE93D8;
+       }
+       .sentence-word {
+           padding: 2px 5px;
+           margin: 0 2px;
+           cursor: pointer;
+           border-radius: 3px;
+           transition: background-color 0.2s;
+       }
+       .sentence-word.highlighted {
+           background-color: #FFF176; /* Yellow highlight */
+           font-weight: bold;
+       }
+       .storybook-page {
+           border: 2px solid #FFB74D; /* Orange border */
+           background-color: #FFE0B2; /* Light orange page */
+           padding: 15px;
+           min-height: 200px;
+           border-radius: 10px;
+       }
+       .storybook-option {
+           background-color: #90CAF9; /* Light blue option */
+           border: 1px solid #64B5F6;
+           padding: 5px 10px;
+           margin: 5px;
+           border-radius: 5px;
+           cursor: pointer;
+       }
+       .character-img {
+           width: 80px; /* Adjust as needed */
+           height: auto;
+           margin-right: 10px;
+       }
+       .modal {
+           display: none;
+           position: fixed;
+           z-index: 1000;
+           left: 0;
+           top: 0;
+           width: 100%;
+           height: 100%;
+           overflow: auto;
+           background-color: rgba(0,0,0,0.5);
+           justify-content: center;
+           align-items: center;
+       }
+       .modal-content {
+           background-color: #fefefe;
+           margin: auto;
+           padding: 20px;
+           border: 1px solid #888;
+           border-radius: 15px;
+           width: 80%;
+           max-width: 400px;
+           text-align: center;
+           box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+       }
+       .modal-button {
+           margin-top: 15px;
+       }
+
+       /* Responsive adjustments */
+       @media (max-width: 768px) {
+           .game-button {
+               font-size: 1rem;
+               padding: 8px 15px;
+           }
+           .logo {
+               max-width: 200px;
+           }
+           .character-img {
+               width: 60px;
+           }
+           .letter-brick {
+               width: 40px;
+               height: 40px;
+               font-size: 1.2rem;
+           }
+           .drop-zone {
+               width: 50px;
+               height: 50px;
+           }
+       }
+       @media (max-width: 480px) {
+           .game-container {
+               padding: 5px;
+               margin: 5px;
+           }
+           .screen {
+               padding: 10px;
+           }
+           .game-button {
+               font-size: 0.9rem;
+               padding: 6px 10px;
+               width: 100%; /* Stack buttons on small screens */
+               margin: 5px 0;
+           }
+           .flex-wrap { /* Utility for wrapping buttons */
+               flex-wrap: wrap;
+           }
+           .logo {
+               max-width: 150px;
+           }
+           .character-speech {
+               font-size: 0.8rem;
+           }
+           .prize-item {
+               width: 60px;
+               height: 60px;
+               font-size: 0.7rem;
+           }
+           .letter-brick, .drop-zone {
+               width: 35px;
+               height: 35px;
+               font-size: 1rem;
+               margin: 2px;
+           }
+           .modal-content {
+               width: 90%;
+           }
+       }
+   </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+   <div class="game-container">
+       <div id="main-menu" class="screen active text-center">
+           <img src="https://placehold.co/300x100/4CAF50/FFFFFF?text=Super+WHY!+Logo&font=Fredoka%20One" alt="Super WHY! Logo" class="logo">
+           <h1 class="text-4xl super-why-font text-cyan-600 mb-6">Adventure Game</h1>
+           <div class="flex flex-col sm:flex-row sm:flex-wrap justify-center items-center">
+               <button onclick="showScreen('alphabet-challenge')" class="game-button">Alphabet Challenge</button>
+               <button onclick="showScreen('spelling-bee')" class="game-button">Spelling Bee</button>
+               <button onclick="showScreen('rhyme-time')" class="game-button">Rhyme Time</button>
+               <button onclick="showScreen('reading-challenge')" class="game-button">Reading Challenge</button>
+               <button onclick="showScreen('storybook-creator')" class="game-button">Storybook Creator</button>
+               <button onclick="showScreen('super-stuff')" class="game-button bg-purple-500 hover:bg-purple-600 text-white border-purple-700 shadow-purple-900">Super Stuff</button>
+           </div>
+           <button onclick="restartGame()" class="game-button bg-red-500 hover:bg-red-600 text-white border-red-700 shadow-red-900 mt-6">Restart Game</button>
+           <div class="character-speech mt-8">
+               <p>Hi, Super Reader! Click a game to start!</p>
+           </div>
+       </div>
+
+       <div id="alphabet-challenge" class="screen">
+           <div class="flex justify-between items-center mb-4">
+               <h2 class="text-3xl super-why-font text-sky-600">Alphabet Bricks</h2>
+               <button onclick="showScreen('main-menu')" class="game-button">Menu</button>
+           </div>
+           <div class="flex items-center mb-4">
+               <img src="https://placehold.co/80x100/FF9800/FFFFFF?text=Alpha+Pig&font=Fredoka%20One" alt="Alpha Pig" class="character-img rounded-full">
+               <p class="character-speech">Alpha Pig to the rescue! Let's build the word: <strong id="alphabet-word-to-spell">CAT</strong></p>
+           </div>
+           <p class="text-lg mb-2">Drag the letters to spell the word!</p>
+           <div id="letter-slots" class="flex justify-center items-center bg-gray-200 p-4 rounded-lg mb-4">
+               </div>
+           <div id="letter-options" class="flex justify-center items-center flex-wrap bg-gray-100 p-4 rounded-lg">
+               </div>
+           <button id="check-alphabet-word" class="game-button mt-4 mx-auto block">Check Word</button>
+       </div>
+
+       <div id="spelling-bee" class="screen">
+           <div class="flex justify-between items-center mb-4">
+               <h2 class="text-3xl super-why-font text-pink-500">Spelling Bee</h2>
+               <button onclick="showScreen('main-menu')" class="game-button">Menu</button>
+           </div>
+           <div class="flex items-center mb-4">
+                <img src="https://placehold.co/80x100/E91E63/FFFFFF?text=Princess+P&font=Fredoka%20One" alt="Princess Presto" class="character-img rounded-full">
+               <p class="character-speech">Princess Presto here! Which word is spelled correctly?</p>
+           </div>
+           <p id="spelling-question" class="text-xl mb-4 text-center">How do you spell <strong id="spelling-word-prompt">APPLE</strong>?</p>
+           <div id="spelling-options" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+               </div>
+       </div>
+
+       <div id="rhyme-time" class="screen">
+           <div class="flex justify-between items-center mb-4">
+               <h2 class="text-3xl super-why-font text-red-500">Rhyme N' Roll</h2>
+               <button onclick="showScreen('main-menu')" class="game-button">Menu</button>
+           </div>
+           <div class="flex items-center mb-4">
+               <img src="https://placehold.co/80x100/F44336/FFFFFF?text=Wonder+Red&font=Fredoka%20One" alt="Wonder Red" class="character-img rounded-full">
+               <p class="character-speech">Wonder Red, ready to rhyme! Which word rhymes with <strong id="rhyme-target-word">HAT</strong>?</p>
+           </div>
+           <div id="rhyme-options" class="flex flex-wrap justify-center items-center p-4 bg-red-100 rounded-lg">
+               </div>
+            <button id="check-rhyme" class="game-button mt-4 mx-auto block">Check Rhyme</button>
+       </div>
+
+       <div id="reading-challenge" class="screen">
+           <div class="flex justify-between items-center mb-4">
+               <h2 class="text-3xl super-why-font text-green-600">Reading Challenge</h2>
+               <button onclick="showScreen('main-menu')" class="game-button">Menu</button>
+           </div>
+            <div class="flex items-center mb-4">
+               <img src="https://placehold.co/80x100/009688/FFFFFF?text=Super+Why&font=Fredoka%20One" alt="Super Why" class="character-img rounded-full">
+               <p class="character-speech">It's Super Why! Read the sentence and click on the word: <strong id="reading-target-word">DOG</strong></p>
+           </div>
+           <div id="reading-sentence-container" class="text-2xl p-6 bg-green-100 rounded-lg text-center leading-relaxed">
+               </div>
+       </div>
+
+       <div id="storybook-creator" class="screen">
+           <div class="flex justify-between items-center mb-4">
+               <h2 class="text-3xl super-why-font text-indigo-500">Storybook Creator</h2>
+               <button onclick="showScreen('main-menu')" class="game-button">Menu</button>
+           </div>
+           <div class="flex items-center mb-4">
+               <img src="https://placehold.co/80x100/795548/FFFFFF?text=Woofster&font=Fredoka%20One" alt="Woofster" class="character-img rounded-full">
+               <p class="character-speech">Woof woof! Let's make a story, Woofster style!</p>
+           </div>
+           <div class="storybook-page mb-4">
+               <p id="story-text-line1">Once upon a time, there was a <span id="story-slot-1" class="font-bold text-indigo-700">[Character]</span>.</p>
+               <p id="story-text-line2">It went to the <span id="story-slot-2" class="font-bold text-indigo-700">[Place]</span>.</p>
+               <p id="story-text-line3">And they found a <span id="story-slot-3" class="font-bold text-indigo-700">[Object]</span>!</p>
+           </div>
+           <div class="mb-2">
+               <h3 class="text-lg font-semibold">Choose a Character:</h3>
+               <div id="character-choices" class="flex flex-wrap">
+                   <button class="storybook-option" onclick="updateStorySlot('story-slot-1', 'brave knight')">Brave Knight</button>
+                   <button class="storybook-option" onclick="updateStorySlot('story-slot-1', 'silly dragon')">Silly Dragon</button>
+                   <button class="storybook-option" onclick="updateStorySlot('story-slot-1', 'curious cat')">Curious Cat</button>
+               </div>
+           </div>
+           <div class="mb-2">
+               <h3 class="text-lg font-semibold">Choose a Place:</h3>
+               <div id="place-choices" class="flex flex-wrap">
+                   <button class="storybook-option" onclick="updateStorySlot('story-slot-2', 'magical castle')">Magical Castle</button>
+                   <button class="storybook-option" onclick="updateStorySlot('story-slot-2', 'sunny beach')">Sunny Beach</button>
+                   <button class="storybook-option" onclick="updateStorySlot('story-slot-2', 'mysterious cave')">Mysterious Cave</button>
+               </div>
+           </div>
+           <div>
+               <h3 class="text-lg font-semibold">Choose an Object:</h3>
+               <div id="object-choices" class="flex flex-wrap">
+                   <button class="storybook-option" onclick="updateStorySlot('story-slot-3', 'sparkling gem')">Sparkling Gem</button>
+                   <button class="storybook-option" onclick="updateStorySlot('story-slot-3', 'talking book')">Talking Book</button>
+                   <button class="storybook-option" onclick="updateStorySlot('story-slot-3', 'giant cookie')">Giant Cookie</button>
+               </div>
+           </div>
+           <button onclick="showPraiseModal('Wow! What a super story!')" class="game-button mt-6 mx-auto block">Finish Story</button>
+       </div>
+
+       <div id="super-stuff" class="screen">
+           <div class="flex justify-between items-center mb-4">
+               <h2 class="text-3xl super-why-font text-yellow-500">Super Stuff!</h2>
+               <button onclick="showScreen('main-menu')" class="game-button">Menu</button>
+           </div>
+           <p class="text-lg mb-4">These are the super prizes you've collected!</p>
+           <div id="prizes-collected" class="flex flex-wrap justify-center items-center bg-yellow-100 p-4 rounded-lg min-h-[200px]">
+               <p id="no-prizes-message" class="text-gray-500">No prizes yet. Play some games to earn them!</p>
+           </div>
+       </div>
+
+       <div id="feedback-modal" class="modal">
+           <div class="modal-content">
+               <p id="modal-message" class="text-xl super-why-font mb-4"></p>
+               <img id="modal-character-img" src="" alt="Character" class="character-img mx-auto mb-2 hidden">
+               <button id="modal-close-button" class="game-button modal-button">Okay!</button>
+           </div>
+       </div>
+
+   </div>
+
+   <script>
+       // --- Game State & Data ---
+       let currentScreen = 'main-menu';
+       let collectedPrizes = []; // Stores names of collected prizes
+       let gameTimers = {}; // To store timers for challenges (optional)
+
+       const characters = {
+           alphaPig: { name: "Alpha Pig", img: "https://placehold.co/80x100/FF9800/FFFFFF?text=Alpha+Pig&font=Fredoka%20One" },
+           wonderRed: { name: "Wonder Red", img: "https://placehold.co/80x100/F44336/FFFFFF?text=Wonder+Red&font=Fredoka%20One" },
+           princessPresto: { name: "Princess Presto", img: "https://placehold.co/80x100/E91E63/FFFFFF?text=Princess+P&font=Fredoka%20One" },
+           superWhy: { name: "Super Why", img: "https://placehold.co/80x100/009688/FFFFFF?text=Super+Why&font=Fredoka%20One" },
+           woofster: { name: "Woofster", img: "https://placehold.co/80x100/795548/FFFFFF?text=Woofster&font=Fredoka%20One" }
+       };
+
+       // --- Core Navigation ---
+       function showScreen(screenId) {
+           document.getElementById(currentScreen).classList.remove('active');
+           document.getElementById(screenId).classList.add('active');
+           currentScreen = screenId;
+           // Initialize game if needed
+           if (screenId === 'alphabet-challenge') initAlphabetChallenge();
+           if (screenId === 'spelling-bee') initSpellingBee();
+           if (screenId === 'rhyme-time') initRhymeTime();
+           if (screenId === 'reading-challenge') initReadingChallenge();
+           if (screenId === 'super-stuff') displayPrizes();
+           if (screenId === 'storybook-creator') initStorybookCreator();
+       }
+
+       function restartGame() {
+           // Reset game state variables
+           collectedPrizes = [];
+           // Potentially reset progress in individual games if stored
+           // For now, just go to main menu and clear prizes
+           localStorage.removeItem('superWhyPrizes'); // Clear saved prizes
+           showPraiseModal("Game Restarted! Let's play again!", null, () => showScreen('main-menu'));
+           displayPrizes(); // Update the super stuff screen
+       }
+
+       // --- Feedback Modal ---
+       const feedbackModal = document.getElementById('feedback-modal');
+       const modalMessage = document.getElementById('modal-message');
+       const modalCharacterImg = document.getElementById('modal-character-img');
+       const modalCloseButton = document.getElementById('modal-close-button');
+
+       function showPraiseModal(message, characterKey = null, callback = null) {
+           modalMessage.textContent = message;
+           if (characterKey && characters[characterKey]) {
+               modalCharacterImg.src = characters[characterKey].img;
+               modalCharacterImg.alt = characters[characterKey].name;
+               modalCharacterImg.classList.remove('hidden');
+           } else {
+               modalCharacterImg.classList.add('hidden');
+           }
+           feedbackModal.style.display = 'flex';
+           
+           modalCloseButton.onclick = () => {
+               feedbackModal.style.display = 'none';
+               if (callback) callback();
+           };
+       }
+
+       // --- Prize System ---
+       function addPrize(prizeName, prizeIcon = "🌟") {
+           if (!collectedPrizes.includes(prizeName)) {
+               collectedPrizes.push(prizeName);
+               savePrizes(); // Save to localStorage
+               showPraiseModal(`You earned a ${prizeName} ${prizeIcon}!`, null, displayPrizes);
+           }
+       }
+
+       function displayPrizes() {
+           const prizesContainer = document.getElementById('prizes-collected');
+           const noPrizesMessage = document.getElementById('no-prizes-message');
+           prizesContainer.innerHTML = ''; // Clear previous prizes
+
+           if (collectedPrizes.length === 0) {
+               noPrizesMessage.style.display = 'block';
+           } else {
+               noPrizesMessage.style.display = 'none';
+               collectedPrizes.forEach(prize => {
+                   const prizeDiv = document.createElement('div');
+                   prizeDiv.classList.add('prize-item');
+                   prizeDiv.textContent = prize; // Can be more complex with icons
+                   prizesContainer.appendChild(prizeDiv);
+               });
+           }
+       }
+       
+       function savePrizes() {
+           localStorage.setItem('superWhyPrizes', JSON.stringify(collectedPrizes));
+       }
+
+       function loadPrizes() {
+           const savedPrizes = localStorage.getItem('superWhyPrizes');
+           if (savedPrizes) {
+               collectedPrizes = JSON.parse(savedPrizes);
+           }
+       }
+
+
+       // --- Mini-Game: Alphabet Bricks ---
+       const alphabetWords = [
+           { word: "CAT", letters: "ACTPZ" },
+           { word: "DOG", letters: "GODLS" },
+           { word: "SUN", letters: "NSUVM" },
+           { word: "PIG", letters: "GPIMN" },
+           { word: "BED", letters: "DEBXY" }
+       ];
+       let currentAlphabetWord = {};
+       let draggedLetter = null;
+
+       function initAlphabetChallenge() {
+           currentAlphabetWord = alphabetWords[Math.floor(Math.random() * alphabetWords.length)];
+           document.getElementById('alphabet-word-to-spell').textContent = currentAlphabetWord.word;
+
+           const letterSlotsContainer = document.getElementById('letter-slots');
+           letterSlotsContainer.innerHTML = '';
+           for (let i = 0; i < currentAlphabetWord.word.length; i++) {
+               const dropZone = document.createElement('div');
+               dropZone.classList.add('drop-zone');
+               dropZone.dataset.index = i;
+               dropZone.addEventListener('dragover', (e) => e.preventDefault()); // Allow drop
+               dropZone.addEventListener('drop', handleDrop);
+               letterSlotsContainer.appendChild(dropZone);
+           }
+
+           const letterOptionsContainer = document.getElementById('letter-options');
+           letterOptionsContainer.innerHTML = '';
+           // Shuffle letters for options
+           const shuffledOptionLetters = currentAlphabetWord.letters.split('').sort(() => 0.5 - Math.random());
+           shuffledOptionLetters.forEach(letter => {
+               const letterBrick = document.createElement('div');
+               letterBrick.classList.add('letter-brick');
+               letterBrick.textContent = letter;
+               letterBrick.draggable = true;
+               letterBrick.addEventListener('dragstart', handleDragStart);
+               letterOptionsContainer.appendChild(letterBrick);
+           });
+
+           document.getElementById('check-alphabet-word').onclick = checkAlphabetWord;
+       }
+
+       function handleDragStart(event) {
+           draggedLetter = event.target;
+           event.dataTransfer.setData('text/plain', event.target.textContent); // For compatibility
+       }
+
+       function handleDrop(event) {
+           event.preventDefault();
+           if (event.target.classList.contains('drop-zone') && !event.target.hasChildNodes()) {
+               const newBrick = draggedLetter.cloneNode(true); // Clone to allow reuse if needed, or just move
+               newBrick.draggable = false; // Can't drag from drop zone
+               newBrick.style.cursor = 'default';
+               event.target.appendChild(newBrick);
+               event.target.classList.add('filled');
+               draggedLetter.style.opacity = '0.5'; // Indicate it's used, or remove if preferred
+               draggedLetter.draggable = false; // Prevent re-dragging the original
+           }
+       }
+
+       function checkAlphabetWord() {
+           const letterSlots = document.querySelectorAll('#letter-slots .drop-zone');
+           let formedWord = "";
+           letterSlots.forEach(slot => {
+               if (slot.firstChild) {
+                   formedWord += slot.firstChild.textContent;
+               }
+           });
+
+           if (formedWord === currentAlphabetWord.word) {
+               showPraiseModal(`That's right! ${currentAlphabetWord.word}! You're an Alphabet Ace!`, 'alphaPig', () => {
+                   addPrize(`${currentAlphabetWord.word} Brick`, '🧱');
+                   initAlphabetChallenge(); // Next word
+               });
+           } else {
+               showPraiseModal("Oops! That's not quite right. Try again!", 'alphaPig');
+               // Optionally reset the board or allow corrections
+               // For simplicity, we'll just let them try again or re-drag
+               // To reset:
+               // document.querySelectorAll('#letter-slots .drop-zone').forEach(dz => { dz.innerHTML = ''; dz.classList.remove('filled'); });
+               // document.querySelectorAll('#letter-options .letter-brick').forEach(lb => { lb.style.opacity = '1'; lb.draggable = true; });
+           }
+       }
+
+       // --- Mini-Game: Spelling Bee ---
+       const spellingWords = [
+           { word: "APPLE", options: ["APLLE", "APPLE", "APEL"], prompt: "a fruit" },
+           { word: "HOUSE", options: ["HOWSE", "HOUSE", "HOUZE"], prompt: "where you live" },
+           { word: "HAPPY", options: ["HAPY", "HAPEE", "HAPPY"], prompt: "feeling good" },
+           { word: "WATER", options: ["WATAR", "WATER", "WOTER"], prompt: "you drink this" },
+           { word: "FRIEND", options: ["FREND", "FRIEND", "FRIND"], prompt: "a buddy" }
+       ];
+       let currentSpellingWord = {};
+
+       function initSpellingBee() {
+           currentSpellingWord = spellingWords[Math.floor(Math.random() * spellingWords.length)];
+           document.getElementById('spelling-word-prompt').innerHTML = `${currentSpellingWord.word} <span class="text-sm text-gray-600">(${currentSpellingWord.prompt})</span>`;
+           
+           const optionsContainer = document.getElementById('spelling-options');
+           optionsContainer.innerHTML = '';
+           currentSpellingWord.options.forEach(option => {
+               const button = document.createElement('button');
+               button.classList.add('game-button', 'choice-button', 'w-full', 'text-center');
+               button.textContent = option;
+               button.onclick = () => checkSpelling(option);
+               optionsContainer.appendChild(button);
+           });
+       }
+
+       function checkSpelling(selectedOption) {
+           if (selectedOption === currentSpellingWord.word) {
+               showPraiseModal(`Correct! ${currentSpellingWord.word} is spelled right! Spell-tacular!`, 'princessPresto', () => {
+                   addPrize(`${currentSpellingWord.word} Spell`, '✨');
+                   initSpellingBee(); // Next word
+               });
+           } else {
+               showPraiseModal("Not quite. Give it another try!", 'princessPresto');
+           }
+       }
+
+       // --- Mini-Game: Rhyme Time ---
+       const rhymeSets = [
+           { target: "HAT", options: ["CAT", "DOG", "SUN", "BOX"], correct: "CAT" },
+           { target: "STAR", options: ["MOON", "CAR", "TREE", "BOOK"], correct: "CAR" },
+           { target: "BLUE", options: ["RED", "SHOE", "GREEN", "SKY"], correct: "SHOE" },
+           { target: "CAKE", options: ["MILK", "SNAKE", "BREAD", "JUICE"], correct: "SNAKE" },
+           { target: "MOUSE", options: ["CAT", "DOG", "HOUSE", "BIRD"], correct: "HOUSE" }
+       ];
+       let currentRhymeSet = {};
+       let selectedRhyme = null;
+
+       function initRhymeTime() {
+           currentRhymeSet = rhymeSets[Math.floor(Math.random() * rhymeSets.length)];
+           document.getElementById('rhyme-target-word').textContent = currentRhymeSet.target;
+           selectedRhyme = null; // Reset selection
+
+           const optionsContainer = document.getElementById('rhyme-options');
+           optionsContainer.innerHTML = '';
+           currentRhymeSet.options.forEach(option => {
+               const wordDiv = document.createElement('div');
+               wordDiv.classList.add('rhyme-word');
+               wordDiv.textContent = option;
+               wordDiv.onclick = () => selectRhymeWord(wordDiv, option);
+               optionsContainer.appendChild(wordDiv);
+           });
+           document.getElementById('check-rhyme').onclick = checkRhyme;
+       }
+
+       function selectRhymeWord(element, word) {
+           // Deselect previous if any
+           const currentlySelected = document.querySelector('#rhyme-options .rhyme-word.selected');
+           if (currentlySelected) {
+               currentlySelected.classList.remove('selected');
+           }
+           // Select new one
+           element.classList.add('selected');
+           selectedRhyme = word;
+       }
+       
+       function checkRhyme() {
+           if (!selectedRhyme) {
+                showPraiseModal("Pick a word first, Wonderoo!", 'wonderRed');
+                return;
+           }
+           if (selectedRhyme === currentRhymeSet.correct) {
+               showPraiseModal(`Yes! ${selectedRhyme} rhymes with ${currentRhymeSet.target}! Wonderful!`, 'wonderRed', () => {
+                   addPrize(`${currentRhymeSet.target}-${selectedRhyme} Rhyme`, '🎶');
+                   initRhymeTime(); // Next set
+               });
+           } else {
+               showPraiseModal(`Hmm, ${selectedRhyme} doesn't rhyme with ${currentRhymeSet.target}. Try again!`, 'wonderRed');
+           }
+       }
+
+
+       // --- Mini-Game: Reading Challenge ---
+       const sentences = [
+           { text: "The quick brown FOX jumps over the lazy DOG.", target: "FOX" },
+           { text: "A big RED apple fell from the TREE.", target: "APPLE" },
+           { text: "My CAT likes to play with a BALL.", target: "CAT" },
+           { text: "The SUN is shining in the blue SKY.", target: "SUN" },
+           { text: "We read a FUNNY book together.", target: "BOOK" }
+       ];
+       let currentReadingChallenge = {};
+
+       function initReadingChallenge() {
+           currentReadingChallenge = sentences[Math.floor(Math.random() * sentences.length)];
+           document.getElementById('reading-target-word').textContent = currentReadingChallenge.target;
+           
+           const sentenceContainer = document.getElementById('reading-sentence-container');
+           sentenceContainer.innerHTML = '';
+           const words = currentReadingChallenge.text.split(/(\s+)/); // Split by space, keeping spaces
+
+           words.forEach(wordOrSpace => {
+               if (wordOrSpace.trim() === '') { // It's a space
+                   sentenceContainer.appendChild(document.createTextNode(wordOrSpace));
+               } else {
+                   const wordSpan = document.createElement('span');
+                   wordSpan.classList.add('sentence-word');
+                   wordSpan.textContent = wordOrSpace;
+                   // Remove punctuation for comparison, but display it
+                   const cleanWord = wordOrSpace.replace(/[.,!?]/g, '');
+                   wordSpan.onclick = () => checkReadingWord(cleanWord, wordSpan);
+                   sentenceContainer.appendChild(wordSpan);
+               }
+           });
+       }
+
+       function checkReadingWord(clickedWord, spanElement) {
+           document.querySelectorAll('.sentence-word.highlighted').forEach(el => el.classList.remove('highlighted'));
+           spanElement.classList.add('highlighted');
+
+           if (clickedWord.toUpperCase() === currentReadingChallenge.target.toUpperCase()) {
+               showPraiseModal(`That's it! You found ${currentReadingChallenge.target}! Super job!`, 'superWhy', () => {
+                   addPrize(`${currentReadingChallenge.target} Read`, '📖');
+                   initReadingChallenge(); // Next sentence
+               });
+           } else {
+                // Provide gentle feedback, but don't call it "wrong" immediately, let them try other words.
+                // If we want immediate wrong feedback:
+                // showPraiseModal(`Not quite ${clickedWord}. Look for ${currentReadingChallenge.target}!`, 'superWhy');
+           }
+       }
+
+       // --- Mini-Game: Storybook Creator ---
+       function initStorybookCreator() {
+           // Reset story slots to placeholders
+           document.getElementById('story-slot-1').textContent = "[Character]";
+           document.getElementById('story-slot-2').textContent = "[Place]";
+           document.getElementById('story-slot-3').textContent = "[Object]";
+           // Could add more dynamic elements here if needed
+       }
+
+       function updateStorySlot(slotId, text) {
+           document.getElementById(slotId).textContent = text;
+       }
+
+
+       // --- Initial Load ---
+       window.onload = () => {
+           loadPrizes(); // Load prizes from localStorage
+           showScreen('main-menu'); // Start at the main menu
+           // Initialize first games to avoid blank screens if user clicks fast
+           initAlphabetChallenge();
+           initSpellingBee();
+           initRhymeTime();
+           initReadingChallenge();
+           initStorybookCreator();
+           displayPrizes(); // Ensure prizes are shown if any were loaded
+       };
+
+   </script>
+</body>
+</html>
