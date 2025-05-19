@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Tutorial Finder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        'primary-hover': '#4A49B8',
+                        'dark-bg': '#181818',
+                        'dark-card': '#252525',
+                        'light-card': '#FFFFFF'
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.css" rel="stylesheet">
+</head>
+<body class="bg-white dark:bg-dark-bg text-gray-800 dark:text-gray-200 transition-colors duration-200">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold mb-2 text-primary">YouTube Tutorial Finder</h1>
+            <p class="text-gray-600 dark:text-gray-400">Find personalized video tutorials for any topic</p>
+        </header>
+
+        <!-- Search section -->
+        <div class="bg-white dark:bg-dark-card rounded-lg shadow-md p-6 mb-8">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="relative flex-1">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                    <input 
+                        type="text" 
+                        id="search-input" 
+                        placeholder="Search for tutorials (e.g. 'javascript for beginners')" 
+                        class="pl-10 pr-4 py-3 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-base"
+                    >
+                </div>
+                <div>
+                    <button 
+                        id="search-button" 
+                        class="w-full md:w-auto px-6 py-3 bg-primary hover:bg-primary-hover text-white font-medium rounded-lg transition-colors duration-200 flex items-center justify-center"
+                    >
+                        <span>Search</span>
+                    </button>
+                </div>
+            </div>
+            <div class="mt-4 flex flex-wrap gap-2">
+                <span class="text-sm text-gray-500 dark:text-gray-400 mr-2">Popular searches:</span>
+                <button class="quick-search-btn text-sm px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">Python for beginners</button>
+                <button class="quick-search-btn text-sm px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">Web development</button>
+                <button class="quick-search-btn text-sm px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">Data science tutorials</button>
+                <button class="quick-search-btn text-sm px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">UI/UX design</button>
+            </div>
+        </div>
+
+        <!-- Results section -->
+        <div id="results-container" class="hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Search Results</h2>
+                <div id="results-count" class="text-sm text-gray-500 dark:text-gray-400"></div>
+            </div>
+            <div id="results-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Results will be inserted here -->
+            </div>
+            <div class="text-center mt-8">
+                <button id="load-more" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg font-medium transition-colors duration-200 hidden">
+                    Load More Results
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading indicator -->
+        <div id="loading" class="hidden">
+            <div class="flex justify-center items-center my-12 flex-col">
+                <div class="w-16 h-16 border-4 border-gray-300 dark:border-gray-700 border-t-primary rounded-full animate-spin"></div>
+                <p class="mt-4 text-gray-600 dark:text-gray-400">Searching for tutorials...</p>
+            </div>
+        </div>
+
+        <!-- No results -->
+        <div id="no-results" class="hidden text-center py-12">
+            <i class="fas fa-search text-4xl text-gray-400 mb-3"></i>
+            <h3 class="text-xl font-medium mb-2">No tutorials found</h3>
+            <p class="text-gray-500 dark:text-gray-400">Try different keywords or check your spelling</p>
+        </div>
+
+        <!-- Error message -->
+        <div id="error-message" class="hidden bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 p-4 rounded-lg mb-8">
+            <div class="flex items-center">
+                <i class="fas fa-exclamation-circle mr-2"></i>
+                <span id="error-text">There was an error fetching the tutorials. Please try again.</span>
+            </div>
+        </div>
+
+        <!-- Video modal -->
+        <div id="video-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+            <div class="bg-white dark:bg-dark-card rounded-lg shadow-xl w-full max-w-4xl mx-4 overflow-hidden">
+                <div class="p-4 flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
+                    <h3 id="modal-title" class="font-bold text-lg truncate flex-1 pr-4"></h3>
+                    <button id="close-modal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="relative pb-[56.25%] h-0">
+                    <iframe id="video-iframe" class="absolute top-0 left-0 w-full h-full" frameborder="0" allowfullscreen></iframe>
+                </div>
+                <div class="p-4">
+                    <div class="flex items-center mb-2">
+                        <img id="modal-channel-img" class="w-8 h-8 rounded-full mr-2" src="" alt="Channel">
+                        <a id="modal-channel" href="#" target="_blank" class="text-primary hover:underline"></a>
+                    </div>
+                    <p id="modal-description" class="text-gray-700 dark:text-gray-300 text-sm mt-2 line-clamp-3"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check for dark mode preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+        // API key from the user
+        const API_KEY = 'AIzaSyCRxdsszQjIGKBxJi7i5neDxkOPngRrhxY';
+        
+        // Elements
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const resultsContainer = document.getElementById('results-container');
+        const resultsGrid = document.getElementById('results-grid');
+        const resultsCount = document.getElementById('results-count');
+        const loadMoreButton = document.getElementById('load-more');
+        const loadingElement = document.getElementById('loading');
+        const noResultsElement = document.getElementById('no-results');
+        const errorMessageElement = document.getElementById('error-message');
+        const errorTextElement = document.getElementById('error-text');
+        const videoModal = document.getElementById('video-modal');
+        const videoIframe = document.getElementById('video-iframe');
+        const modalTitle = document.getElementById('modal-title');
+        const modalChannel = document.getElementById('modal-channel');
+        const modalChannelImg = document.getElementById('modal-channel-img');
+        const modalDescription = document.getElementById('modal-description');
+        const closeModalButton = document.getElementById('close-modal');
+        const quickSearchButtons = document.querySelectorAll('.quick-search-btn');
+
+        // Variables for pagination
+        let nextPageToken = '';
+        let currentQuery = '';
+        let isLoading = false;
+
+        // Event listeners
+        searchButton.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch();
+        });
+        loadMoreButton.addEventListener('click', loadMoreResults);
+        closeModalButton.addEventListener('click', closeVideoModal);
+        
+        // Quick search buttons
+        quickSearchButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                searchInput.value = btn.textContent;
+                performSearch();
+            });
+        });
+
+        // Close modal when clicking outside
+        videoModal.addEventListener('click', (e) => {
+            if (e.target === videoModal) closeVideoModal();
+        });
+
+        // Main search function
+        async function performSearch() {
+            const query = searchInput.value.trim();
+            if (!query) return;
+            
+            currentQuery = query;
+            nextPageToken = '';
+            showLoading();
+            clearResults();
+            
+            try {
+                const results = await searchYouTube(query);
+                hideLoading();
+                
+                if (results.items.length === 0) {
+                    showNoResults();
+                } else {
+                    displayResults(results);
+                    showResultsContainer();
+                }
+            } catch (error) {
+                handleError(error);
+            }
+        }
+
+        // Load more results
+        async function loadMoreResults() {
+            if (isLoading || !nextPageToken) return;
+            
+            loadMoreButton.textContent = 'Loading...';
+            loadMoreButton.disabled = true;
+            isLoading = true;
+            
+            try {
+                const results = await searchYouTube(currentQuery, nextPageToken);
+                displayResults(results, true);
+                isLoading = false;
+                loadMoreButton.textContent = 'Load More Results';
+                loadMoreButton.disabled = false;
+            } catch (error) {
+                handleError(error);
+                isLoading = false;
+                loadMoreButton.textContent = 'Load More Results';
+                loadMoreButton.disabled = false;
+            }
+        }
+
+        // YouTube API search function
+        async function searchYouTube(query, pageToken = '') {
+            const endpoint = 'https://www.googleapis.com/youtube/v3/search';
+            const params = new URLSearchParams({
+                key: API_KEY,
+                q: query + ' tutorial',
+                part: 'snippet',
+                maxResults: 12,
+                type: 'video',
+                videoCategoryId: '27', // Education category
+                relevanceLanguage: 'en'
+            });
+            
+            if (pageToken) {
+                params.append('pageToken', pageToken);
+            }
+            
+            const response = await fetch(`${endpoint}?${params}`);
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error?.message || 'Error fetching data from YouTube');
+            }
+            
+            const data = await response.json();
+            
+            // Get video details (duration, view count, etc.)
+            const videoIds = data.items.map(item => item.id.videoId).join(',');
+            const videoDetailsResponse = await fetch(
+                `https://www.googleapis.com/youtube/v3/videos?key=${API_KEY}&id=${videoIds}&part=contentDetails,statistics,snippet`
+            );
+            
+            const videoDetailsData = await videoDetailsResponse.json();
+            
+            // Add video details to the original data
+            data.items = data.items.map(item => {
+                const videoDetails = videoDetailsData.items.find(v => v.id === item.id.videoId);
+                return { ...item, videoDetails };
+            });
+            
+            return data;
+        }
+
+        // Display results in the UI
+        function displayResults(data, append = false) {
+            if (!append) {
+                resultsGrid.innerHTML = '';
+            }
+            
+            // Store nextPageToken if available
+            nextPageToken = data.nextPageToken || '';
+            loadMoreButton.style.display = nextPageToken ? 'inline-block' : 'none';
+            
+            // Update results count
+            resultsCount.textContent = `Showing ${resultsGrid.childElementCount + 1}-${resultsGrid.childElementCount + data.items.length} results`;
+            
+            data.items.forEach(item => {
+                const videoId = item.id.videoId;
+                const title = item.snippet.title;
+                const thumbnail = item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url || item.snippet.thumbnails.default?.url;
+                const channelTitle = item.snippet.channelTitle;
+                const publishedAt = new Date(item.snippet.publishedAt).toLocaleDateString();
+                
+                // Video details
+                const duration = item.videoDetails ? formatDuration(item.videoDetails.contentDetails.duration) : '';
+                const viewCount = item.videoDetails ? formatViewCount(item.videoDetails.statistics.viewCount) : '';
+                const description = item.snippet.description;
+                
+                const videoCard = document.createElement('div');
+                videoCard.className = 'bg-light-card dark:bg-dark-card rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200';
+                videoCard.innerHTML = `
+                    <div class="relative overflow-hidden" data-video-id="${videoId}" data-title="${title}" data-channel="${channelTitle}" data-description="${description}">
+                        <img src="${thumbnail}" alt="${title}" class="w-full aspect-video object-cover hover:scale-105 transition-transform duration-300">
+                        <div class="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-1.5 py-0.5 rounded">${duration}</div>
+                        <div class="absolute inset-0 bg-black/10 hover:bg-black/20 transition-colors cursor-pointer play-video"></div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-base mb-1 line-clamp-2" title="${title}">${title}</h3>
+                        <div class="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-1">
+                            <span class="mr-2">${channelTitle}</span>
+                            <span class="before:content-['•'] before:mx-2">${viewCount} views</span>
+                        </div>
+                        <div class="text-xs text-gray-500 dark:text-gray-500">${publishedAt}</div>
+                    </div>
+                `;
+                
+                resultsGrid.appendChild(videoCard);
+            });
+            
+            // Add event listeners to play buttons
+            document.querySelectorAll('.play-video').forEach(element => {
+                element.addEventListener('click', (e) => {
+                    const parent = e.currentTarget.parentElement;
+                    const videoId = parent.dataset.videoId;
+                    const title = parent.dataset.title;
+                    const channel = parent.dataset.channel;
+                    const description = parent.dataset.description;
+                    openVideoModal(videoId, title, channel, description);
+                });
+            });
+        }
+
+        // Open video modal
+        function openVideoModal(videoId, title, channel, description) {
+            videoIframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+            modalTitle.textContent = title;
+            modalChannel.textContent = channel;
+            modalChannel.href = `https://www.youtube.com/channel/${videoId}`;
+            modalDescription.textContent = description;
+            
+            // Fetch channel thumbnail (optional, will depend on API usage)
+            modalChannelImg.src = `https://i.imgur.com/undefined.jpg`; // Placeholder
+            
+            videoModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close video modal
+        function closeVideoModal() {
+            videoIframe.src = '';
+            videoModal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // Helper functions
+        function formatDuration(duration) {
+            // Convert ISO 8601 duration to readable format
+            const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+            
+            const hours = (match[1] ? match[1].slice(0, -1) : 0);
+            const minutes = (match[2] ? match[2].slice(0, -1) : 0);
+            const seconds = (match[3] ? match[3].slice(0, -1) : 0);
+            
+            if (hours > 0) {
+                return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            } else {
+                return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }
+
+        function formatViewCount(viewCount) {
+            if (!viewCount) return '0';
+            
+            const count = parseInt(viewCount, 10);
+            if (count >= 1000000) {
+                return `${(count / 1000000).toFixed(1)}M`;
+            } else if (count >= 1000) {
+                return `${(count / 1000).toFixed(1)}K`;
+            } else {
+                return count.toString();
+            }
+        }
+
+        // UI state functions
+        function showLoading() {
+            loadingElement.classList.remove('hidden');
+            noResultsElement.classList.add('hidden');
+            resultsContainer.classList.add('hidden');
+            errorMessageElement.classList.add('hidden');
+        }
+
+        function hideLoading() {
+            loadingElement.classList.add('hidden');
+        }
+
+        function showResultsContainer() {
+            resultsContainer.classList.remove('hidden');
+            noResultsElement.classList.add('hidden');
+        }
+
+        function showNoResults() {
+            noResultsElement.classList.remove('hidden');
+            resultsContainer.classList.add('hidden');
+        }
+
+        function clearResults() {
+            resultsGrid.innerHTML = '';
+            nextPageToken = '';
+            loadMoreButton.style.display = 'none';
+        }
+
+        function handleError(error) {
+            hideLoading();
+            errorTextElement.textContent = error.message || 'An unexpected error occurred. Please try again.';
+            errorMessageElement.classList.remove('hidden');
+            console.error('Error:', error);
+        }
+
+        // Focus the search input on page load
+        window.addEventListener('load', () => {
+            searchInput.focus();
+        });
+    </script>
+</body>
+</html>
