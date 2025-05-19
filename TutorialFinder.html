@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -16,565 +15,714 @@
             line-height: 1.6;
         }
 
-/* Style for the search input focus state */
-    input[type="text"]:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.5); /* YouTube red glow */
-        border-color: #FF0000; /* YouTube red border */
-    }
+        /* Style for the search input focus state */
+        input[type="text"]:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.5); /* YouTube red glow */
+            border-color: #FF0000; /* YouTube red border */
+        }
 
-    /* Style for the video result items */
-    .video-item {
-        background-color: rgba(255, 255, 255, 0.15); /* Slightly more opaque background */
-        border-radius: 0.5rem; /* rounded-lg */
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* shadow-md */
-        padding: 1.5rem; /* p-6 */
-        margin-bottom: 1.5rem; /* mb-6 */
-        display: flex; /* Use flexbox for layout */
-        flex-direction: column; /* Stack elements vertically by default */
-        gap: 1rem; /* Space between elements */
-        align-items: center; /* Center items horizontally by default */
-        text-align: center; /* Center text by default */
-        cursor: pointer; /* Indicate that the item is clickable */
-        transition: transform 0.2s ease-in-out; /* Add a slight hover effect */
-    }
-
-    .video-item:hover {
-        transform: translateY(-5px); /* Lift the item slightly on hover */
-    }
-
-    .video-item .video-thumbnail-container {
-        position: relative; /* Needed for aspect ratio padding */
-        width: 100%; /* Take full width of the container */
-        padding-bottom: 56.25%; /* 16:9 Aspect Ratio (height / width * 100) */
-        height: 0; /* Hide the container's height */
-        overflow: hidden; /* Hide anything outside the padding */
-        border-radius: 0.25rem; /* rounded */
-        pointer-events: none; /* Prevent clicks on the container itself, rely on parent .video-item */
-    }
-
-    .video-item img {
-         display: block; /* Ensure image doesn't have extra space below */
-         width: 100%; /* Make image fill container */
-         height: 100%; /* Make image fill container */
-         object-fit: cover; /* Cover the container while maintaining aspect ratio */
-    }
-
-
-    .video-item .video-details {
-        width: 100%; /* Take full width */
-    }
-
-    .video-item h3 {
-        font-size: 1.25rem; /* text-xl */
-        font-weight: 600; /* font-semibold */
-        margin-bottom: 0.5rem; /* mb-2 */
-        color: #ffffff; /* Text color white */
-    }
-
-    .video-item p {
-        font-size: 1rem; /* text-base */
-        color: #d1d5db; /* gray-300 */
-    }
-
-     /* Style for recommendation sections */
-    .recommendation-section {
-        background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent white */
-        padding: 1.5rem; /* p-6 */
-        border-radius: 0.75rem; /* rounded-xl */
-        margin-top: 2rem; /* mt-8 */
-        text-align: left; /* Align text left */
-    }
-
-    .recommendation-section h2 {
-        font-size: 2rem; /* text-3xl */
-        font-weight: 700; /* font-bold */
-        margin-bottom: 1.5rem; /* mb-6 */
-        text-align: center; /* Center the heading */
-        color: #ffffff; /* White text */
-    }
-
-    .recommendation-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive grid */
-        gap: 1.5rem; /* Gap between items */
-    }
-
-    .recommendation-item {
-         background-color: rgba(255, 255, 255, 0.15); /* Slightly more opaque background */
-         padding: 1rem; /* p-4 */
-         border-radius: 0.5rem; /* rounded-lg */
-         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* shadow-sm */
-    }
-
-    .recommendation-item h4 {
-        font-size: 1.125rem; /* text-lg */
-        font-weight: 600; /* font-semibold */
-        margin-bottom: 0.5rem; /* mb-2 */
-         color: #ffffff; /* White text */
-    }
-
-    .recommendation-item a {
-        color: #a78bfa; /* Purple link color (Tailwind's violet-400) */
-        text-decoration: none; /* No underline */
-        transition: color 0.3s ease; /* Smooth color transition */
-    }
-
-    .recommendation-item a:hover {
-        color: #c4b5fd; /* Lighter purple on hover (Tailwind's violet-300) */
-        text-decoration: underline; /* Underline on hover */
-    }
-
-     /* Style for loading and error messages */
-    #results-container p {
-        text-align: center;
-        font-size: 1.2rem;
-        color: #ffffff;
-    }
-
-    /* Fullscreen Modal Styles */
-    .modal {
-        display: none; /* Hidden by default */
-        position: fixed; /* Stay in place */
-        z-index: 1000; /* Sit on top */
-        left: 0;
-        top: 0;
-        width: 100%; /* Full width */
-        height: 100%; /* Full height */
-        overflow: auto; /* Enable scroll if needed */
-        background-color: rgba(0, 0, 0, 0.9); /* Black background with opacity */
-        justify-content: center; /* Center content horizontally */
-        align-items: center; /* Center content vertically */
-        padding: 20px; /* Add some padding around the modal content */
-        opacity: 0; /* Start with 0 opacity for fade-in effect */
-        transition: opacity 0.3s ease; /* Smooth opacity transition */
-    }
-
-    .modal.show {
-        opacity: 1; /* Full opacity when visible */
-    }
-
-    .modal-content {
-        position: relative; /* Needed for close button positioning */
-        margin: auto; /* Auto margin for centering */
-        width: 95%; /* 95% width */
-        max-width: 1200px; /* Max width */
-        height: 95%; /* 95% height */
-        max-height: 800px; /* Max height */
-        display: flex; /* Use flexbox for iframe centering */
-        justify-content: center;
-        align-items: center;
-        background-color: rgba(255, 255, 255, 0.1); /* Slight background for modal content */
-        border-radius: 0.5rem; /* Rounded corners */
-    }
-
-    .modal-content iframe {
-        width: 100%; /* Make iframe fill its container */
-        height: 100%; /* Make iframe fill its container */
-        border: none; /* Remove iframe border */
-        opacity: 0; /* Start with 0 opacity */
-        transition: opacity 0.5s ease; /* Smooth opacity transition */
-    }
-
-    .modal-content iframe.loaded {
-        opacity: 1; /* Full opacity when loaded */
-    }
-
-    .close-button {
-        position: absolute;
-        top: 10px;
-        right: 25px;
-        color: #fff;
-        font-size: 35px;
-        font-weight: bold;
-        transition: 0.3s;
-        cursor: pointer;
-        z-index: 1001; /* Ensure close button is above iframe */
-    }
-
-    .close-button:hover,
-    .close-button:focus {
-        color: #bbb;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
-    /* Loading Spinner */
-    .loader-container {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1;
-    }
-
-    .loader {
-        border: 5px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        border-top: 5px solid #FF0000; /* YouTube red */
-        width: 50px;
-        height: 50px;
-        -webkit-animation: spin 1s linear infinite;
-        animation: spin 1s linear infinite;
-    }
-
-    @-webkit-keyframes spin {
-        0% { -webkit-transform: rotate(0deg); }
-        100% { -webkit-transform: rotate(360deg); }
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    @media (min-width: 768px) { /* Apply flex layout on medium screens and up */
+        /* Style for the video result items */
         .video-item {
-             flex-direction: row; /* Row layout on larger screens */
-             align-items: flex-start; /* Align items to the top */
-             text-align: left; /* Align text left */
+            background-color: rgba(255, 255, 255, 0.15); /* Slightly more opaque background */
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* shadow-md */
+            padding: 1.5rem; /* p-6 */
+            margin-bottom: 1.5rem; /* mb-6 */
+            display: flex; /* Use flexbox for layout */
+            flex-direction: column; /* Stack elements vertically by default */
+            gap: 1rem; /* Space between elements */
+            align-items: center; /* Center items horizontally by default */
+            text-align: center; /* Center text by default */
+            cursor: pointer; /* Indicate that the item is clickable */
+            transition: transform 0.2s ease-in-out; /* Add a slight hover effect */
+        }
+
+        .video-item:hover {
+            transform: translateY(-5px); /* Lift the item slightly on hover */
         }
 
         .video-item .video-thumbnail-container {
-             width: 180px; /* Fixed width for embedded video container */
-             flex-shrink: 0; /* Prevent shrinking */
-             padding-bottom: 0; /* Remove padding-bottom when height is fixed */
-             height: 100px; /* Fixed height for embedded video container */
+            position: relative; /* Needed for aspect ratio padding */
+            width: 100%; /* Take full width of the container */
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio (height / width * 100) */
+            height: 0; /* Hide the container's height */
+            overflow: hidden; /* Hide anything outside the padding */
+            border-radius: 0.25rem; /* rounded */
+            pointer-events: none; /* Prevent clicks on the container itself, rely on parent .video-item */
         }
 
-         .video-item img {
-             width: 180px; /* Fixed width for thumbnail */
-             height: 100px; /* Fixed height for thumbnail */
-             object-fit: cover; /* Ensure image covers the container */
+        .video-item img {
+             display: block; /* Ensure image doesn't have extra space below */
+             width: 100%; /* Make image fill container */
+             height: 100%; /* Make image fill container */
+             object-fit: cover; /* Cover the container while maintaining aspect ratio */
         }
-    }
 
-    /* Dark mode support */
-    @media (prefers-color-scheme: dark) {
+
+        .video-item .video-details {
+            width: 100%; /* Take full width */
+        }
+
+        .video-item h3 {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600; /* font-semibold */
+            margin-bottom: 0.5rem; /* mb-2 */
+            color: #ffffff; /* Text color white */
+        }
+
+        .video-item p {
+            font-size: 1rem; /* text-base */
+            color: #d1d5db; /* gray-300 */
+        }
+
+         /* Style for recommendation sections */
+        .recommendation-section {
+            background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent white */
+            padding: 1.5rem; /* p-6 */
+            border-radius: 0.75rem; /* rounded-xl */
+            margin-top: 2rem; /* mt-8 */
+            text-align: left; /* Align text left */
+        }
+
+        .recommendation-section h2 {
+            font-size: 2rem; /* text-3xl */
+            font-weight: 700; /* font-bold */
+            margin-bottom: 1.5rem; /* mb-6 */
+            text-align: center; /* Center the heading */
+            color: #ffffff; /* White text */
+        }
+
+        .recommendation-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive grid */
+            gap: 1.5rem; /* Gap between items */
+        }
+
+        .recommendation-item {
+             background-color: rgba(255, 255, 255, 0.15); /* Slightly more opaque background */
+             padding: 1rem; /* p-4 */
+             border-radius: 0.5rem; /* rounded-lg */
+             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* shadow-sm */
+        }
+
+        .recommendation-item h4 {
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600; /* font-semibold */
+            margin-bottom: 0.5rem; /* mb-2 */
+             color: #ffffff; /* White text */
+        }
+
+        .recommendation-item a {
+            color: #a78bfa; /* Purple link color (Tailwind's violet-400) */
+            text-decoration: none; /* No underline */
+            transition: color 0.3s ease; /* Smooth color transition */
+        }
+
+        .recommendation-item a:hover {
+            color: #c4b5fd; /* Lighter purple on hover (Tailwind's violet-300) */
+            text-decoration: underline; /* Underline on hover */
+        }
+
+         /* Style for loading and error messages */
+        #results-container p {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #ffffff;
+        }
+
+        /* Fullscreen Modal Styles */
         .modal {
-            background-color: rgba(0, 0, 0, 0.95); /* Darker background in dark mode */
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.9); /* Black background with opacity */
+            justify-content: center; /* Center content horizontally */
+            align-items: center; /* Center content vertically */
+            padding: 20px; /* Add some padding around the modal content */
+            opacity: 0; /* Start with 0 opacity for fade-in effect */
+            transition: opacity 0.3s ease; /* Smooth opacity transition */
         }
-    }
-</style>
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
+        .modal.show {
+            opacity: 1; /* Full opacity when visible */
+        }
+
+        .modal-content {
+            position: relative; /* Needed for close button positioning */
+            margin: auto; /* Auto margin for centering */
+            width: 95%; /* 95% width */
+            max-width: 1200px; /* Max width */
+            height: 95%; /* 95% height */
+            max-height: 800px; /* Max height */
+            display: flex; /* Use flexbox for iframe centering */
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1); /* Slight background for modal content */
+            border-radius: 0.5rem; /* Rounded corners */
+        }
+
+        .modal-content iframe {
+            width: 100%; /* Make iframe fill its container */
+            height: 100%; /* Make iframe fill its container */
+            border: none; /* Remove iframe border */
+            opacity: 0; /* Start with 0 opacity */
+            transition: opacity 0.5s ease; /* Smooth opacity transition */
+            z-index: 2; /* Place above thumbnail */
+        }
+
+        .modal-content iframe.loaded {
+            opacity: 1; /* Full opacity when loaded */
+        }
+
+        /* Thumbnail background for modal */
+        .modal-thumbnail {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            z-index: 1;
+            opacity: 0.7;
+            transition: opacity 0.5s ease;
+            border-radius: 0.5rem; /* Match modal content corners */
+        }
+
+        .modal-thumbnail.fade-out {
+            opacity: 0;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 25px;
+            color: #fff;
+            font-size: 35px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+            z-index: 1001; /* Ensure close button is above iframe */
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Loading Spinner */
+        .loader-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 3; /* Above both thumbnail and iframe */
+        }
+
+        .loader {
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 5px solid #FF0000; /* YouTube red */
+            width: 50px;
+            height: 50px;
+            -webkit-animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite;
+        }
+
+        .play-button-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background-color: rgba(255, 0, 0, 0.8); /* YouTube red */
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .play-button-overlay:hover {
+            background-color: rgba(255, 0, 0, 1);
+            width: 90px;
+            height: 90px;
+        }
+
+        .play-button-overlay svg {
+            width: 40px;
+            height: 40px;
+            fill: white;
+        }
+
+        /* Apply different sizes for thumbnail containers in recommendations */
+        .recommendation-item .video-thumbnail-container {
+            margin-bottom: 10px;
+        }
+
+        @-webkit-keyframes spin {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (min-width: 768px) { /* Apply flex layout on medium screens and up */
+            .video-item {
+                 flex-direction: row; /* Row layout on larger screens */
+                 align-items: flex-start; /* Align items to the top */
+                 text-align: left; /* Align text left */
+            }
+
+            .video-item .video-thumbnail-container {
+                 width: 180px; /* Fixed width for embedded video container */
+                 flex-shrink: 0; /* Prevent shrinking */
+                 padding-bottom: 0; /* Remove padding-bottom when height is fixed */
+                 height: 100px; /* Fixed height for embedded video container */
+            }
+
+             .video-item img {
+                 width: 180px; /* Fixed width for thumbnail */
+                 height: 100px; /* Fixed height for thumbnail */
+                 object-fit: cover; /* Ensure image covers the container */
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .modal {
+                background-color: rgba(0, 0, 0, 0.95); /* Darker background in dark mode */
+            }
+        }
+    </style>
+     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="flex flex-col items-center justify-center p-4">
 
-<div class="container mx-auto text-center py-12 px-6 bg-white bg-opacity-10 rounded-xl shadow-lg max-w-4xl">
-    <h1 class="text-4xl md:text-5xl font-bold mb-6 text-white drop-shadow-md">
-        Find Your Next Tutorial
-    </h1>
-    <p class="text-lg md:text-xl mb-8 text-gray-100">
-        Discover amazing tutorials on YouTube for anything you want to learn.
-    </p>
+    <div class="container mx-auto text-center py-12 px-6 bg-white bg-opacity-10 rounded-xl shadow-lg max-w-4xl">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6 text-white drop-shadow-md">
+            Find Your Next Tutorial
+        </h1>
+        <p class="text-lg md:text-xl mb-8 text-gray-100">
+            Discover amazing tutorials on YouTube for anything you want to learn.
+        </p>
 
-    <div class="w-full max-w-md mx-auto mb-8">
-        <div class="flex items-center border-2 border-gray-300 rounded-full overflow-hidden shadow-md">
-            <input
-                type="text"
-                id="search-input"
-                placeholder="Search for tutorials..."
-                class="w-full py-3 px-6 text-gray-800 leading-tight focus:outline-none rounded-l-full"
-            >
-            <button id="search-button" class="bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-r-full transition duration-300 ease-in-out flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <span class="ml-2 hidden md:inline">Search</span>
-            </button>
+        <div class="w-full max-w-md mx-auto mb-8">
+            <div class="flex items-center border-2 border-gray-300 rounded-full overflow-hidden shadow-md">
+                <input
+                    type="text"
+                    id="search-input"
+                    placeholder="Search for tutorials..."
+                    class="w-full py-3 px-6 text-gray-800 leading-tight focus:outline-none rounded-l-full"
+                >
+                <button id="search-button" class="bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-r-full transition duration-300 ease-in-out flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <span class="ml-2 hidden md:inline">Search</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="results-container" class="mt-8 text-left">
+            </div>
+
+         <div class="recommendation-section">
+            <h2>Recommended Tutorials</h2>
+            <div class="recommendation-list" id="recommendation-list">
+                <!-- Recommendation items will be populated with thumbnails via JavaScript -->
+            </div>
+        </div>
+
+    </div>
+
+    <div id="fullscreen-modal" class="modal">
+        <span class="close-button">×</span>
+        <div class="modal-content">
+            <img id="modal-thumbnail" class="modal-thumbnail" src="" alt="Video thumbnail">
+            <div class="loader-container" id="video-loader">
+                <div class="loader"></div>
+            </div>
+            <iframe id="modal-video-iframe"
+                src=""
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+            </iframe>
         </div>
     </div>
 
-    <div id="results-container" class="mt-8 text-left">
-        </div>
+    <footer class="mt-12 text-center text-gray-200 text-sm">
+        <p>© 2023 Tutorial Finder. All rights reserved.</p>
+    </footer>
 
-     <div class="recommendation-section">
-        <h2>Recommended Tutorials</h2>
-        <div class="recommendation-list">
-            <div class="recommendation-item">
-                <h4>Canva Code Tutorial</h4>
-                <p>Learn how to use Canva's features for creating visual content, including design principles and tools.</p>
-                 <a href="#" class="block mt-2 search-recommendation" data-query="Canva Code tutorial">Search for this tutorial</a>
-            </div>
-             <div class="recommendation-item">
-                <h4>Basic HTML5 Tutorial</h4>
-                <p>Get started with the fundamentals of HTML5 for building web pages.</p>
-                 <a href="#" class="block mt-2 search-recommendation" data-query="Basic HTML5 tutorial">Search for this tutorial</a>
-            </div>
-             <div class="recommendation-item">
-                <h4>Canva AI Tutorial</h4>
-                <p>Explore how to leverage Canva's AI features to enhance your design workflow.</p>
-                 <a href="#" class="block mt-2 search-recommendation" data-query="Canva AI tutorial">Search for this tutorial</a>
-            </div>
-             <div class="recommendation-item">
-                <h4>Quizizz Tutorial for Educators</h4>
-                <p>Learn how to create and use interactive quizzes with Quizizz in an educational setting.</p>
-                 <a href="#" class="block mt-2 search-recommendation" data-query="Quizizz Tutorial for Educators">Search for this tutorial</a>
-            </div>
-        </div>
-    </div>
+    <script>
+        // IMPORTANT NOTE: Including the API key directly in client-side JavaScript
+        // is generally NOT recommended for production applications as it can be easily
+        // extracted and misused. For a real application, you should handle API calls
+        // on a secure backend server.
+        const API_KEY = 'AIzaSyBYCYT99I2Ah_taeKaHYxRBghil_mbBbGA'; // Your YouTube Data API Key
+        const SEARCH_URL = 'https://www.googleapis.com/youtube/v3/search';
+        const VIDEOS_URL = 'https://www.googleapis.com/youtube/v3/videos';
+        // Base URL for embedding YouTube videos
+        const EMBED_BASE_URL = 'https://www.youtube.com/embed/';
+        // Base URL for video thumbnails (highest quality)
+        const THUMBNAIL_BASE_URL = 'https://img.youtube.com/vi/';
+        const THUMBNAIL_DEFAULT = '/maxresdefault.jpg'; // Highest quality
+        const THUMBNAIL_FALLBACK = '/hqdefault.jpg'; // Fallback if maxres is not available
 
-</div>
+        // Store thumbnails for videos
+        const videoThumbnails = {};
 
-<div id="fullscreen-modal" class="modal">
-    <span class="close-button">×</span>
-    <div class="modal-content">
-        <div class="loader-container" id="video-loader">
-            <div class="loader"></div>
-        </div>
-        <iframe id="modal-video-iframe"
-            src=""
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen>
-        </iframe>
-    </div>
-</div>
+        // Get references to DOM elements
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const resultsContainer = document.getElementById('results-container');
+        const recommendationList = document.getElementById('recommendation-list');
+        const fullscreenModal = document.getElementById('fullscreen-modal');
+        const modalVideoIframe = document.getElementById('modal-video-iframe');
+        const modalThumbnail = document.getElementById('modal-thumbnail');
+        const closeButton = document.querySelector('.close-button');
+        const videoLoader = document.getElementById('video-loader');
 
-<footer class="mt-12 text-center text-gray-200 text-sm">
-    <p>© 2023 Tutorial Finder. All rights reserved.</p>
-</footer>
-
-<script>
-    // IMPORTANT NOTE: Including the API key directly in client-side JavaScript
-    // is generally NOT recommended for production applications as it can be easily
-    // extracted and misused. For a real application, you should handle API calls
-    // on a secure backend server.
-    const API_KEY = 'AIzaSyBYCYT99I2Ah_taeKaHYxRBghil_mbBbGA'; // Your YouTube Data API Key
-    const SEARCH_URL = 'https://www.googleapis.com/youtube/v3/search';
-    // Base URL for embedding YouTube videos - corrected format
-    const EMBED_BASE_URL = 'https://www.youtube.com/embed/';
-
-
-    // Get references to DOM elements
-    const searchInput = document.getElementById('search-input');
-    const searchButton = document.getElementById('search-button');
-    const resultsContainer = document.getElementById('results-container');
-    const recommendationLinks = document.querySelectorAll('.search-recommendation');
-    const fullscreenModal = document.getElementById('fullscreen-modal');
-    const modalVideoIframe = document.getElementById('modal-video-iframe');
-    const closeButton = document.querySelector('.close-button');
-    const videoLoader = document.getElementById('video-loader');
-
-
-    // Function to fetch and display search results
-    async function fetchAndDisplayResults(query) {
-        if (!query) {
-            displayMessage('Please enter a search query.');
-            return;
-        }
-
-        displayMessage('Searching...'); // Show loading message
-
-        try {
-            // Use the YouTube Data API for searching
-            const response = await fetch(`${SEARCH_URL}?part=snippet&q=${encodeURIComponent(query)}&key=${API_KEY}&maxResults=10&type=video`);
-
-            if (!response.ok) {
-                 // Handle HTTP errors
-                const errorText = await response.text();
-                console.error('API Error Response:', errorText); // Log the full error response
-                throw new Error(`HTTP error! status: ${response.status}`);
+        // Recommended tutorials with video IDs
+        const recommendedTutorials = [
+            {
+                title: "Canva Code Tutorial",
+                description: "Learn how to use Canva's features for creating visual content, including design principles and tools.",
+                query: "Canva Code tutorial",
+                videoId: "5eANbVL5Um0" // Example video ID
+            },
+            {
+                title: "Basic HTML5 Tutorial",
+                description: "Get started with the fundamentals of HTML5 for building web pages.",
+                query: "Basic HTML5 tutorial",
+                videoId: "pQN-pnXPaVg" // Example video ID
+            },
+            {
+                title: "Canva AI Tutorial",
+                description: "Explore how to leverage Canva's AI features to enhance your design workflow.",
+                query: "Canva AI tutorial",
+                videoId: "kfBkRT_0oZ0" // Example video ID
+            },
+            {
+                title: "Quizizz Tutorial for Educators",
+                description: "Learn how to create and use interactive quizzes with Quizizz in an educational setting.",
+                query: "Quizizz Tutorial for Educators",
+                videoId: "bz7egnNlJXs" // Example video ID
             }
+        ];
 
-            const data = await response.json();
-
-            // Clear previous results
-            resultsContainer.innerHTML = '';
-
-            if (data.items.length === 0) {
-                displayMessage('No tutorials found for your query.');
-                return;
-            }
-
-            // Iterate through results and display them as clickable items
-            data.items.forEach(item => {
-                const videoId = item.id.videoId;
-                const title = item.snippet.title;
-                const thumbnailUrl = item.snippet.thumbnails.medium.url; // Still using thumbnail for display
-                const channelTitle = item.snippet.channelTitle;
-
-                const videoElement = `
-                    <div class="video-item" data-video-id="${videoId}">
-                         <div class="video-thumbnail-container">
-                             <img src="${thumbnailUrl}" alt="${title} thumbnail">
-                             <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-300">
-                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white" viewBox="0 0 20 20" fill="currentColor">
-                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
-                                 </svg>
-                             </div>
+        // Function to populate recommendation items with thumbnails
+        function populateRecommendations() {
+            recommendationList.innerHTML = '';
+            
+            recommendedTutorials.forEach(item => {
+                const thumbnailUrl = `${THUMBNAIL_BASE_URL}${item.videoId}${THUMBNAIL_DEFAULT}`;
+                
+                const recommendationHtml = `
+                    <div class="recommendation-item">
+                        <div class="video-thumbnail-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 0.25rem; margin-bottom: 0.75rem;">
+                            <img src="${thumbnailUrl}" alt="${item.title}" 
+                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+                            <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 opacity-0 hover:opacity-100 transition-opacity duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
                         </div>
-                        <div class="video-details">
-                            <h3>${title}</h3>
-                            <p>Channel: ${channelTitle}</p>
+                        <h4>${item.title}</h4>
+                        <p>${item.description}</p>
+                        <div class="flex mt-2 space-x-2">
+                            <a href="#" class="text-violet-400 hover:text-violet-300 hover:underline transition-colors duration-300 search-recommendation" data-query="${item.query}">Search for this</a>
+                            <a href="#" class="text-red-400 hover:text-red-300 hover:underline transition-colors duration-300 play-recommendation" data-video-id="${item.videoId}">Play video</a>
                         </div>
                     </div>
                 `;
-                resultsContainer.innerHTML += videoElement;
+                recommendationList.innerHTML += recommendationHtml;
+                
+                // Store thumbnail URL for later use
+                videoThumbnails[item.videoId] = thumbnailUrl;
             });
-
-             // Add click listeners to the newly added video items
-            addVideoItemClickListeners();
-
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            displayMessage(`An error occurred while fetching tutorials: ${error.message}. Please try again.`);
+            
+            // Add event listeners to search recommendation links
+            document.querySelectorAll('.search-recommendation').forEach(link => {
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const query = event.target.dataset.query;
+                    searchInput.value = query;
+                    fetchAndDisplayResults(query);
+                });
+            });
+            
+            // Add event listeners to play recommendation links
+            document.querySelectorAll('.play-recommendation').forEach(link => {
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const videoId = event.target.dataset.videoId;
+                    openFullscreenModal(videoId);
+                });
+            });
+            
+            // Make the entire recommendation thumbnail area clickable
+            document.querySelectorAll('.recommendation-item .video-thumbnail-container').forEach(container => {
+                container.addEventListener('click', () => {
+                    const videoId = container.closest('.recommendation-item').querySelector('.play-recommendation').dataset.videoId;
+                    openFullscreenModal(videoId);
+                });
+            });
         }
-    }
 
-    // Function to add click listeners to video items
-    function addVideoItemClickListeners() {
-         // Get all video items after they have been added to the DOM
-        const videoItems = resultsContainer.querySelectorAll('.video-item');
-
-        videoItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const videoId = item.dataset.videoId; // Get video ID from data attribute
-                openFullscreenModal(videoId);
-            });
-        });
-    }
-
-
-    // Function to open the fullscreen modal with improved loading
-    function openFullscreenModal(videoId) {
-        // Show loading spinner
-        videoLoader.style.display = 'flex';
-        modalVideoIframe.classList.remove('loaded');
-        
-        // Set up iframe with optimized parameters for seamless playback
-        // rel=0: Prevents showing related videos
-        // enablejsapi=1: Enables the YouTube Player API
-        // modestbranding=1: Reduces YouTube branding
-        // start=0: Ensures video starts from beginning
-        // autoplay=1: Automatically plays video when loaded
-        // iv_load_policy=3: Disables video annotations
-        // showinfo=0: Hides video title and uploader info in the player
-        // controls=1: Shows video controls
-        const embedUrl = `${EMBED_BASE_URL}${videoId}?rel=0&enablejsapi=1&modestbranding=1&start=0&autoplay=1&iv_load_policy=3&showinfo=0&controls=1`;
-        modalVideoIframe.src = embedUrl;
-        
-        // Display the modal with fade-in effect
-        fullscreenModal.style.display = 'flex';
-        
-        // Add slight delay before adding 'show' class for the transition to work
-        setTimeout(() => {
-            fullscreenModal.classList.add('show');
-        }, 10);
-        
-        // Event listener for when the iframe is loaded
-        modalVideoIframe.onload = function() {
-            // Hide the loader
-            videoLoader.style.display = 'none';
-            // Show the iframe with fade-in effect
-            modalVideoIframe.classList.add('loaded');
-        };
-        
-        // Add error handling in case the video fails to load
-        modalVideoIframe.onerror = function() {
-            videoLoader.style.display = 'none';
-            displayModalError("Video failed to load. Please try again.");
-        };
-        
-        // Set a loading timeout to handle cases where onload doesn't trigger
-        setTimeout(() => {
-            if (!modalVideoIframe.classList.contains('loaded')) {
-                videoLoader.style.display = 'none';
-                modalVideoIframe.classList.add('loaded');
+        // Function to fetch and display search results
+        async function fetchAndDisplayResults(query) {
+            if (!query) {
+                displayMessage('Please enter a search query.');
+                return;
             }
-        }, 5000); // 5-second fallback
-    }
 
-    // Function to display error in the modal
-    function displayModalError(message) {
-        videoLoader.style.display = 'none';
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'p-4 bg-red-600 text-white rounded absolute';
-        errorDiv.textContent = message;
-        document.querySelector('.modal-content').appendChild(errorDiv);
-        
-        // Remove error message after 4 seconds
-        setTimeout(() => {
-            errorDiv.remove();
-        }, 4000);
-    }
+            displayMessage('Searching...'); // Show loading message
 
-    // Function to close the fullscreen modal with smooth transition
-    function closeFullscreenModal() {
-        // Start fade-out effect
-        fullscreenModal.classList.remove('show');
-        
-        // Wait for fade-out to complete before hiding
-        setTimeout(() => {
-            fullscreenModal.style.display = 'none';
-            // Stop the video by clearing the src after fade-out
-            modalVideoIframe.src = '';
+            try {
+                // Use the YouTube Data API for searching
+                const response = await fetch(`${SEARCH_URL}?part=snippet&q=${encodeURIComponent(query)}&key=${API_KEY}&maxResults=10&type=video`);
+
+                if (!response.ok) {
+                     // Handle HTTP errors
+                    const errorText = await response.text();
+                    console.error('API Error Response:', errorText); // Log the full error response
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Clear previous results
+                resultsContainer.innerHTML = '';
+
+                if (data.items.length === 0) {
+                    displayMessage('No tutorials found for your query.');
+                    return;
+                }
+
+                // Collect all video IDs to get additional details
+                const videoIds = data.items.map(item => item.id.videoId).join(',');
+                
+                // Get additional details for all videos in one request (optional)
+                // Fetching video details can provide more accurate information like duration, views, etc.
+                // but is not required for this implementation
+                
+                // Iterate through results and display them as clickable items
+                data.items.forEach(item => {
+                    const videoId = item.id.videoId;
+                    const title = item.snippet.title;
+                    const thumbnailUrl = item.snippet.thumbnails.high.url; // Use high quality thumbnail
+                    const channelTitle = item.snippet.channelTitle;
+                    
+                    // Store thumbnail URL for later use
+                    videoThumbnails[videoId] = thumbnailUrl;
+
+                    const videoElement = `
+                        <div class="video-item" data-video-id="${videoId}">
+                             <div class="video-thumbnail-container">
+                                 <img src="${thumbnailUrl}" alt="${title} thumbnail" loading="lazy">
+                                 <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-300">
+                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                                     </svg>
+                                 </div>
+                            </div>
+                            <div class="video-details">
+                                <h3>${title}</h3>
+                                <p>Channel: ${channelTitle}</p>
+                            </div>
+                        </div>
+                    `;
+                    resultsContainer.innerHTML += videoElement;
+                });
+
+                 // Add click listeners to the newly added video items
+                addVideoItemClickListeners();
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                displayMessage(`An error occurred while fetching tutorials: ${error.message}. Please try again.`);
+            }
+        }
+
+        // Function to add click listeners to video items
+        function addVideoItemClickListeners() {
+             // Get all video items after they have been added to the DOM
+            const videoItems = resultsContainer.querySelectorAll('.video-item');
+
+            videoItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const videoId = item.dataset.videoId; // Get video ID from data attribute
+                    openFullscreenModal(videoId);
+                });
+            });
+        }
+
+        // Function to check if an image exists and is loadable
+        function checkImage(url) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve(true);
+                img.onerror = () => resolve(false);
+                img.src = url;
+            });
+        }
+
+        // Function to open the fullscreen modal with improved loading and thumbnail
+        async function openFullscreenModal(videoId) {
+            // Show loading spinner
+            videoLoader.style.display = 'flex';
             modalVideoIframe.classList.remove('loaded');
-        }, 300); // Match the transition duration in CSS
-    }
+            
+            // Get thumbnail URL from stored data or construct it
+            let thumbnailUrl = videoThumbnails[videoId];
+            
+            if (!thumbnailUrl) {
+                // Try the highest quality thumbnail first
+                thumbnailUrl = `${THUMBNAIL_BASE_URL}${videoId}${THUMBNAIL_DEFAULT}`;
+                
+                // Check if the high quality thumbnail exists
+                const imageExists = await checkImage(thumbnailUrl);
+                
+                // If not, fall back to the standard high quality
+                if (!imageExists) {
+                    thumbnailUrl = `${THUMBNAIL_BASE_URL}${videoId}${THUMBNAIL_FALLBACK}`;
+                }
+            }
+            
+            // Set the thumbnail image
+            modalThumbnail.src = thumbnailUrl;
+            modalThumbnail.classList.remove('fade-out');
+            
+            // Set up iframe with optimized parameters for seamless playback
+            const embedUrl = `${EMBED_BASE_URL}${videoId}?rel=0&enablejsapi=1&modestbranding=1&start=0&autoplay=1&iv_load_policy=3&showinfo=0&controls=1`;
+            modalVideoIframe.src = embedUrl;
+            
+            // Display the modal with fade-in effect
+            fullscreenModal.style.display = 'flex';
+            
+            // Add slight delay before adding 'show' class for the transition to work
+            setTimeout(() => {
+                fullscreenModal.classList.add('show');
+            }, 10);
+            
+            // Event listener for when the iframe is loaded
+            modalVideoIframe.onload = function() {
+                // Hide the loader
+                videoLoader.style.display = 'none';
+                // Show the iframe with fade-in effect
+                modalVideoIframe.classList.add('loaded');
+                // Fade out the thumbnail
+                modalThumbnail.classList.add('fade-out');
+            };
+            
+            // Add error handling in case the video fails to load
+            modalVideoIframe.onerror = function() {
+                videoLoader.style.display = 'none';
+                displayModalError("Video failed to load. Please try again.");
+            };
+            
+            // Set a loading timeout to handle cases where onload doesn't trigger
+            setTimeout(() => {
+                if (!modalVideoIframe.classList.contains('loaded')) {
+                    videoLoader.style.display = 'none';
+                    modalVideoIframe.classList.add('loaded');
+                    modalThumbnail.classList.add('fade-out');
+                }
+            }, 5000); // 5-second fallback
+        }
 
-    // Function to display messages in the results container
-    function displayMessage(message) {
-        resultsContainer.innerHTML = `<p>${message}</p>`;
-    }
+        // Function to display error in the modal
+        function displayModalError(message) {
+            videoLoader.style.display = 'none';
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'p-4 bg-red-600 text-white rounded absolute';
+            errorDiv.textContent = message;
+            document.querySelector('.modal-content').appendChild(errorDiv);
+            
+            // Remove error message after 4 seconds
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 4000);
+        }
 
-    // Event listener for the search button
-    searchButton.addEventListener('click', () => {
-        const query = searchInput.value.trim();
-        fetchAndDisplayResults(query);
-    });
+        // Function to close the fullscreen modal with smooth transition
+        function closeFullscreenModal() {
+            // Start fade-out effect
+            fullscreenModal.classList.remove('show');
+            
+            // Wait for fade-out to complete before hiding
+            setTimeout(() => {
+                fullscreenModal.style.display = 'none';
+                // Stop the video by clearing the src after fade-out
+                modalVideoIframe.src = '';
+                modalVideoIframe.classList.remove('loaded');
+                modalThumbnail.classList.remove('fade-out');
+            }, 300); // Match the transition duration in CSS
+        }
 
-    // Event listener for pressing Enter in the search input
-    searchInput.addEventListener('keypress', (event) => {
-        if (event.key === 'Enter') {
-            event.preventDefault(); // Prevent default form submission if it were a form
+        // Function to display messages in the results container
+        function displayMessage(message) {
+            resultsContainer.innerHTML = `<p>${message}</p>`;
+        }
+
+        // Event listener for the search button
+        searchButton.addEventListener('click', () => {
             const query = searchInput.value.trim();
             fetchAndDisplayResults(query);
-        }
-    });
-
-    // Add event listeners to recommendation links
-    recommendationLinks.forEach(link => {
-        link.addEventListener('click', (event) => {
-            event.preventDefault(); // Prevent default link behavior
-            const query = event.target.dataset.query; // Get the query from the data attribute
-            searchInput.value = query; // Put the query in the search input
-            fetchAndDisplayResults(query); // Perform the search
         });
-    });
 
-    // Event listener for the close button
-    closeButton.addEventListener('click', closeFullscreenModal);
+        // Event listener for pressing Enter in the search input
+        searchInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent default form submission if it were a form
+                const query = searchInput.value.trim();
+                fetchAndDisplayResults(query);
+            }
+        });
 
-    // Close the modal if the user clicks outside of the modal content
-    window.addEventListener('click', (event) => {
-        if (event.target === fullscreenModal) {
-            closeFullscreenModal();
-        }
-    });
+        // Event listener for the close button
+        closeButton.addEventListener('click', closeFullscreenModal);
 
-    // Handle ESC key to close the modal
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && fullscreenModal.style.display === 'flex') {
-            closeFullscreenModal();
-        }
-    });
+        // Close the modal if the user clicks outside of the modal content
+        window.addEventListener('click', (event) => {
+            if (event.target === fullscreenModal) {
+                closeFullscreenModal();
+            }
+        });
 
-    // Optional: Load some initial trending tutorials or a default search on page load
-    // window.onload = () => {
-    //     fetchAndDisplayResults('popular tutorials'); // Example: search for popular tutorials on load
-    // };
+        // Handle ESC key to close the modal
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && fullscreenModal.style.display === 'flex') {
+                closeFullscreenModal();
+            }
+        });
 
-</script>
-IGNORE_WHEN_COPYING_START
-content_copy
-download
-Use code with caution.
-IGNORE_WHEN_COPYING_END
+        // Initialize recommended tutorials with thumbnails
+        window.onload = () => {
+            populateRecommendations();
+        };
+    </script>
+
 </body>
 </html>
