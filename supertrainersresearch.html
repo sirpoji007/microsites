@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Rise of Gamified Learning & Expert Practices: Insights from Quizizz Super Trainers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Visualization & Content Choices:
+        - Hook/Title: Goal: Inform/Engage, Viz: Large headline text, Unicode icon (HTML/CSS), Justification: Strong opening.
+        - EdTech Wave in Malaysia: Goal: Inform, Viz: Styled Text Block, Callout for National ICT Priority (HTML/CSS), Justification: Contextualize the research.
+        - Decoding Gamification: Goal: Inform/Organize, Viz: Definition + Key Benefit Cards (HTML/CSS with Tailwind), Unicode icons (🎮,💡,🎯), Justification: Clear, concise explanation of gamification.
+        - Quizizz Spotlight: Goal: Inform, Viz: Brief text description (HTML/CSS), Justification: Introduce the platform.
+        - Expert Educator Edge: Goal: Inform/Compare, Viz: Text explaining the focus on experts and the knowledge gap (HTML/CSS), Justification: Highlight study's unique contribution.
+        - Core Theories (Conceptual): Goal: Organize/Inform, Viz: Small HTML cards for Flow, SDT, CLT, TPACK with icons (🌊,😊,🧠,🧩) and brief text, Justification: Introduce key theoretical underpinnings.
+        - Conceptual Framework (NEW): Goal: Visualize/Explain, Viz: Embedded image of the framework, Justification: Show the interplay of theories and practice.
+        - Researching Excellence (Chart.js Donut): Goal: Inform/Compare, Viz: Donut Chart showing Research Focus Areas (Pedagogical Strategies, Quizizz Feature Use, Theoretical Alignment), Justification: Visually represent core research components. Library: Chart.js (Canvas).
+        - Methodology Snapshot: Goal: Organize, Viz: Simplified flow diagram (HTML/CSS with Tailwind borders/flex for Survey -> Interviews -> Analysis), Justification: Easy understanding of the research process.
+        - Impact & Future Outlook: Goal: Inform/Change, Viz: Styled Bullet List with Unicode icons (🌟,📈), Justification: Highlight potential contributions and future directions.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F0F4F8; color: #333333; }
+        .section-title { color: #008080; } /* Teal */
+        .highlight-text { color: #FF8C00; } /* Dark Orange */
+        .card { background-color: white; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); transition: transform 0.3s ease; }
+        .card:hover { transform: translateY(-5px); }
+        .nav-link.active { color: #FF8C00; font-weight: 600; border-bottom: 2px solid #FF8C00;}
+        .chart-container { position: relative; width: 100%; max-width: 450px; margin-left: auto; margin-right: auto; height: 300px; max-height: 350px; }
+        @media (min-width: 768px) { .chart-container { height: 350px; max-height: 400px;} }
+        .stat-box { border-left: 4px solid #FF8C00; }
+        .flow-step { border: 2px solid #008080; background-color: #E0F2F1; } /* Light Teal BG */
+        .flow-arrow { color: #008080; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <nav id="navbar" class="bg-white/80 backdrop-blur-md shadow-sm fixed top-0 left-0 right-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="font-bold text-xl text-[#008080]">Gamified Learning Insights</span>
+                </div>
+                <div class="hidden md:block">
+                    <div id="nav-links-desktop" class="ml-10 flex items-baseline space-x-3 lg:space-x-4">
+                        <a href="#hero" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-[#FF8C00]">Home</a>
+                        <a href="#edtech-wave" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-[#FF8C00]">EdTech Wave</a>
+                        <a href="#gamification" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-[#FF8C00]">Gamification</a>
+                        <a href="#theories" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-[#FF8C00]">Core Theories</a>
+                        <a href="#conceptual-framework" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-[#FF8C00]">Framework</a>
+                        <a href="#research-focus" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-[#FF8C00]">Research Focus</a>
+                        <a href="#impact" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-[#FF8C00]">Impact</a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-700 hover:text-[#FF8C00] focus:outline-none">
+                        <span class="text-2xl">☰</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#hero" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#FF8C00]">Home</a>
+                <a href="#edtech-wave" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#FF8C00]">EdTech Wave</a>
+                <a href="#gamification" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#FF8C00]">Gamification</a>
+                <a href="#theories" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#FF8C00]">Core Theories</a>
+                <a href="#conceptual-framework" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#FF8C00]">Framework</a>
+                <a href="#research-focus" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#FF8C00]">Research Focus</a>
+                <a href="#impact" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#FF8C00]">Impact</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-16">
+        <section id="hero" class="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gradient-to-br from-[#008080] to-[#004D4D] text-white p-8 text-center">
+            <div>
+                <span class="text-6xl mb-4 block">🎓</span>
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">Transforming Education:</h1>
+                <p class="text-2xl md:text-3xl mb-8">The Power of Gamified Learning & Expert Educators in Malaysia</p>
+                <p class="text-lg md:text-xl max-w-3xl mx-auto">
+                    Exploring how Quizizz Super Trainers leverage gamification to create engaging and effective learning experiences, grounded in pedagogical theory and practice.
+                </p>
+            </div>
+        </section>
+
+        <section id="edtech-wave" class="py-12 md:py-20 px-4">
+            <div class="max-w-5xl mx-auto">
+                <h2 class="text-3xl md:text-4xl font-bold section-title mb-8 text-center">The EdTech Wave in Malaysia <span class="text-2xl">🇲🇾</span></h2>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="text-lg leading-relaxed">
+                        <p class="mb-4">Contemporary education is undergoing a significant transformation, driven by the pervasive integration of digital technologies. This shift is accelerated by the evolving needs of 21st-century learners and global changes in how instruction is delivered.</p>
+                        <p class="mb-4">In Malaysia, the strategic integration of Information and Communication Technology (ICT) in education is a <span class="highlight-text font-semibold">national priority</span>. This commitment aims to enhance the quality of learning and equip students with essential digital skills for the future.</p>
+                        <p>Game-based student response systems (GSRs), like Quizizz, are at the forefront of this wave, offering interactive and engaging platforms for learning and assessment that are being widely adopted by educators.</p>
+                    </div>
+                    <div class="stat-box bg-white p-6 rounded-lg shadow-lg">
+                        <h3 class="text-2xl font-semibold text-[#008080] mb-3">National Focus: ICT in Education</h3>
+                        <p class="text-gray-700">Malaysia's educational blueprints emphasize leveraging ICT to scale up quality learning across all levels, fostering an environment of innovation and digital literacy from an early age. This strategic direction supports the adoption of tools like Quizizz.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="gamification" class="py-12 md:py-20 bg-white px-4">
+            <div class="max-w-5xl mx-auto">
+                <h2 class="text-3xl md:text-4xl font-bold section-title mb-12 text-center">Decoding Gamification <span class="text-2xl">🎮</span></h2>
+                <p class="text-xl text-center text-gray-700 mb-10 max-w-3xl mx-auto">Gamification is the strategic application of game design elements and principles in non-game contexts. Its goal? To boost engagement, motivate action, and enhance learning experiences.</p>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="card p-6 text-center">
+                        <span class="text-4xl block mb-3 text-[#FFD700]">💡</span>
+                        <h3 class="text-xl font-semibold text-[#008080] mb-2">Enhanced Engagement</h3>
+                        <p class="text-gray-600">Transforms learning from passive to active, capturing attention and fostering participation through interactive challenges and feedback.</p>
+                    </div>
+                    <div class="card p-6 text-center">
+                        <span class="text-4xl block mb-3 text-[#FFD700]">🎯</span>
+                        <h3 class="text-xl font-semibold text-[#008080] mb-2">Increased Motivation</h3>
+                        <p class="text-gray-600">Leverages intrinsic and extrinsic motivators like points, badges, leaderboards, and storytelling to encourage persistence and effort.</p>
+                    </div>
+                    <div class="card p-6 text-center">
+                        <span class="text-4xl block mb-3 text-[#FFD700]">🚀</span>
+                        <h3 class="text-xl font-semibold text-[#008080] mb-2">Improved Outcomes</h3>
+                        <p class="text-gray-600">Can lead to better knowledge retention, skill development, and a more positive attitude towards learning when designed thoughtfully.</p>
+                    </div>
+                </div>
+                 <p class="text-center mt-8 text-gray-600 italic">Effective gamification is more than just "pointsification"; it requires careful pedagogical design (Hamari et al., 2014; Kapp, 2012).</p>
+            </div>
+        </section>
+
+        <section id="quizizz-experts" class="py-12 md:py-20 px-4">
+            <div class="max-w-5xl mx-auto">
+                 <div class="grid md:grid-cols-2 gap-12 items-start">
+                    <div>
+                        <h2 class="text-3xl font-bold section-title mb-6">Quizizz Spotlight <span class="text-2xl">🌟</span></h2>
+                        <div class="card p-6">
+                            <p class="text-lg text-gray-700 leading-relaxed mb-3">Quizizz is a popular game-based student response system that allows educators to create and share interactive quizzes and presentations. Its features include: customizable game settings, various question types, real-time feedback, engaging visuals (like memes), and detailed performance reports.</p>
+                            <p class="text-gray-700">It's widely used globally to make learning fun, assess understanding, and provide instant feedback in classrooms.</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold section-title mb-6">The Expert Educator Edge <span class="text-2xl">👩‍🏫</span></h2>
+                         <div class="card p-6">
+                            <p class="text-lg text-gray-700 leading-relaxed mb-3">While many educators use Quizizz, there's a knowledge gap regarding the <span class="highlight-text font-semibold">sophisticated pedagogical strategies</span> employed by highly proficient practitioners – the Quizizz Super Trainers.</p>
+                            <p class="text-gray-700">This research focuses on these experts to uncover how they design pedagogically sound and effective gamified learning experiences, moving beyond basic use to truly leverage the platform's potential for deep learning.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="theories" class="py-12 md:py-20 bg-white px-4">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="text-3xl md:text-4xl font-bold section-title mb-12 text-center">Core Theories Powering Learning <span class="text-2xl">🧠</span></h2>
+                <p class="text-xl text-center text-gray-700 mb-10 max-w-3xl mx-auto">Effective gamified learning isn't accidental. It's often grounded in established learning theories. This research explores practices through the lens of:</p>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="card p-6">
+                        <h3 class="text-xl font-semibold text-[#008080] mb-2"><span class="text-2xl mr-2">🌊</span>Flow Theory</h3>
+                        <p class="text-sm text-gray-600">Achieving deep immersion when challenge and skill are balanced (Csikszentmihalyi, 1990).</p>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xl font-semibold text-[#008080] mb-2"><span class="text-2xl mr-2">😊</span>Self-Determination Theory</h3>
+                        <p class="text-sm text-gray-600">Fostering intrinsic motivation via autonomy, competence, and relatedness (Ryan & Deci, 2000).</p>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xl font-semibold text-[#008080] mb-2"><span class="text-2xl mr-2">⚙️</span>Cognitive Load Theory</h3>
+                        <p class="text-sm text-gray-600">Managing mental effort to optimize learning by minimizing extraneous load (Sweller, 1988).</p>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xl font-semibold text-[#008080] mb-2"><span class="text-2xl mr-2">🧩</span>TPACK Framework</h3>
+                        <p class="text-sm text-gray-600">Integrating Technological, Pedagogical, And Content Knowledge effectively (Mishra & Koehler, 2006).</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="conceptual-framework" class="py-12 md:py-20 bg-gray-50 px-4">
+            <div class="max-w-5xl mx-auto text-center">
+                <h2 class="text-3xl md:text-4xl font-bold section-title mb-8">Conceptual Framework of Expert Practice <span class="text-2xl">🖼️</span></h2>
+                <p class="text-xl text-gray-700 mb-10 max-w-3xl mx-auto">
+                    The following framework visually outlines how Quizizz Super Trainers' expertise, informed by key learning theories, translates into effective gamified learning strategies and positive student outcomes.
+                </p>
+                <div class="flex justify-center p-4 bg-white rounded-lg shadow-xl">
+                    <img src="https://sirpoji007.github.io/microsites/framework.png" alt="Conceptual Framework Diagram: TPACK, SDT, Flow, CLT influencing Super Trainer strategies and leading to enhanced motivation, engagement, and learning." class="rounded-md max-w-full h-auto md:max-w-2xl lg:max-w-3xl">
+                </div>
+                 <p class="mt-8 text-gray-600 text-md max-w-3xl mx-auto">
+                    This model highlights the critical interplay between Technological Pedagogical Content Knowledge (TPACK), motivational principles from Self-Determination Theory (SDT), engagement dynamics from Flow Theory, and cognitive processing considerations from Cognitive Load Theory (CLT). These elements collectively inform the sophisticated design and implementation of Quizizz strategies by Super Trainers, ultimately aiming to enhance intrinsic motivation, foster optimal engagement (flow state), and ensure effective learning with reduced cognitive overload for students.
+                </p>
+            </div>
+        </section>
+
+        <section id="research-focus" class="py-12 md:py-20 px-4"> 
+            <div class="max-w-5xl mx-auto text-center">
+                <h2 class="text-3xl md:text-4xl font-bold section-title mb-8">Researching Excellence: Key Focus Areas <span class="text-2xl">🔍</span></h2>
+                <p class="text-xl text-gray-700 mb-10 max-w-3xl mx-auto">This study delves into how Quizizz Super Trainers excel. The core research questions guide the exploration of their expert practices:</p>
+                <div class="chart-container bg-white p-4 rounded-lg shadow-lg">
+                    <canvas id="researchFocusChart"></canvas>
+                </div>
+                <p class="mt-6 text-gray-600 text-md">The chart illustrates the three primary dimensions of inquiry: understanding the specific pedagogical approaches these experts use, how they leverage Quizizz features for their goals, and how their practices align with established learning theories.</p>
+            </div>
+        </section>
+
+        <section id="methodology" class="py-12 md:py-20 bg-white px-4">
+            <div class="max-w-5xl mx-auto text-center">
+                <h2 class="text-3xl md:text-4xl font-bold section-title mb-10">Methodology Snapshot: How We Learn <span class="text-2xl">🛠️</span></h2>
+                <p class="text-xl text-gray-700 mb-10 max-w-3xl mx-auto">A mixed-methods approach combines quantitative and qualitative data for a comprehensive understanding.</p>
+                <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+                    <div class="flow-step p-4 rounded-lg text-center shadow-md w-full md:w-1/4">
+                        <h4 class="text-lg font-semibold text-[#005050]">Online Survey</h4>
+                        <p class="text-sm text-gray-600">(Quantitative Data)</p>
+                    </div>
+                    <div class="flow-arrow text-3xl font-bold hidden md:block">→</div>
+                     <div class="flow-arrow text-3xl font-bold md:hidden">↓</div>
+                    <div class="flow-step p-4 rounded-lg text-center shadow-md w-full md:w-1/4">
+                        <h4 class="text-lg font-semibold text-[#005050]">Interviews</h4>
+                        <p class="text-sm text-gray-600">(Qualitative Data)</p>
+                    </div>
+                    <div class="flow-arrow text-3xl font-bold hidden md:block">→</div>
+                    <div class="flow-arrow text-3xl font-bold md:hidden">↓</div>
+                    <div class="flow-step p-4 rounded-lg text-center shadow-md w-full md:w-1/4">
+                        <h4 class="text-lg font-semibold text-[#005050]">Thematic & Statistical Analysis</h4>
+                        <p class="text-sm text-gray-600">(Data Integration)</p>
+                    </div>
+                </div>
+                <p class="mt-8 text-gray-600">This convergent parallel design allows for rich insights from expert Quizizz Super Trainers in Malaysia.</p>
+            </div>
+        </section>
+
+        <section id="impact" class="py-12 md:py-20 bg-gray-50 px-4"> 
+            <div class="max-w-5xl mx-auto">
+                <h2 class="text-3xl md:text-4xl font-bold section-title mb-10 text-center">Impact & Future Outlook <span class="text-2xl">🚀</span></h2>
+                <p class="text-xl text-center text-gray-700 mb-10 max-w-3xl mx-auto">This research aims to make significant contributions:</p>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="card p-6">
+                        <h3 class="text-xl font-semibold text-[#008080] mb-3"><span class="text-yellow-500 text-2xl mr-2">🌟</span>Inform Professional Development</h3>
+                        <p class="text-gray-600">Provide evidence-based insights for creating effective training programs for educators using gamified tools.</p>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xl font-semibold text-[#008080] mb-3"><span class="text-yellow-500 text-2xl mr-2">📈</span>Establish Best Practices</h3>
+                        <p class="text-gray-600">Identify and share expert strategies for leveraging Quizizz to enhance student engagement and learning outcomes.</p>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xl font-semibold text-[#008080] mb-3"><span class="text-yellow-500 text-2xl mr-2">📚</span>Advance Theory & Practice</h3>
+                        <p class="text-gray-600">Contribute to the academic understanding of how gamification principles are effectively operationalized in real-world educational settings.</p>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xl font-semibold text-[#008080] mb-3"><span class="text-yellow-500 text-2xl mr-2">🛠️</span>Enhance Platform Design</h3>
+                        <p class="text-gray-600">Offer user-driven insights to Quizizz developers for potential platform improvements from a pedagogical perspective.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="bg-[#004D4D] text-white py-12 text-center px-4">
+            <h2 class="text-3xl font-bold mb-4">Pioneering the Future of Learning</h2>
+            <p class="text-lg max-w-2xl mx-auto mb-6">By understanding the nuanced practices of expert educators, we can better harness the power of gamification to create more engaging, effective, and equitable learning experiences for all students.</p>
+            <p class="text-sm">&copy; SirPoji 2025 all rights reserved.</p> 
+        </footer>
+    </main>
+
+    <script>
+        const chartCtx = document.getElementById('researchFocusChart').getContext('2d');
+        const researchFocusChart = new Chart(chartCtx, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    ['Pedagogical', 'Strategies'], 
+                    ['Quizizz Feature', 'Use & Adaptation'], 
+                    ['Alignment with', 'Learning Theories']
+                ],
+                datasets: [{
+                    label: 'Research Focus Areas',
+                    data: [40, 35, 25], // Example data
+                    backgroundColor: [
+                        '#008080', // Teal
+                        '#FF8C00', // Dark Orange
+                        '#FFD700'  // Gold
+                    ],
+                    borderColor: [
+                        '#FFFFFF',
+                        '#FFFFFF',
+                        '#FFFFFF'
+                    ],
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { size: 12 },
+                            color: '#333333',
+                            padding: 15,
+                            usePointStyle: true,
+                             boxWidth: 10,
+                            generateLabels: function(chart) {
+                                const data = chart.data;
+                                if (data.labels.length && data.datasets.length) {
+                                    return data.labels.map(function(label, i) {
+                                        const meta = chart.getDatasetMeta(0);
+                                        const style = meta.controller.getStyle(i);
+                                        return {
+                                            text: Array.isArray(label) ? label.join(' ') : label,
+                                            fillStyle: style.backgroundColor,
+                                            strokeStyle: style.borderColor,
+                                            lineWidth: style.borderWidth,
+                                            hidden: isNaN(data.datasets[0].data[i]) || meta.data[i].hidden,
+                                            index: i,
+                                            pointStyle: 'rectRounded'
+                                        };
+                                    });
+                                }
+                                return [];
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#333333',
+                        titleFont: { size: 14, weight: 'bold'},
+                        bodyFont: { size: 12 },
+                        padding: 10,
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                const item = tooltipItems[0];
+                                let label = item.chart.data.labels[item.dataIndex];
+                                if (Array.isArray(label)) {
+                                  return label.join(' ');
+                                } else {
+                                  return label;
+                                }
+                            },
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += context.parsed + '%';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                cutout: '60%'
+            }
+        });
+
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Smooth scroll and active link highlighting for all nav links
+        const allNavLinks = document.querySelectorAll('.nav-link');
+        allNavLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    const navbarHeight = document.getElementById('navbar').offsetHeight;
+                    const elementPosition = targetElement.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
+        
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: "smooth"
+                    });
+                }
+                // Close mobile menu after click
+                if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        });
+        
+        const sections = document.querySelectorAll('section[id]');
+        const navbar = document.getElementById('navbar');
+        let lastScrollTop = 0;
+
+        function highlightNavLink() {
+            let currentSectionId = '';
+            const navbarHeight = navbar.offsetHeight;
+
+            sections.forEach(section => {
+                // Adjust the trigger point to be slightly before the section top hits the navbar
+                const sectionTop = section.offsetTop - navbarHeight - Math.min(100, section.offsetHeight * 0.3); // 100px or 30% of section height
+                const sectionBottom = sectionTop + section.offsetHeight;
+                
+                if (window.pageYOffset >= sectionTop && window.pageYOffset < sectionBottom) {
+                    currentSectionId = section.getAttribute('id');
+                }
+            });
+
+            // Fallback for the very top or very bottom of the page
+            if (window.pageYOffset < sections[0].offsetTop - navbarHeight - 50) {
+                 currentSectionId = sections[0].getAttribute('id'); // Default to first section if above all
+            } else if ((window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 50) { // If at the bottom
+                currentSectionId = sections[sections.length -1].getAttribute('id');
+            }
+            
+            allNavLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${currentSectionId}`) {
+                    link.classList.add('active');
+                }
+            });
+        }
+        
+        // Navbar hide/show on scroll
+        window.addEventListener('scroll', () => {
+            highlightNavLink();
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if (scrollTop > lastScrollTop && scrollTop > navbar.offsetHeight + 50) { 
+                // Scrolling Down
+                navbar.style.transform = `translateY(-${navbar.offsetHeight}px)`;
+                navbar.style.transition = 'transform 0.3s ease-out';
+            } else {
+                // Scrolling Up or at the top
+                navbar.style.transform = "translateY(0)";
+            }
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; 
+        }, false);
+
+        // Initial highlight
+        highlightNavLink();
+
+    </script>
+</body>
+</html>
+
