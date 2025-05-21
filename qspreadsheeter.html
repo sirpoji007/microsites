@@ -446,7 +446,8 @@ Ensure the 'answer' for multiple-choice questions exactly matches one of the str
 For true/false, the 'answer' should be the string "True" or "False".
 Provide ${numQuestions} questions in total.
 `;
-            const apiKey = ""; // Left empty as per instructions for Canvas environment
+            // API Key integrated here
+            const apiKey = "AIzaSyALFFbeWpOp1KgiD5PBjcFizIUMh8RnSNA"; 
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
             
             try {
