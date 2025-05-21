@@ -3,579 +3,706 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quizizz Question Generator</title>
-    <link rel="icon" href="https://sirpoji.github.io/microsites/spreadsheeter.png" type="image/png">
-    <meta property="og:title" content="Quizizz Question Generator">
-    <meta property="og:description" content="Upload your PDF material and convert it into a Quizizz-ready spreadsheet!">
-    <meta property="og:image" content="https://sirpoji.github.io/microsites/spreadsheeter.png">
-    <meta property="og:type" content="website">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://sirpoji.github.io/microsites/spreadsheeter.png">
+    <title>YouTube Tutorial Finder</title>
+
+    <link rel="icon" type="image/png" href="https://sirpoji007.github.io/microsites/youvidlogo.png">
+
+    <meta property="og:title" content="SirPoji - YOUVID SEEKER">
+    <meta property="og:description" content="Find Your Next Tutorial with AI-powered suggestions.">
+    <meta property="og:image" content="https://sirpoji007.github.io/microsites/youvidbanner.png">
+    <meta property="og:url" content="https://sirpoji007.github.io/microsites/youvidseeker.html"> <meta property="og:type" content="website">
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    
     <style>
+        /* Custom gradient background using YouTube-inspired colors */
         body {
-            font-family: 'Inter', sans-serif;
-            transition: background-color 0.3s, color 0.3s;
+            background: linear-gradient(to bottom right, #FF4E50, #FC913A, #F9D423); /* Shades of red, orange, yellow */
+            min-height: 100vh; /* Ensure gradient covers the full viewport height */
+            font-family: 'Inter', sans-serif; /* Use Inter font */
+            color: #ffffff; /* Default text color white for contrast */
+            line-height: 1.6;
         }
-        /* Basic dark mode support - can be enhanced with more specific component styling */
-        .dark body {
-            background-color: #1f2937; /* Tailwind gray-800 */
-            color: #f3f4f6; /* Tailwind gray-100 */
+
+        /* Style for the search input focus state */
+        input[type="text"]:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.5); /* YouTube red glow */
+            border-color: #FF0000; /* YouTube red border */
         }
-        .dark .bg-white {
-            background-color: #374151; /* Tailwind gray-700 */
+
+        /* Style for the video result items */
+        .video-item {
+            background-color: rgba(255, 255, 255, 0.15); /* Slightly more opaque background */
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* shadow-md */
+            padding: 1.5rem; /* p-6 */
+            margin-bottom: 1.5rem; /* mb-6 */
+            display: flex; /* Use flexbox for layout */
+            flex-direction: column; /* Stack elements vertically by default */
+            gap: 1rem; /* Space between elements */
+            align-items: center; /* Center items horizontally by default */
+            text-align: center; /* Center text by default */
+            cursor: pointer; /* Indicate that the item is clickable */
+            transition: transform 0.2s ease-in-out; /* Add a slight hover effect */
         }
-        .dark .bg-opacity-90 {
-             background-color: rgba(55, 65, 81, 0.9); /* gray-700 with opacity */
+
+        .video-item:hover {
+            transform: translateY(-5px); /* Lift the item slightly on hover */
         }
-        .dark .text-gray-800 {
-            color: #f3f4f6; /* Tailwind gray-100 */
+
+        .video-item .video-thumbnail-container {
+            position: relative; /* Needed for aspect ratio padding */
+            width: 100%; /* Take full width of the container */
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio (height / width * 100) */
+            height: 0; /* Hide the container's height */
+            overflow: hidden; /* Hide anything outside the padding */
+            border-radius: 0.25rem; /* rounded */
+            pointer-events: none; /* Prevent clicks on the container itself, rely on parent .video-item */
         }
-        .dark .text-gray-700 {
-            color: #d1d5db; /* Tailwind gray-300 */
-        }
-        .dark .text-gray-600, .dark .text-gray-500 {
-            color: #9ca3af; /* Tailwind gray-400 */
-        }
-        .dark .border-gray-300 {
-            border-color: #4b5563; /* Tailwind gray-600 */
-        }
-        .dark .hover\:border-blue-500:hover {
-            border-color: #3b82f6; /* Tailwind blue-500 */
-        }
-        .dark .bg-gray-200 {
-            background-color: #4b5563; /* Tailwind gray-600 */
-        }
-        .dark .bg-green-100 {
-            background-color: rgba(16, 185, 129, 0.2); /* Tailwind green-500 with opacity */
-        }
-        .dark .border-green-400 {
-            border-color: #34d399; /* Tailwind green-400 */
-        }
-        .dark .text-green-700, .dark .text-green-600 {
-            color: #6ee7b7; /* Tailwind green-300 */
-        }
-        .dark .bg-red-100 {
-            background-color: rgba(239, 68, 68, 0.2); /* Tailwind red-500 with opacity */
-        }
-        .dark .border-red-400 {
-            border-color: #f87171; /* Tailwind red-400 */
-        }
-        .dark .text-red-700 {
-            color: #fca5a5; /* Tailwind red-300 */
-        }
-        .dark input[type="number"], .dark select {
-            background-color: #4b5563; /* gray-600 */
-            color: #f3f4f6; /* gray-100 */
-            border-color: #6b7280; /* gray-500 */
-        }
-        .dark input[type="number"]:focus, .dark select:focus {
-            border-color: #3b82f6; /* blue-500 */
-            ring-color: #3b82f6;
-        }
-        .dark .quizizz-ai-button {
-            background-color: #8b5cf6; /* Tailwind violet-500 */
-        }
-        .dark .quizizz-ai-button:hover {
-            background-color: #7c3aed; /* Tailwind violet-600 */
+
+        .video-item img {
+             display: block; /* Ensure image doesn't have extra space below */
+             width: 100%; /* Make image fill container */
+             height: 100%; /* Make image fill container */
+             object-fit: cover; /* Cover the container while maintaining aspect ratio */
         }
 
 
-        /* Custom file input styling */
-        input[type="file"] {
-            display: none;
+        .video-item .video-details {
+            width: 100%; /* Take full width */
         }
-        /* Loading spinner animation */
-        .spinner {
-            animation: spin 1s linear infinite;
+
+        .video-item h3 {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600; /* font-semibold */
+            margin-bottom: 0.5rem; /* mb-2 */
+            color: #ffffff; /* Text color white */
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        .video-item p {
+            font-size: 1rem; /* text-base */
+            color: #d1d5db; /* gray-300 */
         }
+
+        .video-summary-container {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #e2e8f0; /* light gray */
+            text-align: left;
+            max-height: 150px; /* Limit height for summary */
+            overflow-y: auto; /* Add scroll if content overflows */
+        }
+
+         /* Style for recommendation sections */
+        .recommendation-section {
+            background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent white */
+            padding: 1.5rem; /* p-6 */
+            border-radius: 0.75rem; /* rounded-xl */
+            margin-top: 2rem; /* mt-8 */
+            text-align: left; /* Align text left */
+        }
+
+        .recommendation-section h2 {
+            font-size: 2rem; /* text-3xl */
+            font-weight: 700; /* font-bold */
+            margin-bottom: 1.5rem; /* mb-6 */
+            text-align: center; /* Center the heading */
+            color: #ffffff; /* White text */
+        }
+
+        .recommendation-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive grid */
+            gap: 1.5rem; /* Gap between items */
+        }
+
+        .recommendation-item {
+             background-color: rgba(255, 255, 255, 0.15); /* Slightly more opaque background */
+             padding: 1rem; /* p-4 */
+             border-radius: 0.5rem; /* rounded-lg */
+             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* shadow-sm */
+        }
+
+        .recommendation-item h4 {
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600; /* font-semibold */
+            margin-bottom: 0.5rem; /* mb-2 */
+            color: #ffffff; /* White text */
+            display: flex; /* Use flex to align icon and text */
+            align-items: center; /* Vertically center icon and text */
+            gap: 0.5rem; /* Space between icon and text */
+        }
+
+        .recommendation-item a {
+            color: #a78bfa; /* Purple link color (Tailwind's violet-400) */
+            text-decoration: none; /* No underline */
+            transition: color 0.3s ease; /* Smooth color transition */
+        }
+
+        .recommendation-item a:hover {
+            color: #c4b5fd; /* Lighter purple on hover (Tailwind's violet-300) */
+            text-decoration: underline; /* Underline on hover */
+        }
+
+         /* Style for loading and error messages */
+        #results-container p, #llm-suggestions-container p {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #ffffff;
+        }
+
+        /* Fullscreen Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.9); /* Black background with opacity */
+            justify-content: center; /* Center content horizontally */
+            align-items: center; /* Center content vertically */
+            padding: 20px; /* Add some padding around the modal content */
+        }
+
+        .modal-content {
+            position: relative; /* Needed for close button positioning */
+            margin: auto; /* Auto margin for centering */
+            width: 95%; /* 95% width */
+            max-width: 1200px; /* Max width */
+            height: 95%; /* 95% height */
+            max-height: 800px; /* Max height */
+            display: flex; /* Use flexbox for iframe centering */
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1); /* Slight background for modal content */
+            border-radius: 0.5rem; /* Rounded corners */
+        }
+
+        .modal-content iframe {
+            width: 100%; /* Make iframe fill its container */
+            height: 100%; /* Make iframe fill its container */
+            border: none; /* Remove iframe border */
+        }
+
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 25px;
+            color: #fff;
+            font-size: 35px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+            z-index: 1001; /* Ensure close button is above iframe */
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Styles for LLM suggestions container */
+        #llm-suggestions-container {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-top: 2rem;
+            text-align: left;
+            color: #ffffff;
+        }
+
+        #llm-suggestions-container h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        #llm-suggestions-container ul {
+            list-style: disc;
+            padding-left: 1.5rem;
+        }
+
+        #llm-suggestions-container li {
+            margin-bottom: 0.5rem;
+        }
+
+        #llm-suggestions-container li a {
+            color: #a78bfa; /* Purple link color */
+            text-decoration: none;
+        }
+
+        #llm-suggestions-container li a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive banner hero styling */
+        .hero-banner {
+            width: 100%;
+            height: auto; /* Maintain aspect ratio */
+            max-width: 800px; /* Limit max width */
+            margin-bottom: 2rem; /* Space below banner */
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+        }
+
+
+        @media (min-width: 768px) { /* Apply flex layout on medium screens and up */
+            .video-item {
+                 flex-direction: row; /* Row layout on larger screens */
+                 align-items: flex-start; /* Align items to the top */
+                 text-align: left; /* Align text left */
+            }
+
+            .video-item .video-thumbnail-container {
+                 width: 180px; /* Fixed width for embedded video container */
+                 flex-shrink: 0; /* Prevent shrinking */
+                 padding-bottom: 0; /* Remove padding-bottom when height is fixed */
+                 height: 100px; /* Fixed height for embedded video container */
+            }
+
+             .video-item img {
+                 width: 180px; /* Fixed width for thumbnail */
+                 height: 100px; /* Fixed height for thumbnail */
+                 object-fit: cover; /* Ensure image covers the container */
+            }
+        }
+
+
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        // Check for dark mode preference and apply it
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-
-        // Set PDF.js worker path
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    </script>
+     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 flex flex-col items-center justify-center p-4 transition-colors duration-300">
+<body class="flex flex-col items-center justify-center p-4">
 
-    <div class="bg-white bg-opacity-90 dark:bg-gray-800 dark:bg-opacity-90 rounded-xl shadow-2xl p-6 sm:p-8 w-full max-w-2xl text-center">
+    <div class="container mx-auto text-center py-12 px-6 bg-white bg-opacity-10 rounded-xl shadow-lg max-w-4xl">
+        <img src="https://sirpoji007.github.io/microsites/youvidbanner.png" alt="YOUVID SEEKER Banner" class="hero-banner mx-auto">
 
-        <div class="flex justify-center mb-6">
-            <div class="bg-blue-500 p-3 sm:p-4 rounded-full shadow-lg">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" sm:width="48" sm:height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
-                     <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                     <polyline points="14 2 14 8 20 8"/>
-                     <line x1="16" y1="13" x2="8" y2="13"/>
-                     <line x1="16" y1="17" x2="8" y2="17"/>
-                     <line x1="10" y1="9" x2="8" y2="9"/>
-                 </svg>
-            </div>
-        </div>
-
-        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 mb-3 sm:mb-4">Quizizz Question Generator</h1>
-        <p class="text-gray-600 dark:text-gray-300 mb-6 sm:mb-8 text-sm sm:text-base">Upload your PDF material and convert it into a Quizizz-ready spreadsheet!</p>
-
-        <div id="upload-area" class="mb-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 sm:p-6 hover:border-blue-500 dark:hover:border-blue-400 transition duration-300 ease-in-out cursor-pointer">
-            <input type="file" accept=".pdf" id="pdfUpload">
-            <label for="pdfUpload" class="flex flex-col items-center justify-center cursor-pointer">
-                <svg id="upload-icon-default" xmlns="http://www.w3.org/2000/svg" width="40" height="40" sm:width="48" sm:height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 dark:text-gray-500 mb-2 sm:mb-3">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="17 8 12 3 7 8"/>
-                    <line x1="12" y1="3" x2="12" y2="15"/>
-                </svg>
-                 <svg id="upload-icon-selected" xmlns="http://www.w3.org/2000/svg" width="40" height="40" sm:width="48" sm:height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 dark:text-green-400 mb-2 sm:mb-3 hidden">
-                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                    <polyline points="14 2 14 8 20 8"/>
-                    <path d="M16 13H8"/>
-                    <path d="M16 17H8"/>
-                    <path d="M10 9H8"/>
-                 </svg>
-
-                <span id="upload-text-default" class="text-base sm:text-lg font-semibold text-gray-700 dark:text-gray-200">Drag & Drop or Click to Upload PDF</span>
-                <span id="upload-text-selected" class="text-base sm:text-lg font-semibold text-green-700 dark:text-green-400 hidden truncate max-w-full px-2"></span>
-                <span class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">(Max file size: 10MB)</span>
-            </label>
-        </div>
-
-        <div id="question-settings" class="mb-6 hidden">
-            <div class="flex flex-col md:flex-row gap-4">
-                <div class="flex-1">
-                    <label for="num-questions" class="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left mb-1">Number of Questions:</label>
-                    <input type="number" id="num-questions" min="5" max="50" value="10" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                <div class="flex-1">
-                    <label for="question-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left mb-1">Question Type:</label>
-                    <select id="question-type" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        <option value="multiple-choice">Multiple Choice</option>
-                        <option value="true-false">True/False</option>
-                        <option value="mixed">Mixed</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <div id="error-message" class="bg-red-100 dark:bg-red-500 dark:bg-opacity-30 border border-red-400 dark:border-red-500 text-red-700 dark:text-red-300 px-4 py-3 rounded relative mb-6 items-center justify-center hidden" role="alert">
-             <div class="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2">
-                     <circle cx="12" cy="12" r="10"/>
-                     <line x1="12" y1="8" x2="12" y2="12"/>
-                     <line x1="12" y1="16" x2="12.01" y2="16"/>
-                 </svg>
-                <span id="error-text" class="block sm:inline text-sm"></span>
-            </div>
-        </div>
-
-        <button id="process-button" class="w-full flex items-center justify-center px-6 py-2.5 sm:px-8 sm:py-3 border border-transparent text-base font-medium rounded-md text-white bg-gray-400 cursor-not-allowed md:text-lg transition duration-300 ease-in-out" disabled>
-             <svg id="button-icon-send" xmlns="http://www.w3.org/2000/svg" width="20" height="20" sm:width="24" sm:height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 sm:mr-3">
-                 <line x1="22" y1="2" x2="11" y2="13"/>
-                 <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-             </svg>
-             <svg id="button-icon-loader" xmlns="http://www.w3.org/2000/svg" width="20" height="20" sm:width="24" sm:height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spinner mr-2 sm:mr-3 hidden">
-                 <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-             </svg>
-            <span id="button-text">Process PDF</span>
-        </button>
-
-        <a href="https://quizizz.com/admin/quizizz-ai" target="_blank" rel="noopener noreferrer" id="quizizz-ai-button" class="mt-4 w-full flex items-center justify-center px-6 py-2.5 sm:px-8 sm:py-3 border border-transparent text-base font-medium rounded-md text-white bg-violet-500 hover:bg-violet-600 dark:bg-violet-600 dark:hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 transition duration-300 ease-in-out md:text-lg quizizz-ai-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" sm:width="24" sm:height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 sm:mr-3">
-                <path d="M12 2a10 10 0 0 0-7.523 16.442l-.614.922a1 1 0 0 0 .287 1.387l.002.001a1 1 0 0 0 1.387-.287l.922-.614A10 10 0 1 0 12 2Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/>
-                <path d="m13.023 10.442-.001.002A2.5 2.5 0 1 0 13.02 15.5l.002-.001A2.5 2.5 0 0 0 13.023 10.442Z"/>
-                <path d="M10.977 10.442a2.5 2.5 0 1 0 0 5.003 2.5 2.5 0 0 0 0-5.003Z"/>
-                <path d="m10.977 15.445.002-.001a2.5 2.5 0 1 0-.004.004l.002-.003Z"/>
-                <path d="m13.023 10.442.001-.002a2.5 2.5 0 1 0-.004.004l.003-.002Z"/>
-                <path d="M12 7a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z"/>
-            </svg>
-            Explore Quizizz AI
-        </a>
-
-        <div id="processing-status" class="mt-4 hidden">
-            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
-            </div>
-            <p id="status-text" class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Preparing to process your PDF...</p>
-        </div>
-
-        <div id="output-area" class="mt-6 sm:mt-8 p-4 sm:p-6 bg-green-100 dark:bg-green-500 dark:bg-opacity-20 border border-green-400 dark:border-green-500 text-green-700 dark:text-green-300 rounded-lg flex flex-col items-center justify-center hidden">
-            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" sm:width="48" sm:height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 dark:text-green-400 mb-3 sm:mb-4">
-                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <path d="m16 13-3.5 3.5L9 13"/>
-                <path d="M12.5 16.5V3"/>
-            </svg>
-            <p class="text-base sm:text-lg font-semibold mb-2 sm:mb-4">Processing Complete!</p>
-            <p id="question-count" class="mb-3 sm:mb-4 text-sm sm:text-base"></p>
-            <a id="download-link" href="#" download="quizizz_questions.xlsx" class="flex items-center px-4 py-2 sm:px-6 sm:py-3 border border-transparent text-sm sm:text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-300 ease-in-out">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" sm:width="20" sm:height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 sm:mr-3">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="7 10 12 15 17 10"/>
-                    <line x1="12" y1="15" x2="12" y2="3"/>
-                </svg>
-                Download Spreadsheet
-            </a>
-        </div>
-
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-6 sm:mt-8">
-            Note: AI-generated questions should be reviewed for accuracy.
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 text-white drop-shadow-md">
+            Find Your Next Tutorial
+        </h1>
+        <p class="text-lg md:text-xl mb-8 text-gray-100">
+            Discover amazing tutorials on YouTube for anything you want to learn.
         </p>
-        
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-4">
-            SirPoji 2025 © All rights reserved
-        </p>
+
+        <div class="w-full max-w-md mx-auto mb-8">
+            <div class="flex items-center border-2 border-gray-300 rounded-full overflow-hidden shadow-md">
+                <input
+                    type="text"
+                    id="search-input"
+                    placeholder="Search for tutorials..."
+                    class="w-full py-3 px-6 text-gray-800 leading-tight focus:outline-none rounded-l-full"
+                >
+                <button id="search-button" class="bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-r-full transition duration-300 ease-in-out flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <span class="ml-2 hidden md:inline">Search</span>
+                </button>
+            </div>
+            <button id="suggest-topics-button" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-full transition duration-300 ease-in-out flex items-center justify-center mx-auto">
+                ✨ Suggest Related Topics
+            </button>
+        </div>
+
+        <div id="llm-suggestions-container" class="hidden">
+            <h3>Suggested Learning Paths</h3>
+            <p id="llm-suggestions-content">Loading suggestions...</p>
+        </div>
+
+        <div id="results-container" class="mt-8 text-left">
+            </div>
+
+         <div class="recommendation-section">
+            <h2>Recommended Tutorials</h2>
+            <div class="recommendation-list">
+                <div class="recommendation-item">
+                    <h4>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2V7a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 01-4 4zm-4 0h12a2 2 0 002-2V7a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 01-4 4z" />
+                        </svg>
+                        Canva for Education Tutorials
+                    </h4>
+                    <p class="text-gray-200">Master Canva for creating engaging educational content.</p>
+                     <a href="#" class="block mt-2 search-recommendation" data-query="Canva for Education tutorials">Search for this tutorial</a>
+                </div>
+                <div class="recommendation-item">
+                    <h4>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9.228a4.5 4.5 0 116.364 0L10 12.636l-1.636-1.636a4.5 4.5 0 010-6.364zm0 0L10 12.636m-1.636-1.636a4.5 4.5 0 010-6.364z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Quizizz for Education Tutorials
+                    </h4>
+                    <p class="text-gray-200">Learn to create interactive quizzes and assessments for students.</p>
+                     <a href="#" class="block mt-2 search-recommendation" data-query="Quizizz for Education tutorials">Search for this tutorial</a>
+                </div>
+                <div class="recommendation-item">
+                    <h4>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                        </svg>
+                        Basic HTML5 Tutorials
+                    </h4>
+                    <p class="text-gray-200">Get started with the fundamentals of HTML5 for building web pages.</p>
+                     <a href="#" class="block mt-2 search-recommendation" data-query="Basic HTML5 tutorials">Search for this tutorial</a>
+                </div>
+                <div class="recommendation-item">
+                    <h4>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v18" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 5H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2z" />
+                        </svg>
+                        Generative AI Tools for Educators
+                    </h4>
+                    <p class="text-gray-200">Explore AI tools for teaching, content creation, and personalized learning.</p>
+                     <a href="#" class="block mt-2 search-recommendation" data-query="Generative AI tools for Educators tutorials">Search for this tutorial</a>
+                </div>
+                <div class="recommendation-item">
+                    <h4>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-lime-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18s-3.332.477-4.5 1.253" />
+                        </svg>
+                        21st Century Design Learning
+                    </h4>
+                    <p class="text-gray-200">Strategies for engaging and effective learning in the modern era.</p>
+                     <a href="#" class="block mt-2 search-recommendation" data-query="21st Century Design Learning tutorials">Search for this tutorial</a>
+                </div>
+                <div class="recommendation-item">
+                    <h4>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-fuchsia-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        Best Practices for Online Learning Videos
+                    </h4>
+                    <p class="text-gray-200">Tips and techniques for creating high-quality and effective video lessons.</p>
+                     <a href="#" class="block mt-2 search-recommendation" data-query="Best Practices for Online Learning Videos tutorials">Search for this tutorial</a>
+                </div>
+            </div>
+        </div>
 
     </div>
 
+    <div id="fullscreen-modal" class="modal">
+        <span class="close-button">×</span>
+        <div class="modal-content">
+            <iframe id="modal-video-iframe"
+                src=""
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+
+    <footer class="mt-12 text-center text-gray-200 text-sm">
+        <p>SirPoji 2025 © all rights reserved</p>
+    </footer>
+
     <script>
-        // DOM Elements
-        const fileInput = document.getElementById('pdfUpload');
-        const uploadArea = document.getElementById('upload-area');
-        const uploadAreaLabel = uploadArea.querySelector('label');
-        const uploadIconDefault = document.getElementById('upload-icon-default');
-        const uploadIconSelected = document.getElementById('upload-icon-selected');
-        const uploadTextDefault = document.getElementById('upload-text-default');
-        const uploadTextSelected = document.getElementById('upload-text-selected');
-        const questionSettings = document.getElementById('question-settings');
-        const numQuestionsInput = document.getElementById('num-questions');
-        const questionTypeSelect = document.getElementById('question-type');
-        const errorMessageDiv = document.getElementById('error-message');
-        const errorTextSpan = document.getElementById('error-text');
-        const processButton = document.getElementById('process-button');
-        const buttonIconSend = document.getElementById('button-icon-send');
-        const buttonIconLoader = document.getElementById('button-icon-loader');
-        const buttonText = document.getElementById('button-text');
-        const processingStatusDiv = document.getElementById('processing-status');
-        const progressBar = document.getElementById('progress-bar');
-        const statusTextP = document.getElementById('status-text');
-        const outputAreaDiv = document.getElementById('output-area');
-        const questionCountP = document.getElementById('question-count');
-        const downloadLinkA = document.getElementById('download-link');
+        // IMPORTANT NOTE: Including the API key directly in client-side JavaScript
+        // is generally NOT recommended for production applications as it can be easily
+        // extracted and misused. For a real application, you should handle API calls
+        // on a secure backend server.
+        const YOUTUBE_API_KEY = 'AIzaSyBYCYT99I2Ah_taeKaHYxRBghil_mbBbGA'; // Your YouTube Data API Key
+        const YOUTUBE_SEARCH_URL = 'https://www.googleapis.com/youtube/v3/search';
+        // Base URL for embedding YouTube videos (Canvas environment proxy)
+        const YOUTUBE_EMBED_BASE_URL = 'https://www.youtube.com/embed/$';
 
-        let selectedFile = null;
-        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+        // Gemini API Key
+        const GEMINI_API_KEY = "AIzaSyBzR6r8LMZAIKxW3WfaTRHpy95tlWHqSWY";
+        const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
-        // --- File Handling ---
-        fileInput.addEventListener('change', handleFileSelect);
-        uploadArea.addEventListener('dragover', handleDragOver);
-        uploadArea.addEventListener('dragleave', handleDragLeave);
-        uploadArea.addEventListener('drop', handleDrop);
+        // Get references to DOM elements
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const resultsContainer = document.getElementById('results-container');
+        const recommendationLinks = document.querySelectorAll('.search-recommendation');
+        const fullscreenModal = document.getElementById('fullscreen-modal');
+        const modalVideoIframe = document.getElementById('modal-video-iframe');
+        const closeButton = document.querySelector('.close-button');
+        const suggestTopicsButton = document.getElementById('suggest-topics-button');
+        const llmSuggestionsContainer = document.getElementById('llm-suggestions-container');
+        const llmSuggestionsContent = document.getElementById('llm-suggestions-content');
 
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
-            processFile(file);
-        }
 
-        function handleDragOver(event) {
-            event.preventDefault();
-            uploadArea.classList.add('border-blue-500', 'dark:border-blue-400');
-        }
+        /**
+         * Calls the Gemini API to generate text.
+         * @param {string} prompt The text prompt for the LLM.
+         * @param {Object|null} schema Optional JSON schema for structured responses.
+         * @returns {Promise<string|Object>} The generated text or parsed JSON object.
+         */
+        async function callGeminiAPI(prompt, schema = null) {
+            llmSuggestionsContent.textContent = 'Generating...'; // Show loading for LLM
+            llmSuggestionsContainer.classList.remove('hidden'); // Show container
 
-        function handleDragLeave(event) {
-            event.preventDefault();
-            uploadArea.classList.remove('border-blue-500', 'dark:border-blue-400');
-        }
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
 
-        function handleDrop(event) {
-            event.preventDefault();
-            uploadArea.classList.remove('border-blue-500', 'dark:border-blue-400');
-            const file = event.dataTransfer.files[0];
-            processFile(file);
-        }
-
-        function processFile(file) {
-            hideError();
-            if (!file) {
-                resetFileInput();
-                return;
-            }
-            if (file.type !== 'application/pdf') {
-                showError('Invalid file type. Please upload a PDF.');
-                resetFileInput();
-                return;
-            }
-            if (file.size > MAX_FILE_SIZE) {
-                showError(`File is too large. Max size: ${MAX_FILE_SIZE / (1024 * 1024)}MB.`);
-                resetFileInput();
-                return;
-            }
-            selectedFile = file;
-            updateUploadUI(file.name);
-            questionSettings.classList.remove('hidden');
-            enableProcessButton();
-            outputAreaDiv.classList.add('hidden'); // Hide previous output
-        }
-
-        function updateUploadUI(fileName) {
-            uploadIconDefault.classList.add('hidden');
-            uploadIconSelected.classList.remove('hidden');
-            uploadTextDefault.classList.add('hidden');
-            uploadTextSelected.textContent = fileName;
-            uploadTextSelected.classList.remove('hidden');
-        }
-
-        function resetFileInput() {
-            selectedFile = null;
-            fileInput.value = ''; // Clear the file input
-            uploadIconDefault.classList.remove('hidden');
-            uploadIconSelected.classList.add('hidden');
-            uploadTextDefault.classList.remove('hidden');
-            uploadTextSelected.classList.add('hidden');
-            uploadTextSelected.textContent = '';
-            questionSettings.classList.add('hidden');
-            disableProcessButton();
-            processingStatusDiv.classList.add('hidden');
-            outputAreaDiv.classList.add('hidden');
-        }
-
-        // --- UI Control ---
-        function showError(message) {
-            errorTextSpan.textContent = message;
-            errorMessageDiv.classList.remove('hidden');
-        }
-
-        function hideError() {
-            errorMessageDiv.classList.add('hidden');
-        }
-
-        function enableProcessButton() {
-            processButton.disabled = false;
-            processButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
-            processButton.classList.add('bg-blue-600', 'hover:bg-blue-700', 'dark:bg-blue-500', 'dark:hover:bg-blue-600');
-        }
-
-        function disableProcessButton() {
-            processButton.disabled = true;
-            processButton.classList.add('bg-gray-400', 'cursor-not-allowed');
-            processButton.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'dark:bg-blue-500', 'dark:hover:bg-blue-600');
-        }
-        
-        function setProcessingState(isProcessing) {
-            processButton.disabled = isProcessing;
-            buttonIconSend.classList.toggle('hidden', isProcessing);
-            buttonIconLoader.classList.toggle('hidden', !isProcessing);
-            buttonText.textContent = isProcessing ? 'Processing...' : 'Process PDF';
-            if (isProcessing) {
-                hideError();
-                processingStatusDiv.classList.remove('hidden');
-                outputAreaDiv.classList.add('hidden');
-            }
-        }
-
-        function updateStatus(message, percent) {
-            statusTextP.textContent = message;
-            progressBar.style.width = `${percent}%`;
-        }
-
-        // --- PDF Processing ---
-        async function extractTextFromPDF(file) {
-            return new Promise(async (resolve, reject) => {
-                try {
-                    const arrayBuffer = await file.arrayBuffer();
-                    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                    let fullText = '';
-                    for (let i = 1; i <= pdf.numPages; i++) {
-                        updateStatus(`Extracting text from page ${i} of ${pdf.numPages}...`, 10 + Math.round((i / pdf.numPages) * 30));
-                        const page = await pdf.getPage(i);
-                        const textContent = await page.getTextContent();
-                        const pageText = textContent.items.map(item => item.str).join(' ');
-                        fullText += pageText + '\n\n'; // Add double newline for paragraph separation
-                    }
-                    // Limit text to avoid exceeding API limits (approx 100k chars for ~25k tokens for Gemini Flash)
-                    const MAX_CHARS_FOR_API = 100000; 
-                    resolve(fullText.substring(0, MAX_CHARS_FOR_API));
-                } catch (error) {
-                    console.error("PDF extraction error:", error);
-                    reject(new Error("Failed to extract text. PDF might be corrupted or password-protected."));
-                }
-            });
-        }
-
-        // --- Gemini API Call ---
-        async function generateQuestionsWithAI(text, numQuestions, questionType) {
-            updateStatus("Sending text to AI for question generation...", 40);
-            let questionTypeDescription = "";
-            if (questionType === "multiple-choice") {
-                questionTypeDescription = "multiple-choice questions with 4 options each";
-            } else if (questionType === "true-false") {
-                questionTypeDescription = "true/false questions";
-            } else { // mixed
-                questionTypeDescription = `a mix of approximately ${Math.ceil(numQuestions / 2)} multiple-choice (with 4 options) and ${Math.floor(numQuestions / 2)} true/false questions`;
+            const payload = { contents: chatHistory };
+            if (schema) {
+                payload.generationConfig = {
+                    responseMimeType: "application/json",
+                    responseSchema: schema
+                };
             }
 
-            const prompt = `
-Based on the following educational content:
----
-${text}
----
-Generate exactly ${numQuestions} quiz questions suitable for Quizizz.
-The questions should be ${questionTypeDescription}.
-
-Return ONLY a valid JSON array of question objects. Do NOT include any explanatory text, comments, or markdown code blocks like \`\`\`json ... \`\`\` around the JSON.
-
-JSON structure for each question:
-For multiple-choice:
-{
-  "type": "multiple-choice",
-  "question": "Question text here?",
-  "options": ["Option A", "Option B", "Option C", "Option D"],
-  "answer": "The exact text of the correct option (must be one of the provided options)",
-  "explanation": "Brief explanation for the correct answer."
-}
-For true/false:
-{
-  "type": "true-false",
-  "question": "Statement that is either true or false.",
-  "answer": "True", 
-  "explanation": "Brief explanation why it's true or false."
-}
-
-Ensure the 'answer' for multiple-choice questions exactly matches one of the strings in the 'options' array.
-For true/false, the 'answer' should be the string "True" or "False".
-Provide ${numQuestions} questions in total.
-`;
-            const apiKey = ""; // Left empty as per instructions for Canvas environment
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-            
             try {
-                const response = await fetch(apiUrl, {
+                const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    body: JSON.stringify(payload)
                 });
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    console.error("Gemini API Error:", errorData);
-                    throw new Error(`AI API request failed: ${errorData.error?.message || response.statusText}`);
+                    throw new Error(`Gemini API error: ${response.status} - ${JSON.stringify(errorData)}`);
                 }
-                const result = await response.json();
-                updateStatus("AI processing complete. Formatting spreadsheet...", 80);
 
-                if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
-                    const rawJson = result.candidates[0].content.parts[0].text;
-                    // Attempt to clean the response if it's wrapped in markdown
-                    const cleanedJson = rawJson.replace(/^```json\s*|```\s*$/g, '').trim();
-                    try {
-                        return JSON.parse(cleanedJson);
-                    } catch (parseError) {
-                         console.error("Failed to parse JSON from AI response:", cleanedJson, parseError);
-                         throw new Error("AI returned an invalid format. Could not parse questions.");
-                    }
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    return schema ? JSON.parse(text) : text;
                 } else {
-                    throw new Error("AI returned an unexpected response structure.");
+                    throw new Error("Gemini API response structure unexpected or content missing.");
                 }
             } catch (error) {
                 console.error("Error calling Gemini API:", error);
-                throw error; // Re-throw to be caught by the main process handler
+                llmSuggestionsContent.textContent = `Error generating content: ${error.message}`;
+                throw error; // Re-throw to be caught by the calling function
             }
         }
 
-        // --- Spreadsheet Generation (SheetJS) ---
-        function createQuizizzSpreadsheet(questions) {
-            updateStatus("Generating spreadsheet...", 90);
-            const worksheetData = [
-                ["Question Text", "Question Type", "Option 1", "Option 2", "Option 3", "Option 4", "Option 5", "Correct Answer (number)", "Time (seconds)", "Image Link", "Answer Explanation"]
-            ];
 
-            questions.forEach(q => {
-                if (q.type === "multiple-choice") {
-                    const correctAnswerText = q.answer;
-                    // Ensure q.options is an array before calling findIndex
-                    const optionsArray = Array.isArray(q.options) ? q.options : [];
-                    const correctIndex = optionsArray.findIndex(opt => opt === correctAnswerText) + 1;
-                    
-                    worksheetData.push([
-                        q.question || "", 
-                        "Multiple Choice",
-                        optionsArray[0] || "", 
-                        optionsArray[1] || "", 
-                        optionsArray[2] || "", 
-                        optionsArray[3] || "", 
-                        "", // Option 5 empty
-                        correctIndex || "", 
-                        "30", 
-                        "", 
-                        q.explanation || ""
-                    ]);
-                } else if (q.type === "true-false") {
-                    worksheetData.push([
-                        q.question || "", 
-                        "True/False",
-                        "True", "False", "", "", "",
-                        q.answer === "True" ? 1 : (q.answer === "False" ? 2 : ""), 
-                        "20", 
-                        "", 
-                        q.explanation || ""
-                    ]);
-                }
-            });
-
-            const workbook = XLSX.utils.book_new();
-            const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Quizizz Questions");
-            const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-            return new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        }
-
-        // --- Main Process ---
-        processButton.addEventListener('click', async () => {
-            if (!selectedFile) {
-                showError("Please select a PDF file first.");
+        // Function to fetch and display search results
+        async function fetchAndDisplayResults(query) {
+            if (!query) {
+                displayMessage('Please enter a search query.');
                 return;
             }
-            setProcessingState(true);
-            updateStatus("Starting process...", 5);
+
+            displayMessage('Searching...'); // Show loading message
 
             try {
-                const pdfText = await extractTextFromPDF(selectedFile);
-                if (!pdfText || pdfText.trim().length === 0) {
-                     throw new Error("Could not extract any text from the PDF.");
-                }
-                updateStatus("PDF text extracted. Generating questions...", 40);
-                
-                const numQuestions = parseInt(numQuestionsInput.value);
-                const questionType = questionTypeSelect.value;
+                // Use the YouTube Data API for searching
+                const response = await fetch(`${YOUTUBE_SEARCH_URL}?part=snippet&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}&maxResults=10&type=video`);
 
-                const generatedQuestions = await generateQuestionsWithAI(pdfText, numQuestions, questionType);
-                
-                if (!Array.isArray(generatedQuestions) || generatedQuestions.length === 0) {
-                    throw new Error("AI did not return valid questions. Please check the PDF content or try different settings.");
+                if (!response.ok) {
+                     // Handle HTTP errors
+                    const errorText = await response.text();
+                    console.error('API Error Response:', errorText); // Log the full error response
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                
-                const spreadsheetBlob = createQuizizzSpreadsheet(generatedQuestions);
-                
-                downloadLinkA.href = URL.createObjectURL(spreadsheetBlob);
-                const timestamp = new Date().toISOString().replace(/[:.T-]/g, '').substring(0,14); // YYYYMMDDHHMMSS
-                downloadLinkA.download = `Quizizz_Questions_${timestamp}.xlsx`;
-                questionCountP.textContent = `Successfully generated ${generatedQuestions.length} questions!`;
-                
-                outputAreaDiv.classList.remove('hidden');
-                updateStatus("Process complete!", 100);
 
-            } catch (err) {
-                console.error("Processing error:", err);
-                showError(err.message || "An unknown error occurred.");
-                updateStatus("Error occurred.", 0); // Reset progress on error
-            } finally {
-                setProcessingState(false);
-                 // Keep file selected for retry if needed, or call resetFileInput() to clear
+                const data = await response.json();
+
+                // Clear previous results
+                resultsContainer.innerHTML = '';
+
+                if (data.items.length === 0) {
+                    displayMessage('No tutorials found for your query.');
+                    return;
+                }
+
+                // Iterate through results and display them as clickable items
+                data.items.forEach(item => {
+                    const videoId = item.id.videoId;
+                    const title = item.snippet.title;
+                    const thumbnailUrl = item.snippet.thumbnails.medium.url; // Still using thumbnail for display
+                    const channelTitle = item.snippet.channelTitle;
+                    const description = item.snippet.description; // Get description for summarization
+
+                    const videoElement = `
+                        <div class="video-item" data-video-id="${videoId}" data-video-title="${title}" data-video-description="${description}">
+                             <div class="video-thumbnail-container">
+                                 <img src="${thumbnailUrl}" alt="${title} thumbnail">
+                                 <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-300">
+                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                                     </svg>
+                                 </div>
+                            </div>
+                            <div class="video-details">
+                                <h3>${title}</h3>
+                                <p>Channel: ${channelTitle}</p>
+                                <button class="summarize-button mt-2 bg-purple-600 hover:bg-purple-700 text-white py-1 px-3 rounded text-sm transition duration-300 ease-in-out">
+                                    ✨ Summarize Video
+                                </button>
+                                <div class="video-summary-container hidden mt-2"></div>
+                            </div>
+                        </div>
+                    `;
+                    resultsContainer.innerHTML += videoElement;
+                });
+
+                 // Add click listeners to the newly added video items and summarize buttons
+                addVideoItemClickListeners();
+                addSummarizeButtonListeners();
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                displayMessage(`An error occurred while fetching tutorials: ${error.message}. Please try again.`);
+            }
+        }
+
+        // Function to add click listeners to video items
+        function addVideoItemClickListeners() {
+             // Get all video items after they have been added to the DOM
+            const videoItems = resultsContainer.querySelectorAll('.video-item');
+
+            videoItems.forEach(item => {
+                item.addEventListener('click', (event) => {
+                    // Prevent opening modal if summarize button was clicked
+                    if (event.target.classList.contains('summarize-button')) {
+                        return;
+                    }
+                    const videoId = item.dataset.videoId; // Get video ID from data attribute
+                    openFullscreenModal(videoId);
+                });
+            });
+        }
+
+        // Function to add click listeners to summarize buttons
+        function addSummarizeButtonListeners() {
+            const summarizeButtons = resultsContainer.querySelectorAll('.summarize-button');
+            summarizeButtons.forEach(button => {
+                button.addEventListener('click', async (event) => {
+                    const videoItem = event.target.closest('.video-item');
+                    const title = videoItem.dataset.videoTitle;
+                    const description = videoItem.dataset.videoDescription;
+                    const summaryContainer = videoItem.querySelector('.video-summary-container');
+
+                    if (summaryContainer.classList.contains('hidden')) {
+                        summaryContainer.classList.remove('hidden');
+                        summaryContainer.textContent = 'Generating summary...';
+                        try {
+                            const prompt = `Summarize the following YouTube video content based on its title and description in 2-3 sentences. If the description is empty, state that the summary is based only on the title.\n\nTitle: ${title}\nDescription: ${description}`;
+                            const summary = await callGeminiAPI(prompt);
+                            summaryContainer.textContent = summary;
+                        } catch (error) {
+                            summaryContainer.textContent = 'Failed to generate summary.';
+                        }
+                    } else {
+                        summaryContainer.classList.add('hidden');
+                        summaryContainer.textContent = ''; // Clear content when hidden
+                    }
+                });
+            });
+        }
+
+
+        // Function to open the fullscreen modal
+        function openFullscreenModal(videoId) {
+            // Use the standard embed URL format with autoplay
+            const embedUrl = `${YOUTUBE_EMBED_BASE_URL}${videoId}?autoplay=1`;
+            modalVideoIframe.src = embedUrl;
+            fullscreenModal.style.display = 'flex'; // Use flex to center content
+        }
+
+        // Function to close the fullscreen modal
+        function closeFullscreenModal() {
+            modalVideoIframe.src = ''; // Stop the video by clearing the src
+            fullscreenModal.style.display = 'none';
+        }
+
+        // Function to display messages in the results container
+        function displayMessage(message) {
+            resultsContainer.innerHTML = `<p>${message}</p>`;
+        }
+
+        // Event listener for the search button
+        searchButton.addEventListener('click', () => {
+            const query = searchInput.value.trim();
+            fetchAndDisplayResults(query);
+        });
+
+        // Event listener for pressing Enter in the search input
+        searchInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent default form submission if it were a form
+                const query = searchInput.value.trim();
+                fetchAndDisplayResults(query);
             }
         });
 
+        // Add event listeners to recommendation links
+        recommendationLinks.forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault(); // Prevent default link behavior
+                const query = event.target.dataset.query; // Get the query from the data attribute
+                searchInput.value = query; // Put the query in the search input
+                fetchAndDisplayResults(query); // Perform the search
+            });
+        });
+
+        // Event listener for the close button
+        closeButton.addEventListener('click', closeFullscreenModal);
+
+        // Close the modal if the user clicks outside of the modal content
+        window.addEventListener('click', (event) => {
+            if (event.target === fullscreenModal) {
+                closeFullscreenModal();
+            }
+        });
+
+        // Event listener for the "Suggest Related Topics" button
+        suggestTopicsButton.addEventListener('click', async () => {
+            const query = searchInput.value.trim();
+            const topic = query || "general learning"; // Use search query or a default
+
+            llmSuggestionsContent.textContent = 'Generating suggestions...';
+            llmSuggestionsContainer.classList.remove('hidden');
+
+            try {
+                const prompt = `Suggest 5-7 related learning topics or next steps for someone interested in "${topic}". Provide only a comma-separated list of topics.`;
+                const suggestedTopicsString = await callGeminiAPI(prompt);
+
+                // Parse the comma-separated string into an array
+                const topicsArray = suggestedTopicsString.split(',').map(t => t.trim()).filter(t => t.length > 0);
+
+                if (topicsArray.length > 0) {
+                    let htmlList = '<ul>';
+                    topicsArray.forEach(t => {
+                        htmlList += `<li><a href="#" class="search-recommendation" data-query="${t}">${t}</a></li>`;
+                    });
+                    htmlList += '</ul>';
+                    llmSuggestionsContent.innerHTML = htmlList;
+
+                    // Re-add event listeners for newly created recommendation links
+                    llmSuggestionsContainer.querySelectorAll('.search-recommendation').forEach(link => {
+                        link.addEventListener('click', (event) => {
+                            event.preventDefault();
+                            const newQuery = event.target.dataset.query;
+                            searchInput.value = newQuery;
+                            fetchAndDisplayResults(newQuery);
+                            llmSuggestionsContainer.classList.add('hidden'); // Hide suggestions after clicking
+                        });
+                    });
+
+                } else {
+                    llmSuggestionsContent.textContent = 'No suggestions found. Try a different topic.';
+                }
+            } catch (error) {
+                llmSuggestionsContent.textContent = 'Failed to generate suggestions.';
+            }
+        });
+
+        // Optional: Load some initial trending tutorials or a default search on page load
+        // window.onload = () => {
+        //     fetchAndDisplayResults('popular tutorials'); // Example: search for popular tutorials on load
+        // };
+
     </script>
+
 </body>
 </html>
 
