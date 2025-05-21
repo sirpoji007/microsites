@@ -182,6 +182,8 @@
             align-items: center;
             background-color: rgba(255, 255, 255, 0.1); /* Slight background for modal content */
             border-radius: 0.5rem; /* Rounded corners */
+            flex-direction: column; /* Stack iframe and message vertically */
+            gap: 1rem; /* Space between iframe and message */
         }
 
         .modal-content iframe {
@@ -398,6 +400,16 @@
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen>
             </iframe>
+            <div id="playback-message" class="text-white text-center text-sm mt-4">
+                <p>If the video doesn't play, it might be due to:</p>
+                <ul class="list-disc list-inside mx-auto max-w-xs text-left mt-2">
+                    <li>Embedding restrictions set by the video creator.</li>
+                    <li>Regional availability limitations.</li>
+                    <li>Your YouTube API key's referrer restrictions (check Google Cloud Console).</li>
+                </ul>
+                <p class="mt-2">You can try watching it directly on YouTube:</p>
+                <a id="youtube-direct-link" href="#" target="_blank" class="text-blue-400 hover:underline">Watch on YouTube</a>
+            </div>
         </div>
     </div>
 
@@ -412,8 +424,9 @@
         // on a secure backend server.
         const YOUTUBE_API_KEY = 'AIzaSyBYCYT99I2Ah_taeKaHYxRBghil_mbBbGA'; // Your YouTube Data API Key
         const YOUTUBE_SEARCH_URL = 'https://www.googleapis.com/youtube/v3/search';
-        // Base URL for embedding YouTube videos (Canvas environment proxy)
-        const YOUTUBE_EMBED_BASE_URL = 'https://www.youtube.com/embed/$';
+        // Base URL for embedding YouTube videos (using direct YouTube embed URL)
+        const YOUTUBE_EMBED_BASE_URL = 'https://www.youtube.com/embed/';
+        const YOUTUBE_WATCH_URL = 'https://www.youtube.com/watch?v='; // Direct YouTube watch link
 
         // Gemini API Key
         const GEMINI_API_KEY = "AIzaSyBzR6r8LMZAIKxW3WfaTRHpy95tlWHqSWY";
@@ -430,6 +443,7 @@
         const suggestTopicsButton = document.getElementById('suggest-topics-button');
         const llmSuggestionsContainer = document.getElementById('llm-suggestions-container');
         const llmSuggestionsContent = document.getElementById('llm-suggestions-content');
+        const youtubeDirectLink = document.getElementById('youtube-direct-link');
 
 
         /**
@@ -602,9 +616,10 @@
 
         // Function to open the fullscreen modal
         function openFullscreenModal(videoId) {
-            // Use the standard embed URL format with autoplay
-            const embedUrl = `${YOUTUBE_EMBED_BASE_URL}${videoId}?autoplay=1`;
+            // Use the standard embed URL format with autoplay and enablejsapi
+            const embedUrl = `${YOUTUBE_EMBED_BASE_URL}${videoId}?autoplay=1&enablejsapi=1`;
             modalVideoIframe.src = embedUrl;
+            youtubeDirectLink.href = `${YOUTUBE_WATCH_URL}${videoId}`; // Set direct YouTube link
             fullscreenModal.style.display = 'flex'; // Use flex to center content
         }
 
