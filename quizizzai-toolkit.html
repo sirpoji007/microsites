@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizPoint Extractor & AI Toolkit - Enhanced with Gemini</title>
+
+    <link rel="icon" type="image/png" href="https://sirpoji007.github.io/microsites/SPQuizizzTool2_20250510_045954_0000.png" onerror="this.href='https://placehold.co/32x32/6e8efb/ffffff?text=Q'">
+
+    <meta property="og:title" content="QuizPoint Extractor & AI Toolkit with Gemini">
+    <meta property="og:description" content="Upload PDF, extract points, generate summaries & quiz questions with AI!">
+    <meta property="og:image" content="https://sirpoji007.github.io/microsites/quizizztoolkit.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://sirpoji007.github.io/microsites/quizizzai-toolkit.html"> 
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="QuizPoint Extractor & AI Toolkit with Gemini">
+    <meta name="twitter:description" content="Upload PDF, extract points, generate summaries & quiz questions with AI!">
+    <meta name="twitter:image" content="https://sirpoji007.github.io/microsites/quizizztoolkit.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/lucide-static@latest/dist/lucide.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        .gradient-text { background-clip: text; -webkit-background-clip: text; color: transparent; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loader-spin { animation: spin 1s linear infinite; }
+        .toolkit-icon-bg { display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; font-size: 2rem; color: white; transition: transform 0.3s ease; }
+        .toolkit-card:hover .toolkit-icon-bg { transform: scale(1.1); }
+        .ai-feature-button:disabled { cursor: not-allowed; opacity: 0.6; }
+        .banner-image {
+            max-height: 400px; /* Adjust as needed */
+            object-fit: cover; /* Or 'contain' if you want to see the whole image */
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#6e8efb', 'secondary': '#a777e3', 'accent': '#ff7e5f',
+                        'light-bg': '#f4f7f6', 'card-bg': '#ffffff',
+                        'text-main': '#333333', 'text-muted': '#555555',
+                        'success': '#28a745', 'danger': '#dc3545',
+                    },
+                    boxShadow: {
+                        'custom': '0 10px 25px rgba(0, 0, 0, 0.1)',
+                        'card-hover': '0 10px 25px rgba(110, 142, 251, 0.3)',
+                    },
+                    borderRadius: { 'xl': '12px', }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-primary to-secondary min-h-screen flex flex-col items-center justify-start py-6 px-4 sm:py-12">
+
+    <div class="container bg-card-bg p-6 sm:p-10 rounded-xl shadow-custom w-full max-w-4xl my-8">
+        <header class="text-center mb-6 sm:mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-accent to-yellow-400 text-white rounded-full shadow-lg mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-target"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-bold gradient-text bg-gradient-to-r from-primary to-secondary mb-2">QuizPoint Extractor & AI Toolkit</h1>
+            <p class="text-md sm:text-lg text-text-muted">Upload PDF, extract points, and use AI to generate summaries & quiz questions!</p>
+        </header>
+
+        <section class="mb-8 sm:mb-12">
+            <img src="https://sirpoji007.github.io/microsites/quizizztoolkit.png" 
+                 alt="Quizizz AI Toolkit Banner" 
+                 class="w-full rounded-xl shadow-lg banner-image"
+                 onerror="this.style.display='none'; console.error('Banner image failed to load.')">
+        </section>
+
+
+        <main>
+            <section class="bg-slate-50 p-6 rounded-xl shadow-sm mb-8">
+                <h2 class="text-xl sm:text-2xl font-semibold text-secondary mb-4 flex items-center">
+                    <i data-lucide="lightbulb" class="mr-2"></i> How to Use:
+                </h2>
+                <ol class="list-decimal list-inside space-y-2 text-text-muted text-sm sm:text-base">
+                    <li><strong>Prepare Your PDF:</strong> Ensure your PDF contains selectable text.</li>
+                    <li><strong>Upload:</strong> Click "Choose PDF" or drag & drop your file.</li>
+                    <li><strong>Process:</strong> The tool extracts and formats text into points. These points are optimized to be more complete for AI processing.</li>
+                    <li><strong>Copy Points:</strong> Review and copy the extracted points.</li>
+                    <li><strong>✨ AI Features:</strong> Use the "Summarize" or "Generate Questions" buttons with the extracted points. Generated content might need minor edits for Quizizz platform's length limits.</li>
+                </ol>
+            </section>
+
+            <section class="bg-slate-50 p-6 rounded-xl shadow-sm mb-8">
+                <h2 class="text-xl sm:text-2xl font-semibold text-secondary mb-4 flex items-center">
+                    <i data-lucide="upload-cloud" class="mr-2"></i> Upload Your PDF
+                </h2>
+                <div id="fileDropArea" class="file-drop-area border-3 border-dashed border-primary rounded-xl p-6 sm:p-10 text-center bg-indigo-50 transition-all duration-300 ease-in-out hover:border-indigo-600 hover:bg-indigo-100 cursor-pointer">
+                    <input type="file" id="pdfFile" accept=".pdf" class="hidden">
+                    <div class="flex flex-col items-center justify-center text-text-muted">
+                        <i data-lucide="file-text" class="text-primary mb-3 w-12 h-12"></i>
+                        <span class="file-msg block mb-3 text-sm sm:text-base">Drag & drop your PDF here, or</span>
+                        <label for="pdfFile" class="file-input-label button-style inline-flex items-center bg-gradient-to-r from-accent to-yellow-400 hover:from-yellow-400 hover:to-accent text-white px-6 py-3 rounded-lg font-semibold text-sm sm:text-base shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105 cursor-pointer">
+                            <i data-lucide="file-plus-2" class="mr-2 w-5 h-5"></i> Choose PDF
+                        </label>
+                        <div class="file-name-display mt-4 text-xs sm:text-sm italic text-gray-500" id="fileNameDisplay">No file selected</div>
+                    </div>
+                </div>
+                <div id="pdfLoader" class="loader flex justify-center my-4" style="display: none;">
+                    <div class="loader-spin border-4 border-slate-200 border-t-primary rounded-full w-10 h-10"></div>
+                    <p class="ml-3 text-text-muted">Processing PDF...</p>
+                </div>
+                <div id="pdfErrorMessage" class="error-message bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative my-4 text-sm" style="display: none;" role="alert">
+                    <strong class="font-bold">Oops!</strong>
+                    <span class="block sm:inline" id="pdfErrorText">Something went wrong with PDF processing.</span>
+                </div>
+            </section>
+
+            <section id="pointsOutputSection" class="bg-slate-50 p-6 rounded-xl shadow-sm mb-8" style="display: none;">
+                <h2 class="text-xl sm:text-2xl font-semibold text-secondary mb-4 flex items-center">
+                    <i data-lucide="list-checks" class="mr-2"></i> Your Extracted Points:
+                </h2>
+                <p class="text-text-muted mb-3 text-sm sm:text-base">Plain text points, optimized for AI. Copy and paste!</p>
+                <textarea id="outputText" rows="10" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow text-sm sm:text-base bg-white shadow-inner" placeholder="Your extracted points will appear here..." readonly></textarea>
+                <div class="mt-4 flex flex-col sm:flex-row gap-3">
+                    <button id="copyPointsButton" class="button-style flex-1 flex items-center justify-center bg-gradient-to-r from-primary to-secondary hover:from-secondary hover:to-primary text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                        <i data-lucide="copy" class="mr-2 w-5 h-5"></i> Copy Points
+                    </button>
+                    <button id="summarizePointsButton" class="ai-feature-button button-style flex-1 flex items-center justify-center bg-gradient-to-r from-green-500 to-emerald-600 hover:from-emerald-600 hover:to-green-700 text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                        <i data-lucide="wand-2" class="mr-2 w-5 h-5"></i> ✨ Summarize Points
+                    </button>
+                    <button id="generateQuestionsButton" class="ai-feature-button button-style flex-1 flex items-center justify-center bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-indigo-600 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                        <i data-lucide="file-question" class="mr-2 w-5 h-5"></i> ✨ Generate Questions
+                    </button>
+                </div>
+            </section>
+
+            <section id="aiSummarySection" class="bg-slate-50 p-6 rounded-xl shadow-sm mb-8" style="display: none;">
+                <h2 class="text-xl sm:text-2xl font-semibold text-green-600 mb-4 flex items-center">
+                    <i data-lucide="wand-2" class="mr-2"></i> ✨ AI Generated Summary:
+                </h2>
+                <textarea id="summaryOutputText" rows="8" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow text-sm sm:text-base bg-white shadow-inner" placeholder="AI summary will appear here..." readonly></textarea>
+                <button id="copySummaryButton" class="button-style mt-4 w-full sm:w-auto flex items-center justify-center bg-gradient-to-r from-green-500 to-emerald-600 hover:from-emerald-600 hover:to-green-700 text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105" style="display:none;">
+                    <i data-lucide="copy" class="mr-2 w-5 h-5"></i> Copy Summary
+                </button>
+                <div id="summaryLoader" class="loader flex justify-center my-4" style="display: none;">
+                    <div class="loader-spin border-4 border-slate-200 border-t-green-500 rounded-full w-8 h-8"></div>
+                    <p class="ml-3 text-text-muted">Generating summary...</p>
+                </div>
+                <div id="summaryErrorMessage" class="error-message bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative my-4 text-sm" style="display: none;" role="alert">
+                    <strong class="font-bold">Summary Error:</strong>
+                    <span class="block sm:inline" id="summaryErrorText">Could not generate summary.</span>
+                </div>
+            </section>
+
+            <section id="aiQuestionsSection" class="bg-slate-50 p-6 rounded-xl shadow-sm mb-8" style="display: none;">
+                <h2 class="text-xl sm:text-2xl font-semibold text-purple-600 mb-4 flex items-center">
+                    <i data-lucide="file-question" class="mr-2"></i> ✨ AI Generated Quiz Questions:
+                </h2>
+                <textarea id="questionsOutputText" rows="15" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-shadow text-sm sm:text-base bg-white shadow-inner" placeholder="AI generated quiz questions will appear here..." readonly></textarea>
+                <button id="copyQuestionsButton" class="button-style mt-4 w-full sm:w-auto flex items-center justify-center bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-indigo-600 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105" style="display:none;">
+                    <i data-lucide="copy" class="mr-2 w-5 h-5"></i> Copy Questions
+                </button>
+                <div id="questionsLoader" class="loader flex justify-center my-4" style="display: none;">
+                    <div class="loader-spin border-4 border-slate-200 border-t-purple-500 rounded-full w-8 h-8"></div>
+                    <p class="ml-3 text-text-muted">Generating questions...</p>
+                </div>
+                <div id="questionsErrorMessage" class="error-message bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative my-4 text-sm" style="display: none;" role="alert">
+                    <strong class="font-bold">Question Generation Error:</strong>
+                    <span class="block sm:inline" id="questionsErrorText">Could not generate questions.</span>
+                </div>
+            </section>
+
+            <section class="toolkit-section bg-indigo-50 p-6 sm:p-8 rounded-xl shadow-sm mt-10">
+                <h2 class="text-2xl sm:text-3xl font-bold text-center gradient-text bg-gradient-to-r from-primary to-secondary mb-3">
+                    <i data-lucide="rocket" class="inline-block mr-2 align-middle"></i> Explore the Quizizz AI Toolkit
+                </h2>
+                <p class="text-text-muted text-center mb-8 text-sm sm:text-base max-w-2xl mx-auto">Click any tool below to open it in a new window and supercharge your teaching & learning!</p>
+                <div class="toolkit-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="quizizzToolkitGrid">
+                    </div>
+            </section>
+        </main>
+
+        <footer class="mt-12 pt-6 border-t border-gray-200 text-center">
+            <p class="text-sm text-gray-400">&copy; SirPoji <span id="currentYear"></span>. All rights reserved. Enhanced with Gemini AI.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // PDF Elements
+            const pdfFileInput = document.getElementById('pdfFile');
+            const fileDropArea = document.getElementById('fileDropArea');
+            const fileNameDisplay = document.getElementById('fileNameDisplay');
+            const pdfLoader = document.getElementById('pdfLoader');
+            const pdfErrorMessageDiv = document.getElementById('pdfErrorMessage');
+            const pdfErrorTextSpan = document.getElementById('pdfErrorText');
+            
+            // Points Output Elements
+            const pointsOutputSection = document.getElementById('pointsOutputSection');
+            const outputText = document.getElementById('outputText');
+            const copyPointsButton = document.getElementById('copyPointsButton');
+            const summarizePointsButton = document.getElementById('summarizePointsButton');
+            const generateQuestionsButton = document.getElementById('generateQuestionsButton');
+
+            // AI Summary Elements
+            const aiSummarySection = document.getElementById('aiSummarySection');
+            const summaryOutputText = document.getElementById('summaryOutputText');
+            const copySummaryButton = document.getElementById('copySummaryButton');
+            const summaryLoader = document.getElementById('summaryLoader');
+            const summaryErrorMessageDiv = document.getElementById('summaryErrorMessage');
+            const summaryErrorTextSpan = document.getElementById('summaryErrorText');
+
+            // AI Questions Elements
+            const aiQuestionsSection = document.getElementById('aiQuestionsSection');
+            const questionsOutputText = document.getElementById('questionsOutputText');
+            const copyQuestionsButton = document.getElementById('copyQuestionsButton');
+            const questionsLoader = document.getElementById('questionsLoader');
+            const questionsErrorMessageDiv = document.getElementById('questionsErrorMessage');
+            const questionsErrorTextSpan = document.getElementById('questionsErrorText');
+            
+            const currentYearSpan = document.getElementById('currentYear');
+            if(currentYearSpan) currentYearSpan.textContent = new Date().getFullYear();
+
+            // --- Utility Functions ---
+            function showLoader(loaderElement, show = true) {
+                loaderElement.style.display = show ? 'flex' : 'none';
+            }
+            function showError(errorDiv, errorSpan, message, show = true) {
+                errorSpan.textContent = message;
+                errorDiv.style.display = show ? 'block' : 'none';
+            }
+            function hideAllErrorMessages() {
+                showError(pdfErrorMessageDiv, pdfErrorTextSpan, '', false);
+                showError(summaryErrorMessageDiv, summaryErrorTextSpan, '', false);
+                showError(questionsErrorMessageDiv, questionsErrorTextSpan, '', false);
+            }
+            function resetAISections() {
+                aiSummarySection.style.display = 'none';
+                summaryOutputText.value = '';
+                copySummaryButton.style.display = 'none';
+                aiQuestionsSection.style.display = 'none';
+                questionsOutputText.value = '';
+                copyQuestionsButton.style.display = 'none';
+            }
+
+            // --- File Drop Area Logic ---
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                fileDropArea.addEventListener(eventName, preventDefaults, false);
+            });
+            function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+            fileDropArea.addEventListener('dragenter', () => fileDropArea.classList.add('border-indigo-600', 'bg-indigo-100'), false);
+            fileDropArea.addEventListener('dragover', () => fileDropArea.classList.add('border-indigo-600', 'bg-indigo-100'), false);
+            fileDropArea.addEventListener('dragleave', () => fileDropArea.classList.remove('border-indigo-600', 'bg-indigo-100'), false);
+            
+            fileDropArea.addEventListener('drop', (event) => {
+                fileDropArea.classList.remove('border-indigo-600', 'bg-indigo-100');
+                const files = event.dataTransfer.files;
+                if (files.length > 0) {
+                    if (files[0].type === "application/pdf") {
+                        pdfFileInput.files = files;
+                        handleFile(files[0]);
+                    } else {
+                        showError(pdfErrorMessageDiv, pdfErrorTextSpan, "Please drop a PDF file.");
+                        resetUIState();
+                    }
+                }
+            }, false);
+            
+            fileDropArea.addEventListener('click', (event) => {
+                if (event.target.tagName.toLowerCase() !== 'label' && event.target.parentElement.tagName.toLowerCase() !== 'label') {
+                     pdfFileInput.click();
+                }
+            });
+
+            pdfFileInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) handleFile(file); else resetUIState();
+            });
+
+            function handleFile(file) {
+                if (file.type !== "application/pdf") {
+                    showError(pdfErrorMessageDiv, pdfErrorTextSpan, "Invalid file type. Please upload a PDF.");
+                    resetUIState();
+                    return;
+                }
+                fileNameDisplay.textContent = `Selected: ${file.name}`;
+                fileNameDisplay.classList.remove('text-gray-500', 'italic');
+                fileNameDisplay.classList.add('text-primary', 'font-medium');
+                outputText.value = '';
+                pointsOutputSection.style.display = 'none';
+                resetAISections();
+                hideAllErrorMessages();
+                extractTextFromPdf(file);
+            }
+            
+            function resetUIState() {
+                fileNameDisplay.textContent = "No file selected";
+                fileNameDisplay.classList.add('text-gray-500', 'italic');
+                fileNameDisplay.classList.remove('text-primary', 'font-medium');
+                pdfFileInput.value = '';
+                outputText.value = '';
+                outputText.placeholder = "Your extracted points will appear here...";
+                pointsOutputSection.style.display = 'none';
+                resetAISections();
+                hideAllErrorMessages();
+            }
+
+            async function extractTextFromPdf(file) {
+                showLoader(pdfLoader, true);
+                outputText.placeholder = "Processing your PDF... this may take a moment.";
+                hideAllErrorMessages();
+
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const typedarray = new Uint8Array(e.target.result);
+                    try {
+                        const pdf = await pdfjsLib.getDocument({ data: typedarray }).promise;
+                        let fullText = '';
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const textContent = await page.getTextContent();
+                            textContent.items.forEach(item => {
+                                fullText += item.str;
+                                if (item.hasEOL) fullText += '\n'; else fullText += ' ';
+                            });
+                            fullText += '\n'; // Add a newline after each page for separation
+                        }
+                        processTextForQuizizz(fullText);
+                    } catch (error) {
+                        console.error("Error parsing PDF:", error);
+                        showError(pdfErrorMessageDiv, pdfErrorTextSpan, "Could not process the PDF. It might be corrupted, encrypted, or primarily image-based.");
+                        outputText.placeholder = "Error processing PDF.";
+                        resetUIState();
+                    } finally {
+                        showLoader(pdfLoader, false);
+                    }
+                };
+                reader.onerror = () => {
+                    console.error("File reading error");
+                    showError(pdfErrorMessageDiv, pdfErrorTextSpan, "Error reading the file. Please try again.");
+                    showLoader(pdfLoader, false);
+                    outputText.placeholder = "Error reading file.";
+                    resetUIState();
+                };
+                reader.readAsArrayBuffer(file);
+            }
+
+            function processTextForQuizizz(rawText) {
+                let cleanedText = rawText.replace(/[\*_#]/g, ''); 
+                cleanedText = cleanedText.replace(/\s-\s/g, ' '); 
+                cleanedText = cleanedText.replace(/(\r\n|\n|\r){2,}/g, '\n').trim(); 
+
+                const lines = cleanedText.split(/\n/);
+                let quizizzPoints = [];
+
+                lines.forEach(line => {
+                    let trimmedPoint = line.trim();
+                    trimmedPoint = trimmedPoint.replace(/^(\d+\.|[a-zA-Z][.)]|[•●▪▫]\s*)+/, '').trim();
+                    trimmedPoint = trimmedPoint.replace(/[^\w\s,.?!'"()%-]/g, ''); 
+                    
+                    if (trimmedPoint.length > 5 && trimmedPoint.length < 800) { 
+                        quizizzPoints.push(trimmedPoint);
+                    }
+                });
+
+                if (quizizzPoints.length > 0) {
+                    outputText.value = quizizzPoints.join('\n\n'); 
+                    pointsOutputSection.style.display = 'block';
+                    outputText.placeholder = "Your extracted points will appear here...";
+                } else {
+                    outputText.value = '';
+                    outputText.placeholder = "No suitable points found after processing. Please check PDF content and ensure it's text-based.";
+                    showError(pdfErrorMessageDiv, pdfErrorTextSpan, "No suitable points extracted. The PDF might be image-based or content formatting is unusual.");
+                    pointsOutputSection.style.display = 'none';
+                }
+            }
+            
+            function copyToClipboard(text, buttonElement, successIconClass, originalIconClass, originalText) {
+                if (!text) return;
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = text;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                tempTextArea.setSelectionRange(0, 99999); 
+
+                let success = false;
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                         navigator.clipboard.writeText(text).then(() => {
+                            showCopyFeedback(buttonElement, successIconClass, originalIconClass, originalText, true);
+                         }).catch(err => {
+                            console.error('Async Clipboard: Could not copy text: ', err);
+                            legacyCopy(text, buttonElement, successIconClass, originalIconClass, originalText);
+                         });
+                         return; 
+                    } else {
+                       success = document.execCommand('copy');
+                    }
+                } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                    success = false;
+                }
+                document.body.removeChild(tempTextArea);
+                showCopyFeedback(buttonElement, successIconClass, originalIconClass, originalText, success);
+                if (!success) {
+                    alert('Failed to copy. Please manually select and copy the text.');
+                }
+            }
+
+            function legacyCopy(text, buttonElement, successIconClass, originalIconClass, originalText) {
+                const tempTextArea = document.createElement('textarea'); 
+                tempTextArea.value = text;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                let success = false;
+                try {
+                    success = document.execCommand('copy');
+                } catch (err) {
+                     console.error('Legacy execCommand copy failed: ', err);
+                }
+                document.body.removeChild(tempTextArea);
+                showCopyFeedback(buttonElement, successIconClass, originalIconClass, originalText, success);
+                 if (!success) {
+                    alert('Failed to copy using execCommand. Please manually select and copy.');
+                }
+            }
+
+            function showCopyFeedback(button, successIconLucideName, originalIconLucideName, originalText, successful) {
+                const iconElement = button.querySelector('i');
+                const textNode = Array.from(button.childNodes).find(node => node.nodeType === Node.TEXT_NODE);
+                
+                if (successful) {
+                    if (iconElement) iconElement.setAttribute('data-lucide', successIconLucideName);
+                    if (textNode) textNode.textContent = ' Copied!';
+                    button.classList.add('bg-success', 'hover:bg-green-600');
+                    button.classList.remove('from-primary', 'to-secondary', 'from-green-500', 'to-emerald-600', 'from-purple-500', 'to-indigo-600');
+                } else {
+                     if (textNode) textNode.textContent = ' Copy Failed';
+                     button.classList.add('bg-danger', 'hover:bg-red-600');
+                }
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+
+                setTimeout(() => {
+                    if (iconElement) iconElement.setAttribute('data-lucide', originalIconLucideName);
+                    if (textNode) textNode.textContent = ` ${originalText}`;
+                    button.classList.remove('bg-success', 'hover:bg-green-600', 'bg-danger', 'hover:bg-red-600');
+                    if (button.id === 'copyPointsButton') button.classList.add('from-primary', 'to-secondary');
+                    else if (button.id === 'copySummaryButton') button.classList.add('from-green-500', 'to-emerald-600');
+                    else if (button.id === 'copyQuestionsButton') button.classList.add('from-purple-500', 'to-indigo-600');
+                    
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                }, 2000);
+            }
+
+            copyPointsButton.addEventListener('click', () => copyToClipboard(outputText.value, copyPointsButton, 'check-circle', 'copy', 'Copy Points'));
+            copySummaryButton.addEventListener('click', () => copyToClipboard(summaryOutputText.value, copySummaryButton, 'check-circle', 'copy', 'Copy Summary'));
+            copyQuestionsButton.addEventListener('click', () => copyToClipboard(questionsOutputText.value, copyQuestionsButton, 'check-circle', 'copy', 'Copy Questions'));
+
+            const GEMINI_API_KEY = "AIzaSyCJDK5Wx4AOLxgl4qZP1xw3iXD0wh1_BN4"; 
+            const GEMINI_API_URL_BASE = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+
+            async function callGeminiAPI(prompt, loaderElement, errorDiv, errorSpan, outputTextarea, outputSection, copyButtonElement) {
+                showLoader(loaderElement, true);
+                showError(errorDiv, errorSpan, '', false); 
+                outputTextarea.value = ''; 
+                outputTextarea.placeholder = '✨ AI is thinking...';
+                copyButtonElement.style.display = 'none'; 
+
+                let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                const payload = { contents: chatHistory };
+                const fullApiUrl = `${GEMINI_API_URL_BASE}?key=${GEMINI_API_KEY}`;
+
+                try {
+                    const response = await fetch(fullApiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error("Gemini API Error Response:", errorData); 
+                        let detailedErrorMessage = `API request failed with status ${response.status}.`;
+                        if (errorData.error && errorData.error.message) {
+                            detailedErrorMessage += ` Message: ${errorData.error.message}`;
+                        }
+                         if (errorData.error && errorData.error.details) {
+                            detailedErrorMessage += ` Details: ${JSON.stringify(errorData.error.details)}`;
+                        }
+                        throw new Error(detailedErrorMessage);
+                    }
+
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const generatedText = result.candidates[0].content.parts[0].text;
+                        outputTextarea.value = generatedText;
+                        outputSection.style.display = 'block';
+                        copyButtonElement.style.display = 'flex';
+                    } else if (result.promptFeedback && result.promptFeedback.blockReason) {
+                         console.error("Gemini API content blocked:", result.promptFeedback);
+                         throw new Error(`Content generation blocked. Reason: ${result.promptFeedback.blockReason}. ${result.promptFeedback.blockReasonMessage || ''}`);
+                    } else {
+                        console.error("Gemini API - Unexpected response structure:", result);
+                        throw new Error("Received an unexpected response from the AI. No content generated.");
+                    }
+                } catch (error) {
+                    console.error("Error calling Gemini API:", error);
+                    showError(errorDiv, errorSpan, `AI Error: ${error.message}`);
+                    outputTextarea.placeholder = 'Failed to generate content.';
+                } finally {
+                    showLoader(loaderElement, false);
+                }
+            }
+
+            summarizePointsButton.addEventListener('click', async () => {
+                const points = outputText.value;
+                if (!points.trim()) {
+                    showError(summaryErrorMessageDiv, summaryErrorTextSpan, "No points available to summarize.");
+                    aiSummarySection.style.display = 'block'; 
+                    return;
+                }
+                const prompt = `Summarize the following key points concisely. Focus on the main ideas and present them in a brief paragraph or a few bullet points. Ensure the summary is well-structured and easy to understand:\n\n---\n${points}\n---`;
+                aiSummarySection.style.display = 'block';
+                await callGeminiAPI(prompt, summaryLoader, summaryErrorMessageDiv, summaryErrorTextSpan, summaryOutputText, aiSummarySection, copySummaryButton);
+            });
+
+            generateQuestionsButton.addEventListener('click', async () => {
+                const points = outputText.value;
+                if (!points.trim()) {
+                    showError(questionsErrorMessageDiv, questionsErrorTextSpan, "No points available to generate questions from.");
+                    aiQuestionsSection.style.display = 'block'; 
+                    return;
+                }
+                const prompt = `Based on the following key points, generate 3-5 multiple-choice quiz questions.
+For each question:
+1.  Provide the question itself.
+2.  Offer 4 answer options, labeled A, B, C, and D.
+3.  Clearly indicate the correct answer (e.g., "Correct Answer: C").
+Ensure the questions are directly related to the provided points, are clear, unambiguous, and suitable for a quiz. Avoid overly complex sentence structures in questions and options.
+
+Key Points:
+---
+${points}
+---
+`;
+                aiQuestionsSection.style.display = 'block';
+                await callGeminiAPI(prompt, questionsLoader, questionsErrorMessageDiv, questionsErrorTextSpan, questionsOutputText, aiQuestionsSection, copyQuestionsButton);
+            });
+
+            const quizizzTools = [
+                { name: "Multiple Choice Quiz Generator", url: "https://quizizz.com/ai-toolkit/multiple-choice-quiz-generator", icon: "❓", color: "bg-gradient-to-br from-red-400 to-pink-500" },
+                { name: "Practice Worksheet Generator", url: "https://quizizz.com/ai-toolkit/practice-worksheet-generator", icon: "📝", color: "bg-gradient-to-br from-blue-400 to-indigo-500" },
+                { name: "Reading Passage Generator", url: "https://quizizz.com/ai-toolkit/reading-passage-generator", icon: "📖", color: "bg-gradient-to-br from-green-400 to-teal-500" },
+                { name: "Math Word Problems Generator", url: "https://quizizz.com/ai-toolkit/math-word-problems-generator", icon: "📐", color: "bg-gradient-to-br from-yellow-400 to-amber-500" },
+                { name: "Story Based Problems Quiz Generator", url: "https://quizizz.com/ai-toolkit/story-based-problems-quiz-generator", icon: "📚", color: "bg-gradient-to-br from-purple-400 to-violet-500" },
+                { name: "Bloom's Taxonomy Aligned Quiz", url: "https://quizizz.com/ai-toolkit/blooms-taxonomy-aligned-quiz-generator", icon: "🧠", color: "bg-gradient-to-br from-pink-400 to-rose-500" },
+                { name: "Real World Scenario Quiz Generator", url: "https://quizizz.com/ai-toolkit/real-world-scenario-quiz-generator", icon: "🌍", color: "bg-gradient-to-br from-sky-400 to-cyan-500" },
+                { name: "Lesson Plan Generator", url: "https://quizizz.com/ai-toolkit/lesson-plan-generator", icon: "📅", color: "bg-gradient-to-br from-orange-400 to-red-500" },
+            ];
+
+            function populateToolkitGrid() {
+                const gridContainer = document.getElementById('quizizzToolkitGrid');
+                if (!gridContainer) return;
+                gridContainer.innerHTML = ''; 
+
+                quizizzTools.forEach(tool => {
+                    const cardLink = document.createElement('a');
+                    cardLink.href = tool.url;
+                    cardLink.target = "_blank";
+                    cardLink.rel = "noopener noreferrer";
+                    cardLink.className = 'toolkit-card-link block group';
+
+                    const cardDiv = document.createElement('div');
+                    cardDiv.className = 'toolkit-card bg-white p-5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 h-full flex flex-col items-center text-center border border-transparent hover:border-primary';
+
+                    const iconContainer = document.createElement('div');
+                    iconContainer.className = `toolkit-icon-bg mb-4 ${tool.color || 'bg-gradient-to-br from-gray-400 to-gray-500'}`;
+                    iconContainer.textContent = tool.icon;
+                    
+                    const nameParagraph = document.createElement('p');
+                    nameParagraph.className = 'toolkit-card-name text-sm font-semibold text-text-main group-hover:text-primary transition-colors duration-300';
+                    nameParagraph.textContent = tool.name;
+
+                    cardDiv.appendChild(iconContainer);
+                    cardDiv.appendChild(nameParagraph);
+                    cardLink.appendChild(cardDiv);
+                    gridContainer.appendChild(cardLink);
+                });
+            }
+            populateToolkitGrid();
+            
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+    </script>
+</body>
+</html>
+
