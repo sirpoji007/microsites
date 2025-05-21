@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizizz Question Generator</title>
+    <link rel="icon" href="https://sirpoji.github.io/microsites/spreadsheeter.png" type="image/png">
+    <meta property="og:title" content="Quizizz Question Generator">
+    <meta property="og:description" content="Upload your PDF material and convert it into a Quizizz-ready spreadsheet!">
+    <meta property="og:image" content="https://sirpoji.github.io/microsites/spreadsheeter.png">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://sirpoji.github.io/microsites/spreadsheeter.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        /* Basic dark mode support - can be enhanced with more specific component styling */
+        .dark body {
+            background-color: #1f2937; /* Tailwind gray-800 */
+            color: #f3f4f6; /* Tailwind gray-100 */
+        }
+        .dark .bg-white {
+            background-color: #374151; /* Tailwind gray-700 */
+        }
+        .dark .bg-opacity-90 {
+             background-color: rgba(55, 65, 81, 0.9); /* gray-700 with opacity */
+        }
+        .dark .text-gray-800 {
+            color: #f3f4f6; /* Tailwind gray-100 */
+        }
+        .dark .text-gray-700 {
+            color: #d1d5db; /* Tailwind gray-300 */
+        }
+        .dark .text-gray-600, .dark .text-gray-500 {
+            color: #9ca3af; /* Tailwind gray-400 */
+        }
+        .dark .border-gray-300 {
+            border-color: #4b5563; /* Tailwind gray-600 */
+        }
+        .dark .hover\:border-blue-500:hover {
+            border-color: #3b82f6; /* Tailwind blue-500 */
+        }
+        .dark .bg-gray-200 {
+            background-color: #4b5563; /* Tailwind gray-600 */
+        }
+        .dark .bg-green-100 {
+            background-color: rgba(16, 185, 129, 0.2); /* Tailwind green-500 with opacity */
+        }
+        .dark .border-green-400 {
+            border-color: #34d399; /* Tailwind green-400 */
+        }
+        .dark .text-green-700, .dark .text-green-600 {
+            color: #6ee7b7; /* Tailwind green-300 */
+        }
+        .dark .bg-red-100 {
+            background-color: rgba(239, 68, 68, 0.2); /* Tailwind red-500 with opacity */
+        }
+        .dark .border-red-400 {
+            border-color: #f87171; /* Tailwind red-400 */
+        }
+        .dark .text-red-700 {
+            color: #fca5a5; /* Tailwind red-300 */
+        }
+        .dark input[type="number"], .dark select {
+            background-color: #4b5563; /* gray-600 */
+            color: #f3f4f6; /* gray-100 */
+            border-color: #6b7280; /* gray-500 */
+        }
+        .dark input[type="number"]:focus, .dark select:focus {
+            border-color: #3b82f6; /* blue-500 */
+            ring-color: #3b82f6;
+        }
+        .dark .quizizz-ai-button {
+            background-color: #8b5cf6; /* Tailwind violet-500 */
+        }
+        .dark .quizizz-ai-button:hover {
+            background-color: #7c3aed; /* Tailwind violet-600 */
+        }
+
+
+        /* Custom file input styling */
+        input[type="file"] {
+            display: none;
+        }
+        /* Loading spinner animation */
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        // Check for dark mode preference and apply it
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // Set PDF.js worker path
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 flex flex-col items-center justify-center p-4 transition-colors duration-300">
+
+    <div class="bg-white bg-opacity-90 dark:bg-gray-800 dark:bg-opacity-90 rounded-xl shadow-2xl p-6 sm:p-8 w-full max-w-2xl text-center">
+
+        <div class="flex justify-center mb-6">
+            <div class="bg-blue-500 p-3 sm:p-4 rounded-full shadow-lg">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" sm:width="48" sm:height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                     <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                     <polyline points="14 2 14 8 20 8"/>
+                     <line x1="16" y1="13" x2="8" y2="13"/>
+                     <line x1="16" y1="17" x2="8" y2="17"/>
+                     <line x1="10" y1="9" x2="8" y2="9"/>
+                 </svg>
+            </div>
+        </div>
+
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 mb-3 sm:mb-4">Quizizz Question Generator</h1>
+        <p class="text-gray-600 dark:text-gray-300 mb-6 sm:mb-8 text-sm sm:text-base">Upload your PDF material and convert it into a Quizizz-ready spreadsheet!</p>
+
+        <div id="upload-area" class="mb-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 sm:p-6 hover:border-blue-500 dark:hover:border-blue-400 transition duration-300 ease-in-out cursor-pointer">
+            <input type="file" accept=".pdf" id="pdfUpload">
+            <label for="pdfUpload" class="flex flex-col items-center justify-center cursor-pointer">
+                <svg id="upload-icon-default" xmlns="http://www.w3.org/2000/svg" width="40" height="40" sm:width="48" sm:height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 dark:text-gray-500 mb-2 sm:mb-3">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                 <svg id="upload-icon-selected" xmlns="http://www.w3.org/2000/svg" width="40" height="40" sm:width="48" sm:height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 dark:text-green-400 mb-2 sm:mb-3 hidden">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <path d="M16 13H8"/>
+                    <path d="M16 17H8"/>
+                    <path d="M10 9H8"/>
+                 </svg>
+
+                <span id="upload-text-default" class="text-base sm:text-lg font-semibold text-gray-700 dark:text-gray-200">Drag & Drop or Click to Upload PDF</span>
+                <span id="upload-text-selected" class="text-base sm:text-lg font-semibold text-green-700 dark:text-green-400 hidden truncate max-w-full px-2"></span>
+                <span class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">(Max file size: 10MB)</span>
+            </label>
+        </div>
+
+        <div id="question-settings" class="mb-6 hidden">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <label for="num-questions" class="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left mb-1">Number of Questions:</label>
+                    <input type="number" id="num-questions" min="5" max="50" value="10" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="flex-1">
+                    <label for="question-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 text-left mb-1">Question Type:</label>
+                    <select id="question-type" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="multiple-choice">Multiple Choice</option>
+                        <option value="true-false">True/False</option>
+                        <option value="mixed">Mixed</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="error-message" class="bg-red-100 dark:bg-red-500 dark:bg-opacity-30 border border-red-400 dark:border-red-500 text-red-700 dark:text-red-300 px-4 py-3 rounded relative mb-6 items-center justify-center hidden" role="alert">
+             <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2">
+                     <circle cx="12" cy="12" r="10"/>
+                     <line x1="12" y1="8" x2="12" y2="12"/>
+                     <line x1="12" y1="16" x2="12.01" y2="16"/>
+                 </svg>
+                <span id="error-text" class="block sm:inline text-sm"></span>
+            </div>
+        </div>
+
+        <button id="process-button" class="w-full flex items-center justify-center px-6 py-2.5 sm:px-8 sm:py-3 border border-transparent text-base font-medium rounded-md text-white bg-gray-400 cursor-not-allowed md:text-lg transition duration-300 ease-in-out" disabled>
+             <svg id="button-icon-send" xmlns="http://www.w3.org/2000/svg" width="20" height="20" sm:width="24" sm:height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 sm:mr-3">
+                 <line x1="22" y1="2" x2="11" y2="13"/>
+                 <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+             </svg>
+             <svg id="button-icon-loader" xmlns="http://www.w3.org/2000/svg" width="20" height="20" sm:width="24" sm:height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spinner mr-2 sm:mr-3 hidden">
+                 <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+             </svg>
+            <span id="button-text">Process PDF</span>
+        </button>
+
+        <a href="https://quizizz.com/admin/quizizz-ai" target="_blank" rel="noopener noreferrer" id="quizizz-ai-button" class="mt-4 w-full flex items-center justify-center px-6 py-2.5 sm:px-8 sm:py-3 border border-transparent text-base font-medium rounded-md text-white bg-violet-500 hover:bg-violet-600 dark:bg-violet-600 dark:hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 transition duration-300 ease-in-out md:text-lg quizizz-ai-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" sm:width="24" sm:height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 sm:mr-3">
+                <path d="M12 2a10 10 0 0 0-7.523 16.442l-.614.922a1 1 0 0 0 .287 1.387l.002.001a1 1 0 0 0 1.387-.287l.922-.614A10 10 0 1 0 12 2Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/>
+                <path d="m13.023 10.442-.001.002A2.5 2.5 0 1 0 13.02 15.5l.002-.001A2.5 2.5 0 0 0 13.023 10.442Z"/>
+                <path d="M10.977 10.442a2.5 2.5 0 1 0 0 5.003 2.5 2.5 0 0 0 0-5.003Z"/>
+                <path d="m10.977 15.445.002-.001a2.5 2.5 0 1 0-.004.004l.002-.003Z"/>
+                <path d="m13.023 10.442.001-.002a2.5 2.5 0 1 0-.004.004l.003-.002Z"/>
+                <path d="M12 7a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z"/>
+            </svg>
+            Explore Quizizz AI
+        </a>
+
+        <div id="processing-status" class="mt-4 hidden">
+            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+            </div>
+            <p id="status-text" class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Preparing to process your PDF...</p>
+        </div>
+
+        <div id="output-area" class="mt-6 sm:mt-8 p-4 sm:p-6 bg-green-100 dark:bg-green-500 dark:bg-opacity-20 border border-green-400 dark:border-green-500 text-green-700 dark:text-green-300 rounded-lg flex flex-col items-center justify-center hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" sm:width="48" sm:height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 dark:text-green-400 mb-3 sm:mb-4">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <path d="m16 13-3.5 3.5L9 13"/>
+                <path d="M12.5 16.5V3"/>
+            </svg>
+            <p class="text-base sm:text-lg font-semibold mb-2 sm:mb-4">Processing Complete!</p>
+            <p id="question-count" class="mb-3 sm:mb-4 text-sm sm:text-base"></p>
+            <a id="download-link" href="#" download="quizizz_questions.xlsx" class="flex items-center px-4 py-2 sm:px-6 sm:py-3 border border-transparent text-sm sm:text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-300 ease-in-out">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" sm:width="20" sm:height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 sm:mr-3">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Download Spreadsheet
+            </a>
+        </div>
+
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-6 sm:mt-8">
+            Note: AI-generated questions should be reviewed for accuracy.
+        </p>
+        
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-4">
+            SirPoji 2025 © All rights reserved
+        </p>
+
+    </div>
+
+    <script>
+        // DOM Elements
+        const fileInput = document.getElementById('pdfUpload');
+        const uploadArea = document.getElementById('upload-area');
+        const uploadAreaLabel = uploadArea.querySelector('label');
+        const uploadIconDefault = document.getElementById('upload-icon-default');
+        const uploadIconSelected = document.getElementById('upload-icon-selected');
+        const uploadTextDefault = document.getElementById('upload-text-default');
+        const uploadTextSelected = document.getElementById('upload-text-selected');
+        const questionSettings = document.getElementById('question-settings');
+        const numQuestionsInput = document.getElementById('num-questions');
+        const questionTypeSelect = document.getElementById('question-type');
+        const errorMessageDiv = document.getElementById('error-message');
+        const errorTextSpan = document.getElementById('error-text');
+        const processButton = document.getElementById('process-button');
+        const buttonIconSend = document.getElementById('button-icon-send');
+        const buttonIconLoader = document.getElementById('button-icon-loader');
+        const buttonText = document.getElementById('button-text');
+        const processingStatusDiv = document.getElementById('processing-status');
+        const progressBar = document.getElementById('progress-bar');
+        const statusTextP = document.getElementById('status-text');
+        const outputAreaDiv = document.getElementById('output-area');
+        const questionCountP = document.getElementById('question-count');
+        const downloadLinkA = document.getElementById('download-link');
+
+        let selectedFile = null;
+        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+        // --- File Handling ---
+        fileInput.addEventListener('change', handleFileSelect);
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('dragleave', handleDragLeave);
+        uploadArea.addEventListener('drop', handleDrop);
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            processFile(file);
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            uploadArea.classList.add('border-blue-500', 'dark:border-blue-400');
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            uploadArea.classList.remove('border-blue-500', 'dark:border-blue-400');
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            uploadArea.classList.remove('border-blue-500', 'dark:border-blue-400');
+            const file = event.dataTransfer.files[0];
+            processFile(file);
+        }
+
+        function processFile(file) {
+            hideError();
+            if (!file) {
+                resetFileInput();
+                return;
+            }
+            if (file.type !== 'application/pdf') {
+                showError('Invalid file type. Please upload a PDF.');
+                resetFileInput();
+                return;
+            }
+            if (file.size > MAX_FILE_SIZE) {
+                showError(`File is too large. Max size: ${MAX_FILE_SIZE / (1024 * 1024)}MB.`);
+                resetFileInput();
+                return;
+            }
+            selectedFile = file;
+            updateUploadUI(file.name);
+            questionSettings.classList.remove('hidden');
+            enableProcessButton();
+            outputAreaDiv.classList.add('hidden'); // Hide previous output
+        }
+
+        function updateUploadUI(fileName) {
+            uploadIconDefault.classList.add('hidden');
+            uploadIconSelected.classList.remove('hidden');
+            uploadTextDefault.classList.add('hidden');
+            uploadTextSelected.textContent = fileName;
+            uploadTextSelected.classList.remove('hidden');
+        }
+
+        function resetFileInput() {
+            selectedFile = null;
+            fileInput.value = ''; // Clear the file input
+            uploadIconDefault.classList.remove('hidden');
+            uploadIconSelected.classList.add('hidden');
+            uploadTextDefault.classList.remove('hidden');
+            uploadTextSelected.classList.add('hidden');
+            uploadTextSelected.textContent = '';
+            questionSettings.classList.add('hidden');
+            disableProcessButton();
+            processingStatusDiv.classList.add('hidden');
+            outputAreaDiv.classList.add('hidden');
+        }
+
+        // --- UI Control ---
+        function showError(message) {
+            errorTextSpan.textContent = message;
+            errorMessageDiv.classList.remove('hidden');
+        }
+
+        function hideError() {
+            errorMessageDiv.classList.add('hidden');
+        }
+
+        function enableProcessButton() {
+            processButton.disabled = false;
+            processButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+            processButton.classList.add('bg-blue-600', 'hover:bg-blue-700', 'dark:bg-blue-500', 'dark:hover:bg-blue-600');
+        }
+
+        function disableProcessButton() {
+            processButton.disabled = true;
+            processButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+            processButton.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'dark:bg-blue-500', 'dark:hover:bg-blue-600');
+        }
+        
+        function setProcessingState(isProcessing) {
+            processButton.disabled = isProcessing;
+            buttonIconSend.classList.toggle('hidden', isProcessing);
+            buttonIconLoader.classList.toggle('hidden', !isProcessing);
+            buttonText.textContent = isProcessing ? 'Processing...' : 'Process PDF';
+            if (isProcessing) {
+                hideError();
+                processingStatusDiv.classList.remove('hidden');
+                outputAreaDiv.classList.add('hidden');
+            }
+        }
+
+        function updateStatus(message, percent) {
+            statusTextP.textContent = message;
+            progressBar.style.width = `${percent}%`;
+        }
+
+        // --- PDF Processing ---
+        async function extractTextFromPDF(file) {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    let fullText = '';
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        updateStatus(`Extracting text from page ${i} of ${pdf.numPages}...`, 10 + Math.round((i / pdf.numPages) * 30));
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const pageText = textContent.items.map(item => item.str).join(' ');
+                        fullText += pageText + '\n\n'; // Add double newline for paragraph separation
+                    }
+                    // Limit text to avoid exceeding API limits (approx 100k chars for ~25k tokens for Gemini Flash)
+                    const MAX_CHARS_FOR_API = 100000; 
+                    resolve(fullText.substring(0, MAX_CHARS_FOR_API));
+                } catch (error) {
+                    console.error("PDF extraction error:", error);
+                    reject(new Error("Failed to extract text. PDF might be corrupted or password-protected."));
+                }
+            });
+        }
+
+        // --- Gemini API Call ---
+        async function generateQuestionsWithAI(text, numQuestions, questionType) {
+            updateStatus("Sending text to AI for question generation...", 40);
+            let questionTypeDescription = "";
+            if (questionType === "multiple-choice") {
+                questionTypeDescription = "multiple-choice questions with 4 options each";
+            } else if (questionType === "true-false") {
+                questionTypeDescription = "true/false questions";
+            } else { // mixed
+                questionTypeDescription = `a mix of approximately ${Math.ceil(numQuestions / 2)} multiple-choice (with 4 options) and ${Math.floor(numQuestions / 2)} true/false questions`;
+            }
+
+            const prompt = `
+Based on the following educational content:
+---
+${text}
+---
+Generate exactly ${numQuestions} quiz questions suitable for Quizizz.
+The questions should be ${questionTypeDescription}.
+
+Return ONLY a valid JSON array of question objects. Do NOT include any explanatory text, comments, or markdown code blocks like \`\`\`json ... \`\`\` around the JSON.
+
+JSON structure for each question:
+For multiple-choice:
+{
+  "type": "multiple-choice",
+  "question": "Question text here?",
+  "options": ["Option A", "Option B", "Option C", "Option D"],
+  "answer": "The exact text of the correct option (must be one of the provided options)",
+  "explanation": "Brief explanation for the correct answer."
+}
+For true/false:
+{
+  "type": "true-false",
+  "question": "Statement that is either true or false.",
+  "answer": "True", 
+  "explanation": "Brief explanation why it's true or false."
+}
+
+Ensure the 'answer' for multiple-choice questions exactly matches one of the strings in the 'options' array.
+For true/false, the 'answer' should be the string "True" or "False".
+Provide ${numQuestions} questions in total.
+`;
+            const apiKey = ""; // Left empty as per instructions for Canvas environment
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error("Gemini API Error:", errorData);
+                    throw new Error(`AI API request failed: ${errorData.error?.message || response.statusText}`);
+                }
+                const result = await response.json();
+                updateStatus("AI processing complete. Formatting spreadsheet...", 80);
+
+                if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
+                    const rawJson = result.candidates[0].content.parts[0].text;
+                    // Attempt to clean the response if it's wrapped in markdown
+                    const cleanedJson = rawJson.replace(/^```json\s*|```\s*$/g, '').trim();
+                    try {
+                        return JSON.parse(cleanedJson);
+                    } catch (parseError) {
+                         console.error("Failed to parse JSON from AI response:", cleanedJson, parseError);
+                         throw new Error("AI returned an invalid format. Could not parse questions.");
+                    }
+                } else {
+                    throw new Error("AI returned an unexpected response structure.");
+                }
+            } catch (error) {
+                console.error("Error calling Gemini API:", error);
+                throw error; // Re-throw to be caught by the main process handler
+            }
+        }
+
+        // --- Spreadsheet Generation (SheetJS) ---
+        function createQuizizzSpreadsheet(questions) {
+            updateStatus("Generating spreadsheet...", 90);
+            const worksheetData = [
+                ["Question Text", "Question Type", "Option 1", "Option 2", "Option 3", "Option 4", "Option 5", "Correct Answer (number)", "Time (seconds)", "Image Link", "Answer Explanation"]
+            ];
+
+            questions.forEach(q => {
+                if (q.type === "multiple-choice") {
+                    const correctAnswerText = q.answer;
+                    // Ensure q.options is an array before calling findIndex
+                    const optionsArray = Array.isArray(q.options) ? q.options : [];
+                    const correctIndex = optionsArray.findIndex(opt => opt === correctAnswerText) + 1;
+                    
+                    worksheetData.push([
+                        q.question || "", 
+                        "Multiple Choice",
+                        optionsArray[0] || "", 
+                        optionsArray[1] || "", 
+                        optionsArray[2] || "", 
+                        optionsArray[3] || "", 
+                        "", // Option 5 empty
+                        correctIndex || "", 
+                        "30", 
+                        "", 
+                        q.explanation || ""
+                    ]);
+                } else if (q.type === "true-false") {
+                    worksheetData.push([
+                        q.question || "", 
+                        "True/False",
+                        "True", "False", "", "", "",
+                        q.answer === "True" ? 1 : (q.answer === "False" ? 2 : ""), 
+                        "20", 
+                        "", 
+                        q.explanation || ""
+                    ]);
+                }
+            });
+
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Quizizz Questions");
+            const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+            return new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        }
+
+        // --- Main Process ---
+        processButton.addEventListener('click', async () => {
+            if (!selectedFile) {
+                showError("Please select a PDF file first.");
+                return;
+            }
+            setProcessingState(true);
+            updateStatus("Starting process...", 5);
+
+            try {
+                const pdfText = await extractTextFromPDF(selectedFile);
+                if (!pdfText || pdfText.trim().length === 0) {
+                     throw new Error("Could not extract any text from the PDF.");
+                }
+                updateStatus("PDF text extracted. Generating questions...", 40);
+                
+                const numQuestions = parseInt(numQuestionsInput.value);
+                const questionType = questionTypeSelect.value;
+
+                const generatedQuestions = await generateQuestionsWithAI(pdfText, numQuestions, questionType);
+                
+                if (!Array.isArray(generatedQuestions) || generatedQuestions.length === 0) {
+                    throw new Error("AI did not return valid questions. Please check the PDF content or try different settings.");
+                }
+                
+                const spreadsheetBlob = createQuizizzSpreadsheet(generatedQuestions);
+                
+                downloadLinkA.href = URL.createObjectURL(spreadsheetBlob);
+                const timestamp = new Date().toISOString().replace(/[:.T-]/g, '').substring(0,14); // YYYYMMDDHHMMSS
+                downloadLinkA.download = `Quizizz_Questions_${timestamp}.xlsx`;
+                questionCountP.textContent = `Successfully generated ${generatedQuestions.length} questions!`;
+                
+                outputAreaDiv.classList.remove('hidden');
+                updateStatus("Process complete!", 100);
+
+            } catch (err) {
+                console.error("Processing error:", err);
+                showError(err.message || "An unknown error occurred.");
+                updateStatus("Error occurred.", 0); // Reset progress on error
+            } finally {
+                setProcessingState(false);
+                 // Keep file selected for retry if needed, or call resetFileInput() to clear
+            }
+        });
+
+    </script>
+</body>
+</html>
+
