@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROC Indicator Simulation - Bursa Malaysia Context (Vibrant)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e0f2fe; /* Tailwind sky-100 - Lighter, vibrant background */
+        }
+        .chart-container {
+            width: 100%;
+            height: 200px; /* Fixed height for charts */
+            background-color: #ffffff; /* White background for charts */
+            border-radius: 0.5rem; /* Tailwind rounded-lg */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Tailwind shadow-md */
+            margin-bottom: 1rem;
+            border: 1px solid #bae6fd; /* Tailwind sky-200 border */
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .tooltip {
+            position: absolute;
+            background-color: rgba(0,0,0,0.8);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .btn {
+            padding: 0.6rem 1.2rem; /* Slightly larger padding */
+            border-radius: 0.5rem; /* Tailwind rounded-lg */
+            font-weight: 600; /* Tailwind font-semibold */
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            text-transform: uppercase; /* Uppercase button text */
+            letter-spacing: 0.05em;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .btn:active {
+            transform: translateY(0px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn-primary {
+            background-color: #0ea5e9; /* Tailwind sky-500 */
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #0284c7; /* Tailwind sky-600 */
+        }
+        .btn-secondary {
+            background-color: #fb923c; /* Tailwind orange-400 */
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #f97316; /* Tailwind orange-500 */
+        }
+        .btn-buy {
+            background-color: #22c55e; /* Tailwind green-500 */
+            color: white;
+        }
+        .btn-buy:hover {
+            background-color: #16a34a; /* Tailwind green-600 */
+        }
+        .btn-sell {
+            background-color: #f43f5e; /* Tailwind rose-500 */
+            color: white;
+        }
+        .btn-sell:hover {
+            background-color: #e11d48; /* Tailwind rose-600 */
+        }
+        .info-box {
+            background-color: #ffffff; /* White */
+            padding: 1.5rem;
+            border-radius: 0.75rem; /* Tailwind rounded-xl */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-left: 5px solid #0ea5e9; /* Tailwind sky-500 accent */
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #cbd5e1; /* Tailwind slate-300 */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #38bdf8; /* Tailwind sky-400 */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0ea5e9; /* Tailwind sky-500 */
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.75rem; /* Tailwind rounded-xl */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            width: 90%;
+            max-width: 500px;
+            transform: scale(0.95);
+            transition: transform 0.3s ease-in-out;
+            border-top: 5px solid #0ea5e9; /* Tailwind sky-500 */
+        }
+        .modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+        input[type="number"], select {
+            border-color: #94a3b8; /* Tailwind slate-400 */
+            border-radius: 0.375rem; /* Tailwind rounded-md */
+        }
+        input[type="number"]:focus, select:focus {
+            border-color: #0ea5e9; /* Tailwind sky-500 */
+            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.3); /* Sky-500 focus ring */
+            outline: none;
+        }
+        .text-main-title { color: #0c4a6e; /* Tailwind sky-800 */ }
+        .text-subtitle { color: #0369a1; /* Tailwind sky-700 */ }
+        .text-content-strong { color: #075985; /* Tailwind sky-700 */ }
+        .text-content-normal { color: #334155; /* Tailwind slate-700 */ }
+        .text-label { color: #0f172a; /* Tailwind slate-900 */ }
+        .section-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem; /* Tailwind rounded-xl */
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-5xl mx-auto">
+        <header class="mb-10 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold text-main-title mb-2">Rate of Change (ROC) Simulation</h1>
+            <p class="text-xl text-subtitle">Explore ROC with Mock Bursa Malaysia Stocks (MYR)</p>
+        </header>
+
+        <div class="section-card grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div>
+                <label for="rocPeriod" class="block text-sm font-medium text-label mb-1">ROC Period (n days):</label>
+                <input type="number" id="rocPeriod" value="14" min="1" max="50" class="mt-1 block w-full p-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500">
+            </div>
+            <div>
+                <label for="stockSelector" class="block text-sm font-medium text-label mb-1">Select Stock:</label>
+                <select id="stockSelector" class="mt-1 block w-full p-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500">
+                    <option value="stockA">GENTING Bhd (Mock)</option>
+                    <option value="stockB">MAYBANK (Mock)</option>
+                    <option value="stockC">TOPGLOV (Mock)</option>
+                </select>
+            </div>
+            <div class="flex items-end space-x-3">
+                <button id="applySettings" class="btn btn-primary w-full md:w-auto">Apply</button>
+                <button id="resetSimulation" class="btn btn-secondary w-full md:w-auto">Reset</button>
+            </div>
+        </div>
+
+        <div class="mb-8">
+            <h2 class="text-2xl font-semibold text-content-strong mb-3">Stock Price Chart (MYR)</h2>
+            <div class="chart-container">
+                <canvas id="priceChart"></canvas>
+            </div>
+            <div class="tooltip" id="priceTooltip"></div>
+        </div>
+        <div class="mb-8">
+            <h2 class="text-2xl font-semibold text-content-strong mb-3">Rate of Change (ROC) Chart</h2>
+            <div class="chart-container">
+                <canvas id="rocChart"></canvas>
+            </div>
+            <div class="tooltip" id="rocTooltip"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <div class="section-card">
+                <h3 class="text-xl font-semibold text-content-strong mb-4">Trading Panel (Day: <span id="currentDayDisplay" class="text-sky-600">0</span>)</h3>
+                <div class="space-y-3 mb-5">
+                    <p class="text-lg">Price: <strong id="currentPriceDisplay" class="text-blue-600">MYR 0.00</strong></p>
+                    <p class="text-lg">ROC: <strong id="currentRocDisplay" class="text-purple-600">0.00</strong></p>
+                </div>
+                <div class="flex space-x-3 mb-4">
+                    <input type="number" id="tradeAmount" value="100" min="1" class="block w-1/2 p-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500" placeholder="Shares">
+                    <button id="buyButton" class="btn btn-buy flex-1">Buy</button>
+                    <button id="sellButton" class="btn btn-sell flex-1">Sell</button>
+                </div>
+                 <button id="nextDayButton" class="btn btn-primary w-full text-lg py-3">Next Day &raquo;</button>
+            </div>
+
+            <div class="section-card">
+                <h3 class="text-xl font-semibold text-content-strong mb-4">Portfolio Snapshot</h3>
+                <div class="space-y-2 text-content-normal text-md">
+                    <p>Cash: <strong id="cashDisplay" class="text-emerald-600 font-semibold">MYR 10,000.00</strong></p>
+                    <p>Shares Held: <strong id="sharesDisplay" class="text-slate-800 font-semibold">0</strong></p>
+                    <p>Avg. Buy Price: <strong id="avgBuyPriceDisplay" class="text-slate-800 font-semibold">MYR 0.00</strong></p>
+                    <p>Holdings Value: <strong id="holdingsValueDisplay" class="text-slate-800 font-semibold">MYR 0.00</strong></p>
+                    <p>Portfolio Value: <strong id="portfolioValueDisplay" class="text-indigo-600 font-bold text-lg">MYR 10,000.00</strong></p>
+                    <p>Profit/Loss: <strong id="pnlDisplay" class="font-bold text-lg">MYR 0.00</strong></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section-card mb-8">
+            <h3 class="text-xl font-semibold text-content-strong mb-3">Trade Log</h3>
+            <div id="tradeLog" class="h-40 overflow-y-auto border border-slate-300 rounded-md p-3 text-sm space-y-1.5 bg-slate-50">
+                </div>
+        </div>
+
+        <div class="info-box">
+            <h2 class="text-2xl font-semibold text-content-strong mb-4">Understanding ROC</h2>
+            <div class="space-y-3 text-content-normal">
+                <p>The Rate of Change (ROC) is a momentum oscillator measuring the percentage change in price between the current price and the price 'n' periods ago.</p>
+                <p><strong>Formula:</strong> <code class="bg-sky-100 text-sky-700 p-1 rounded text-sm">ROC = [(Current Price - Price n periods ago) / Price n periods ago] * 100</code></p>
+                <p class="font-semibold text-content-strong mt-2">Key Interpretations:</p>
+                <ul class="list-disc list-inside space-y-1.5">
+                    <li><strong>Positive ROC:</strong> Upward buying pressure (bullish). Higher ROC = stronger momentum.</li>
+                    <li><strong>Negative ROC:</strong> Downward selling pressure (bearish). Lower ROC = stronger momentum.</li>
+                    <li><strong>Zero Line Crossover:</strong>
+                        <ul class="list-disc list-inside ml-5 space-y-1">
+                            <li>Rise above zero: Potential bullish signal (buy).</li>
+                            <li>Fall below zero: Potential bearish signal (sell).</li>
+                        </ul>
+                    </li>
+                    <li><strong>ROC Period:</strong> Shorter periods (e.g., 9 days) are more sensitive. Longer periods (e.g., 20 days) are smoother. Experiment above!</li>
+                    <li><strong>Overbought/Oversold:</strong> Extreme ROC values can suggest these conditions, but levels are subjective.</li>
+                </ul>
+                <p class="mt-3 p-3 bg-sky-50 border border-sky-200 rounded-md"><strong>Simulation Tip:</strong> Use "Next Day" to advance. Observe ROC. Try buying on upward momentum (ROC rising/positive) and selling on downward momentum. Aim to grow your portfolio!</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="messageModal" class="modal">
+        <div class="modal-content text-center">
+            <p id="modalMessageText" class="text-lg mb-6 text-slate-700"></p>
+            <button id="modalCloseButton" class="btn btn-primary px-8 py-2.5">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const rocPeriodInput = document.getElementById('rocPeriod');
+        const stockSelector = document.getElementById('stockSelector');
+        const applySettingsButton = document.getElementById('applySettings');
+        const resetSimulationButton = document.getElementById('resetSimulation');
+        
+        const priceChartCanvas = document.getElementById('priceChart');
+        const rocChartCanvas = document.getElementById('rocChart');
+        const priceTooltip = document.getElementById('priceTooltip');
+        const rocTooltip = document.getElementById('rocTooltip');
+
+        const currentDayDisplay = document.getElementById('currentDayDisplay');
+        const currentPriceDisplay = document.getElementById('currentPriceDisplay');
+        const currentRocDisplay = document.getElementById('currentRocDisplay');
+        const tradeAmountInput = document.getElementById('tradeAmount');
+        const buyButton = document.getElementById('buyButton');
+        const sellButton = document.getElementById('sellButton');
+        const nextDayButton = document.getElementById('nextDayButton');
+        
+        const cashDisplay = document.getElementById('cashDisplay');
+        const sharesDisplay = document.getElementById('sharesDisplay');
+        const avgBuyPriceDisplay = document.getElementById('avgBuyPriceDisplay');
+        const holdingsValueDisplay = document.getElementById('holdingsValueDisplay');
+        const portfolioValueDisplay = document.getElementById('portfolioValueDisplay');
+        const pnlDisplay = document.getElementById('pnlDisplay');
+        const tradeLog = document.getElementById('tradeLog');
+
+        const messageModal = document.getElementById('messageModal');
+        const modalMessageText = document.getElementById('modalMessageText');
+        const modalCloseButton = document.getElementById('modalCloseButton');
+
+        // Chart contexts
+        const priceCtx = priceChartCanvas.getContext('2d');
+        const rocCtx = rocChartCanvas.getContext('2d');
+
+        // Simulation State
+        let stockData = {}; 
+        let currentStockId = 'stockA';
+        let prices = [];
+        let rocValues = [];
+        let currentDay = 0;
+        let rocPeriod = 14;
+        const totalDays = 200; 
+        const visibleDays = 60; 
+
+        // Portfolio State
+        let cash = 10000;
+        let sharesHeld = 0;
+        let totalCostOfShares = 0; 
+        let realizedPNL = 0; 
+
+
+        // --- Utility Functions ---
+        function formatCurrency(value) {
+            return `MYR ${value.toFixed(2)}`;
+        }
+
+        function showModal(message) {
+            modalMessageText.textContent = message;
+            messageModal.classList.add('active');
+        }
+
+        modalCloseButton.addEventListener('click', () => {
+            messageModal.classList.remove('active');
+        });
+        
+        function addTradeLogEntry(entry) {
+            const logEntryDiv = document.createElement('div');
+            logEntryDiv.className = 'text-slate-700 py-1';
+            logEntryDiv.textContent = `Day ${currentDay}: ${entry}`;
+            if (tradeLog.firstChild) {
+                tradeLog.insertBefore(logEntryDiv, tradeLog.firstChild);
+            } else {
+                tradeLog.appendChild(logEntryDiv);
+            }
+            // Simple visual cue for buy/sell in log
+            if (entry.toLowerCase().includes('bought')) {
+                logEntryDiv.classList.add('text-green-700');
+            } else if (entry.toLowerCase().includes('sold')) {
+                logEntryDiv.classList.add('text-red-700');
+            }
+        }
+
+        // --- Stock Data Generation ---
+        function generateStockData(basePrice = 5.00, volatility = 0.02, trend = 0.0005) {
+            const data = [];
+            let price = basePrice;
+            for (let i = 0; i < totalDays; i++) {
+                let dailyTrend = trend;
+                if (i > totalDays * 0.25 && i < totalDays * 0.6) { 
+                    dailyTrend = trend * (Math.random() > 0.4 ? 2.8 : -1.8);
+                } else if (i > totalDays * 0.75) { 
+                     dailyTrend = trend * (Math.random() > 0.6 ? -2.2 : 1.2);
+                }
+
+                const change = (Math.random() - 0.5 + (Math.random() * 0.25 - 0.125)) * volatility + dailyTrend; 
+                price *= (1 + change);
+                price = Math.max(price, 0.05); 
+                data.push(parseFloat(price.toFixed(2)));
+            }
+            return data;
+        }
+        
+        function initializeStockData() {
+            stockData['stockA'] = generateStockData(12.00, 0.028, 0.00035); 
+            stockData['stockB'] = generateStockData(4.80, 0.018, 0.00025);  
+            stockData['stockC'] = generateStockData(0.90, 0.045, -0.00015); 
+            prices = stockData[currentStockId];
+        }
+
+
+        // --- ROC Calculation ---
+        function calculateROC(data, period) {
+            const roc = [];
+            for (let i = 0; i < data.length; i++) {
+                if (i < period) {
+                    roc.push(null); 
+                } else {
+                    const currentPrice = data[i];
+                    const pastPrice = data[i - period];
+                    if (pastPrice !== 0 && pastPrice !== null && currentPrice !== null) {
+                        roc.push(((currentPrice - pastPrice) / pastPrice) * 100);
+                    } else {
+                        roc.push(null);
+                    }
+                }
+            }
+            return roc;
+        }
+
+        // --- Chart Drawing ---
+        function drawChart(ctx, data, color, chartType = 'price', tooltipEl) {
+            const canvas = ctx.canvas;
+            const { width, height } = canvas;
+            ctx.clearRect(0, 0, width, height);
+
+            const startIndex = Math.max(0, currentDay - visibleDays + 1);
+            const endIndex = currentDay + 1;
+            const visibleDataUnfiltered = data.slice(startIndex, endIndex);
+            const visibleData = visibleDataUnfiltered.filter(d => d !== null && d !== undefined); // Ensure no nulls for min/max
+            
+            if (visibleData.length < 2) {
+                 ctx.fillStyle = '#475569'; // slate-600
+                 ctx.textAlign = 'center';
+                 ctx.font = '14px Inter';
+                 ctx.fillText(currentDay < rocPeriod && chartType === 'roc' ? `ROC needs ${rocPeriod} days of data.` : 'Not enough data to display chart.', width / 2, height / 2);
+                 return;
+            }
+
+            const dataMin = Math.min(...visibleData);
+            const dataMax = Math.max(...visibleData);
+            
+            let yMin, yMax;
+            const paddingFactor = 0.15; // Increased padding for better visual
+            if (chartType === 'roc') {
+                const absMax = Math.max(Math.abs(dataMin), Math.abs(dataMax));
+                yMin = -absMax - absMax * paddingFactor; 
+                yMax = absMax + absMax * paddingFactor;
+                if (yMin === 0 && yMax === 0) { 
+                    yMin = -5; yMax = 5; // Give some default range if all ROC is 0
+                }
+            } else { 
+                const range = dataMax - dataMin;
+                yMin = dataMin - range * paddingFactor;
+                yMax = dataMax + range * paddingFactor;
+            }
+            if (yMin === yMax) { 
+                yMin -= 1;
+                yMax += 1;
+            }
+
+
+            const xStep = width / (Math.max(1, visibleDataUnfiltered.length -1)); // Use unfiltered length for x-axis spacing
+            const yRange = yMax - yMin;
+
+            // Draw Y-axis labels and grid lines
+            const numYGridLines = 5;
+            ctx.strokeStyle = '#e2e8f0'; // slate-200
+            ctx.fillStyle = '#64748b'; // slate-500
+            ctx.font = '10px Inter';
+            ctx.lineWidth = 0.5;
+
+            for (let i = 0; i <= numYGridLines; i++) {
+                const val = yMin + (yRange / numYGridLines) * i;
+                const y = height - (height * (val - yMin) / yRange);
+                
+                ctx.beginPath();
+                ctx.moveTo(30, y); // Start grid line after Y-axis label space
+                ctx.lineTo(width, y);
+                ctx.stroke();
+                
+                ctx.textAlign = 'left';
+                ctx.fillText(val.toFixed(chartType === 'roc' ? 1 : 2), 0, y - 2); 
+            }
+            
+            // Draw X-axis labels
+            ctx.textAlign = 'center';
+            const numXLabels = Math.min(visibleDataUnfiltered.length, 5); // Show up to 5 X-axis labels
+            for (let i = 0; i < numXLabels; i++) {
+                const dataIndex = Math.floor(i * (visibleDataUnfiltered.length -1) / (numXLabels -1 < 1 ? 1 : numXLabels -1));
+                const dayLabel = startIndex + dataIndex;
+                const xPos = xStep * dataIndex;
+                if(dayLabel >= 0) ctx.fillText(`D${dayLabel}`, xPos, height - 5);
+            }
+
+
+            // Draw Zero line for ROC chart
+            if (chartType === 'roc') {
+                const zeroY = height - (height * (0 - yMin) / yRange);
+                if (zeroY >= 0 && zeroY <= height) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#94a3b8'; // slate-400
+                    ctx.lineWidth = 1.5; // Make zero line more prominent
+                    ctx.setLineDash([4, 2]); // Dashed line
+                    ctx.moveTo(0, zeroY);
+                    ctx.lineTo(width, zeroY);
+                    ctx.stroke();
+                    ctx.setLineDash([]); // Reset dash
+                }
+            }
+
+            // Draw data line
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2.5; // Thicker line
+            let firstPoint = true;
+            
+            visibleDataUnfiltered.forEach((value, index) => {
+                if (value === null || value === undefined) {
+                    firstPoint = true; // Reset for next segment if there's a null
+                    return;
+                }
+                const x = xStep * index;
+                const y = height - (height * (value - yMin) / yRange);
+                if (firstPoint) {
+                    ctx.moveTo(x, y);
+                    firstPoint = false;
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.stroke();
+
+            // Tooltip functionality
+            canvas.onmousemove = (event) => {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = event.clientX - rect.left;
+                
+                let closestIndex = -1;
+                let minDist = Infinity;
+
+                visibleDataUnfiltered.forEach((val, index) => {
+                    if (val === null || val === undefined) return;
+                    const x = xStep * index;
+                    const dist = Math.abs(mouseX - x);
+                    if (dist < minDist && dist < xStep) { // Snap to nearest point, wider snap
+                        minDist = dist;
+                        closestIndex = index;
+                    }
+                });
+
+                if (closestIndex !== -1 && visibleDataUnfiltered[closestIndex] !== null && visibleDataUnfiltered[closestIndex] !== undefined) {
+                    const dataValue = visibleDataUnfiltered[closestIndex];
+                    const day = startIndex + closestIndex;
+                    tooltipEl.style.opacity = '1';
+                    tooltipEl.style.left = `${event.clientX + 15}px`; 
+                    tooltipEl.style.top = `${event.clientY - 15}px`;  
+                    tooltipEl.innerHTML = `Day ${day}: ${dataValue.toFixed(2)} ${chartType === 'price' ? 'MYR' : ''}`;
+                } else {
+                    tooltipEl.style.opacity = '0';
+                }
+            };
+            canvas.onmouseleave = () => {
+                tooltipEl.style.opacity = '0';
+            };
+        }
+
+        // --- Update UI ---
+        function updateDisplays() {
+            currentDayDisplay.textContent = currentDay;
+            const currentPrice = prices[currentDay] !== undefined ? prices[currentDay] : 0;
+            const currentRocVal = rocValues[currentDay];
+            const currentRoc = currentRocVal !== undefined && currentRocVal !== null ? currentRocVal.toFixed(2) : 'N/A';
+
+            currentPriceDisplay.textContent = formatCurrency(currentPrice);
+            currentPriceDisplay.className = currentPrice >= (prices[currentDay-1] || currentPrice) ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold';
+
+            currentRocDisplay.textContent = currentRoc;
+            if (currentRocVal !== null && currentRocVal !== undefined) {
+                currentRocDisplay.className = currentRocVal > 0 ? 'text-teal-600 font-semibold' : (currentRocVal < 0 ? 'text-pink-600 font-semibold' : 'text-slate-600 font-semibold');
+            }
+
+
+            cashDisplay.textContent = formatCurrency(cash);
+            sharesDisplay.textContent = sharesHeld;
+            
+            const avgBuyPrice = sharesHeld > 0 ? totalCostOfShares / sharesHeld : 0;
+            avgBuyPriceDisplay.textContent = formatCurrency(avgBuyPrice);
+
+            const holdingsValue = sharesHeld * currentPrice;
+            holdingsValueDisplay.textContent = formatCurrency(holdingsValue);
+
+            const totalPortfolioValue = cash + holdingsValue;
+            portfolioValueDisplay.textContent = formatCurrency(totalPortfolioValue);
+
+            const unrealizedPNL = sharesHeld > 0 ? (currentPrice * sharesHeld) - totalCostOfShares : 0;
+            const totalPNL = realizedPNL + unrealizedPNL;
+            pnlDisplay.textContent = formatCurrency(totalPNL);
+            pnlDisplay.className = totalPNL >= 0 ? 'text-green-500 font-bold text-lg' : 'text-red-500 font-bold text-lg';
+            
+            buyButton.disabled = currentDay >= totalDays -1;
+            sellButton.disabled = currentDay >= totalDays -1 || sharesHeld === 0;
+            nextDayButton.disabled = currentDay >= totalDays -1;
+
+            if(currentDay >= totalDays -1) {
+                showModal(`Simulation ended! Final Portfolio Value: ${formatCurrency(totalPortfolioValue)}. P&L: ${formatCurrency(totalPNL)}`);
+            }
+        }
+
+        function redrawCharts() {
+            drawChart(priceCtx, prices, '#2563eb', 'price', priceTooltip); // Tailwind blue-600
+            drawChart(rocCtx, rocValues, '#db2777', 'roc', rocTooltip);   // Tailwind pink-600
+        }
+
+        // --- Simulation Logic ---
+        function advanceDay() {
+            if (currentDay < totalDays - 1) {
+                currentDay++;
+                updateDisplays();
+                redrawCharts();
+            }
+        }
+
+        function buyShares() {
+            const amount = parseInt(tradeAmountInput.value);
+            if (isNaN(amount) || amount <= 0) {
+                showModal("Please enter a valid number of shares to buy.");
+                return;
+            }
+            const currentPrice = prices[currentDay];
+            const cost = amount * currentPrice;
+
+            if (cash >= cost) {
+                cash -= cost;
+                sharesHeld += amount;
+                totalCostOfShares += cost;
+                addTradeLogEntry(`Bought ${amount} shares @ ${formatCurrency(currentPrice)}. Cost: ${formatCurrency(cost)}`);
+                updateDisplays();
+            } else {
+                showModal("Not enough cash to complete this purchase.");
+            }
+        }
+
+        function sellShares() {
+            const amount = parseInt(tradeAmountInput.value);
+             if (isNaN(amount) || amount <= 0) {
+                showModal("Please enter a valid number of shares to sell.");
+                return;
+            }
+            if (amount > sharesHeld) {
+                showModal("You don't hold that many shares to sell.");
+                return;
+            }
+            
+            const currentPrice = prices[currentDay];
+            const proceeds = amount * currentPrice;
+            
+            const avgBuyPriceForSoldShares = totalCostOfShares / sharesHeld; 
+            const costOfSoldShares = amount * avgBuyPriceForSoldShares;
+            realizedPNL += (proceeds - costOfSoldShares);
+
+            cash += proceeds;
+            totalCostOfShares -= costOfSoldShares; 
+            if (totalCostOfShares < 0.001) totalCostOfShares = 0; // Precision fix
+            sharesHeld -= amount;
+            if (sharesHeld === 0) totalCostOfShares = 0; 
+
+            addTradeLogEntry(`Sold ${amount} shares @ ${formatCurrency(currentPrice)}. Proceeds: ${formatCurrency(proceeds)}`);
+            updateDisplays();
+        }
+        
+        function resetSimulationState(fullReset = true) {
+            currentStockId = stockSelector.value;
+            prices = stockData[currentStockId];
+            rocPeriod = parseInt(rocPeriodInput.value);
+            if (isNaN(rocPeriod) || rocPeriod < 1) {
+                rocPeriod = 14;
+                rocPeriodInput.value = 14;
+                showModal("Invalid ROC period, reset to 14.");
+            }
+            
+            rocValues = calculateROC(prices, rocPeriod);
+            currentDay = 0; 
+            
+            if (fullReset) {
+                cash = 10000;
+                sharesHeld = 0;
+                totalCostOfShares = 0;
+                realizedPNL = 0;
+                tradeLog.innerHTML = ''; 
+                addTradeLogEntry("Simulation reset. Good luck!");
+            } else {
+                 addTradeLogEntry(`Settings updated. Stock: ${stockSelector.options[stockSelector.selectedIndex].text}, ROC Period: ${rocPeriod}`);
+            }
+            
+            updateDisplays();
+            redrawCharts();
+        }
+
+        // --- Event Listeners ---
+        applySettingsButton.addEventListener('click', () => {
+            const newPeriod = parseInt(rocPeriodInput.value);
+            const newStock = stockSelector.value;
+
+            if (newPeriod !== rocPeriod || newStock !== currentStockId) {
+                 if (isNaN(newPeriod) || newPeriod < 1) {
+                    showModal("Invalid ROC period. Please enter a number greater than 0.");
+                    rocPeriodInput.value = rocPeriod; 
+                    return;
+                }
+                resetSimulationState(false); // Soft reset: update indicators, keep portfolio
+            } else {
+                showModal("No settings changed or settings already applied.");
+            }
+        });
+
+        resetSimulationButton.addEventListener('click', () => {
+            // Using custom modal for confirm
+            showModal("Reset simulation? This will clear portfolio and trade history. Click OK to confirm, or close this message to cancel.");
+            // Temporarily repurpose modal button for confirm logic
+            const tempConfirmHandler = () => {
+                resetSimulationState(true); // Full reset
+                modalCloseButton.removeEventListener('click', tempConfirmHandler); // Clean up
+                modalCloseButton.addEventListener('click', () => messageModal.classList.remove('active')); // Restore original close
+            };
+            modalCloseButton.removeEventListener('click', () => messageModal.classList.remove('active')); // Remove original if any
+            modalCloseButton.addEventListener('click', tempConfirmHandler);
+        });
+        
+        nextDayButton.addEventListener('click', advanceDay);
+        buyButton.addEventListener('click', buyShares);
+        sellButton.addEventListener('click', sellShares);
+
+        // --- Initial Setup ---
+        function init() {
+            initializeStockData(); 
+            resetSimulationState(true); 
+        }
+
+        function resizeCanvases() {
+            const chartContainers = document.querySelectorAll('.chart-container');
+            chartContainers.forEach(container => {
+                const canvas = container.querySelector('canvas');
+                if (canvas) {
+                    const dpr = window.devicePixelRatio || 1;
+                    const rect = canvas.getBoundingClientRect();
+                    canvas.width = rect.width * dpr;
+                    canvas.height = rect.height * dpr;
+                    const ctx = canvas.getContext('2d');
+                    ctx.scale(dpr, dpr);
+                    // Set canvas style width/height to ensure it fits CSS layout
+                    canvas.style.width = `${rect.width}px`;
+                    canvas.style.height = `${rect.height}px`;
+
+                }
+            });
+            if (prices.length > 0) { // Only redraw if data exists
+                 redrawCharts();
+            }
+        }
+
+        window.addEventListener('resize', resizeCanvases);
+        
+        window.onload = () => {
+            init();
+            // Call resizeCanvases after a short delay to ensure layout is stable
+            setTimeout(resizeCanvases, 100); 
+        };
+
+    </script>
+</body>
+</html>
+
