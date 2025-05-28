@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Analysis Report: MR D.I.Y. Group (M) Berhad (MRDIY)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .report-header {
+            background-color: #1E3A8A; /* Dark Blue */
+            color: white;
+        }
+        .section-title {
+            border-bottom: 2px solid #3B82F6; /* Blue */
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .table th, .table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #E5E7EB; /* Light Gray */
+        }
+        .table th {
+            background-color: #F3F4F6; /* Very Light Gray */
+        }
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .badge-green {
+            background-color: #D1FAE5; /* Light Green */
+            color: #065F46; /* Dark Green */
+        }
+        .badge-red {
+            background-color: #FEE2E2; /* Light Red */
+            color: #991B1B; /* Dark Red */
+        }
+        .badge-yellow {
+            background-color: #FEF3C7; /* Light Yellow */
+            color: #92400E; /* Dark Yellow */
+        }
+        .badge-blue {
+            background-color: #DBEAFE; /* Light Blue */
+            color: #1E40AF; /* Dark Blue */
+        }
+        .chart-placeholder {
+            border: 2px dashed #9CA3AF; /* Medium Gray */
+            padding: 2rem;
+            text-align: center;
+            color: #6B7280; /* Gray */
+            background-color: #F9FAFB; /* Very Light Gray */
+            border-radius: 0.5rem;
+        }
+        /* Tab-like navigation styling */
+        .tab-buttons button {
+            padding: 0.75rem 1.5rem;
+            margin-right: 0.5rem;
+            border-radius: 0.375rem 0.375rem 0 0;
+            background-color: #E5E7EB;
+            color: #374151;
+            font-weight: 500;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .tab-buttons button.active {
+            background-color: #3B82F6;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 1.5rem;
+            border: 1px solid #D1D5DB;
+            border-top: none;
+            border-radius: 0 0 0.375rem 0.375rem;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <header class="report-header p-6 shadow-md">
+        <div class="container mx-auto">
+            <h1 class="text-3xl font-bold">Technical Analysis Report</h1>
+            <p class="text-xl">MR D.I.Y. Group (M) Berhad (MRDIY | 5296)</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-6">
+        <div class="card">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div>
+                    <p class="text-sm text-gray-500">Stock Code</p>
+                    <p class="text-lg font-semibold">MRDIY (5296.KL)</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Date of Analysis</p>
+                    <p class="text-lg font-semibold">May 28, 2025</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Last Closing Price (May 28, 2025)</p>
+                    <p class="text-lg font-semibold text-blue-600">RM1.59</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-buttons mb-0">
+            <button class="tab-button active" onclick="openTab(event, 'summary')">Summary & Outlook</button>
+            <button class="tab-button" onclick="openTab(event, 'indicators')">Indicator Analysis</button>
+            <button class="tab-button" onclick="openTab(event, 'strategy')">Trading Strategy</button>
+            <button class="tab-button" onclick="openTab(event, 'chartDesc')">Chart Illustration</button>
+        </div>
+
+        <div id="summary" class="tab-content active card !rounded-t-none">
+            <h2 class="section-title">Overall Technical Summary & Outlook</h2>
+            <p class="mb-4">
+                MRDIY is currently exhibiting a mixed technical picture. Short-term indicators suggest mild bullish momentum as the price hovers slightly above its 10-day and 20-day moving averages. However, the medium to long-term outlook remains cautious, with the price trading near its 50-day moving averages and below its key 200-day Simple Moving Average (SMA).
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="p-4 bg-blue-50 rounded-lg">
+                    <h3 class="font-semibold text-blue-700 mb-1">Short-Term Outlook (Days to Weeks)</h3>
+                    <p><span class="badge badge-yellow">Neutral to Mildly Bullish</span></p>
+                    <p class="text-sm mt-2">Potential for upward consolidation if support holds. A break above RM1.60 could signal further strength.</p>
+                </div>
+                <div class="p-4 bg-green-50 rounded-lg">
+                    <h3 class="font-semibold text-green-700 mb-1">Medium-Term Outlook (Weeks to Months)</h3>
+                    <p><span class="badge badge-yellow">Neutral</span></p>
+                    <p class="text-sm mt-2">The stock is at an inflection point around RM1.59-RM1.60. A decisive move above RM1.63 is needed for a bullish shift.</p>
+                </div>
+                <div class="p-4 bg-red-50 rounded-lg">
+                    <h3 class="font-semibold text-red-700 mb-1">Long-Term Outlook (Months to Years)</h3>
+                    <p><span class="badge badge-red">Cautiously Bearish to Neutral</span></p>
+                    <p class="text-sm mt-2">Price below the 200-day SMA (RM1.63) warrants caution. A sustained break above this level is required for a positive long-term outlook.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="indicators" class="tab-content card !rounded-t-none">
+            <h2 class="section-title">Detailed Indicator Analysis</h2>
+            
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold mb-2 text-blue-700">Moving Averages (SMA & EMA)</h3>
+                <table class="w-full table">
+                    <thead>
+                        <tr>
+                            <th>Period</th>
+                            <th>SMA (approx.)</th>
+                            <th>EMA (approx.)</th>
+                            <th>Price vs MA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>10-Day</td>
+                            <td>RM1.58</td>
+                            <td>RM1.58</td>
+                            <td><span class="badge badge-green">Above</span></td>
+                        </tr>
+                        <tr>
+                            <td>20-Day</td>
+                            <td>RM1.58</td>
+                            <td>RM1.58</td>
+                            <td><span class="badge badge-green">Above</span></td>
+                        </tr>
+                        <tr>
+                            <td>50-Day</td>
+                            <td>RM1.59 - RM1.60</td>
+                            <td>RM1.60</td>
+                            <td><span class="badge badge-yellow">At/Slightly Below</span></td>
+                        </tr>
+                        <tr>
+                            <td>200-Day</td>
+                            <td>RM1.63</td>
+                            <td>RM1.60</td>
+                            <td><span class="badge badge-red">Below (SMA) / At (EMA)</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="mt-3 text-sm">
+                    The price (RM1.59) is currently above its short-term MAs, suggesting some upward momentum. It is testing its 50-day MAs and the 200-day EMA. A sustained break above the 200-day SMA (RM1.63) is a key bullish signal to watch.
+                </p>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold mb-2 text-blue-700">Bollinger Bands (20-period, 2 Std Dev)</h3>
+                <p class="mb-2">The middle band (20-day SMA) is around RM1.58. With the current price at RM1.59, MRDIY is trading in the upper half of its Bollinger Bands.</p>
+                <ul class="list-disc list-inside text-sm space-y-1">
+                    <li><strong>Upper Band (approx.):</strong> RM1.62 (RM1.58 + 2*StdDev) - Acts as dynamic resistance.</li>
+                    <li><strong>Middle Band (20 SMA):</strong> RM1.58 - Dynamic support/resistance.</li>
+                    <li><strong>Lower Band (approx.):</strong> RM1.54 (RM1.58 - 2*StdDev) - Acts as dynamic support.</li>
+                </ul>
+                <p class="mt-3 text-sm">
+                    The bands' width can indicate volatility. A "squeeze" (narrowing bands) might precede a significant price move. Currently, the price being in the upper half suggests some buying interest.
+                </p>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold mb-2 text-blue-700">Envelope (20-day SMA, +/- 2.5%)</h3>
+                 <ul class="list-disc list-inside text-sm space-y-1">
+                    <li><strong>Upper Envelope (approx.):</strong> RM1.62 (RM1.58 * 1.025)</li>
+                    <li><strong>Lower Envelope (approx.):</strong> RM1.54 (RM1.58 * 0.975)</li>
+                </ul>
+                <p class="mt-3 text-sm">
+                    The price at RM1.59 is trading comfortably within these envelope bands. A touch or break of these bands could signal overbought or oversold conditions respectively.
+                </p>
+            </div>
+             <div class="mb-6">
+                <h3 class="text-xl font-semibold mb-2 text-blue-700">Relative Strength Index (RSI)</h3>
+                <p class="text-sm">
+                    Based on recent data (around May 23, 2025), the RSI(14) was observed at approximately 66.875.
+                    An RSI value between 30 and 70 is generally considered neutral. A value above 70 suggests overbought conditions, while below 30 suggests oversold.
+                    An RSI of 66.875 is approaching the overbought territory but still indicates bullish momentum.
+                </p>
+            </div>
+        </div>
+
+        <div id="strategy" class="tab-content card !rounded-t-none">
+            <h2 class="section-title">Potential Trading Strategy</h2>
+            <p class="mb-4">The following strategy is based on the current technical setup and is for informational purposes. Risk management is crucial.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-lg font-semibold mb-2 text-green-600">Potential Entry (Buy Signal)</h3>
+                    <p class="text-sm">Consider entry if the price demonstrates a confirmed daily close above **RM1.60 - RM1.61** with increased volume. This would indicate a break above immediate resistance levels (50-day MAs, 200-day EMA).</p>
+                    <p class="text-sm mt-1">Alternatively, a bounce from strong support near **RM1.54 - RM1.55** could offer a more conservative entry, provided bullish confirmation signals appear.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-2 text-red-600">Stop-Loss Placement</h3>
+                    <p class="text-sm">If entering around RM1.60-RM1.61, a stop-loss could be placed on a daily close below **RM1.53 - RM1.55**. This level is below the recent 20-day SMA and the lower Bollinger Band/Envelope.</p>
+                </div>
+            </div>
+            <div class="mt-6">
+                <h3 class="text-lg font-semibold mb-2 text-blue-600">Profit Targets</h3>
+                 <ul class="list-disc list-inside text-sm space-y-1">
+                    <li><strong>Target 1:</strong> RM1.68 - RM1.72 (Recent minor swing highs, potential resistance zone)</li>
+                    <li><strong>Target 2:</strong> RM1.80 (Further psychological and potential technical resistance)</li>
+                </ul>
+            </div>
+            <div class="mt-6">
+                 <h3 class="text-lg font-semibold mb-2">Key Levels to Watch</h3>
+                <table class="w-full table">
+                    <thead>
+                        <tr>
+                            <th>Level Type</th>
+                            <th>Price (RM)</th>
+                            <th>Significance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Immediate Resistance</td>
+                            <td>1.60 - 1.61</td>
+                            <td>50-day MAs, 200-day EMA, Psychological</td>
+                        </tr>
+                        <tr>
+                            <td>Key Resistance</td>
+                            <td>1.63</td>
+                            <td>200-day SMA, Upper Bollinger/Envelope (approx.)</td>
+                        </tr>
+                         <tr>
+                            <td>Further Resistance</td>
+                            <td>1.68 - 1.72</td>
+                            <td>Previous swing points</td>
+                        </tr>
+                        <tr>
+                            <td>Immediate Support</td>
+                            <td>1.58</td>
+                            <td>10-day & 20-day MAs, Middle Bollinger Band</td>
+                        </tr>
+                        <tr>
+                            <td>Key Support</td>
+                            <td>1.54 - 1.55</td>
+                            <td>Lower Bollinger/Envelope (approx.), recent lows</td>
+                        </tr>
+                        <tr>
+                            <td>Major Support</td>
+                            <td>1.50</td>
+                            <td>Psychological, potential longer-term support</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="chartDesc" class="tab-content card !rounded-t-none">
+            <h2 class="section-title">Chart Illustration (Descriptive)</h2>
+            <div class="chart-placeholder">
+                <p class="text-lg font-medium mb-2">Visualizing MRDIY's Price Action</p>
+                <p class="text-sm mb-4">
+                    If a live chart were displayed here, it would typically show MRDIY's daily candlesticks for the past 6-12 months.
+                    Overlaid on this price action would be:
+                </p>
+                <ul class="list-disc list-inside text-left text-sm mx-auto max-w-md space-y-1">
+                    <li><strong>Moving Averages:</strong>
+                        A 20-day SMA (Blue Line), a 50-day SMA (Red Line), and a 200-day SMA (Green Line).
+                        Currently, the price (RM1.59) would be seen trading slightly above the 20-day SMA, very close to the 50-day SMA, and below the 200-day SMA. The 200-day EMA (perhaps a dashed yellow line) would be near RM1.60.
+                    </li>
+                    <li><strong>Bollinger Bands:</strong>
+                        A set of three lines: the 20-day SMA as the middle band, with an upper and lower band representing two standard deviations away. The price would be in the upper half of these bands.
+                    </li>
+                    <li><strong>Volume Bars:</strong>
+                        Typically shown at the bottom, indicating trading volume for each day. Increased volume on breakouts or breakdowns would be noteworthy.
+                    </li>
+                    <li><strong>RSI (Relative Strength Index):</strong>
+                        Often shown in a separate panel below the price chart, the RSI(14) line would be around 66.8, moving upwards but not yet in overbought territory (above 70).
+                    </li>
+                </ul>
+                <p class="text-sm mt-4">
+                    The chart would visually confirm the current consolidation phase, the proximity to key moving averages, and the recent slight bullish tilt in the short term. Traders would look for candlestick patterns and volume cues near the identified support and resistance levels.
+                </p>
+            </div>
+        </div>
+
+        <div class="card mt-6">
+            <h2 class="section-title">Disclaimer</h2>
+            <p class="text-xs text-gray-600">
+                This report is for informational and educational purposes only and should not be construed as a recommendation to buy or sell any securities. Trading and investing in the stock market involve substantial risks, including the potential loss of principal. Past performance is not indicative of future results.
+                The information provided herein is based on data believed to be reliable as of the date of analysis, but its accuracy and completeness are not guaranteed. Technical analysis is a methodology that relies on historical price and volume data and does not consider all market factors or fundamental company data.
+                Investors should conduct their own due diligence and consult with a qualified financial advisor before making any investment decisions. The author and publisher of this report are not responsible for any trading decisions taken based on the information provided.
+            </p>
+        </div>
+
+        <footer class="text-center py-6 text-sm text-gray-500">
+            <p>&copy; <span id="currentYear"></span> Technical Analysis Service. All rights reserved.</p>
+            <p>Report Generated: May 28, 2025</p>
+        </footer>
+    </main>
+
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        function openTab(event, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+                tabcontent[i].classList.remove("active");
+            }
+            tablinks = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).style.display = "block";
+            document.getElementById(tabName).classList.add("active");
+            event.currentTarget.classList.add("active");
+        }
+    </script>
+
+</body>
+</html>
+
